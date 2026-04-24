@@ -1,0 +1,148 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Emergency Resources API",
+    "version": "1.0.0",
+    "description": "API to query available emergency personnel, equipment, and shelter capacity across city agencies"
+  },
+  "paths": {
+    "/resources/personnel": {
+      "get": {
+        "operationId": "GetAvailablePersonnel",
+        "summary": "Get available emergency personnel by agency",
+        "description": "Returns headcount of available emergency personnel across all city agencies, filterable by agency and status.",
+        "parameters": [
+          {
+            "name": "agency",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" },
+            "description": "Filter by agency name (e.g., 'fire', 'police', 'ems', 'oem', 'public-works'). Omit for all agencies."
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string", "enum": ["available", "deployed", "all"] },
+            "description": "Filter by personnel status (default: available)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Personnel availability data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "as_of": { "type": "string", "format": "date-time" },
+                    "agencies": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "agency": { "type": "string" },
+                          "total_staff": { "type": "integer" },
+                          "available": { "type": "integer" },
+                          "deployed": { "type": "integer" },
+                          "off_duty": { "type": "integer" },
+                          "locations": { "type": "array", "items": { "type": "string" } }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/resources/equipment": {
+      "get": {
+        "operationId": "GetAvailableResources",
+        "summary": "Get available emergency equipment and supplies",
+        "description": "Returns inventory of available emergency equipment including vehicles, generators, rescue boats, and supplies.",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" },
+            "description": "Equipment type filter (e.g., 'generator', 'rescue-boat', 'evacuation-bus', 'water-pump', 'shelter-supply')"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Equipment inventory",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "as_of": { "type": "string", "format": "date-time" },
+                    "equipment": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "type": { "type": "string" },
+                          "total": { "type": "integer" },
+                          "available": { "type": "integer" },
+                          "deployed": { "type": "integer" },
+                          "locations": { "type": "array", "items": { "type": "string" } },
+                          "notes": { "type": "string" }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/resources/shelters": {
+      "get": {
+        "operationId": "GetShelterCapacity",
+        "summary": "Get emergency shelter status and capacity",
+        "description": "Returns list of emergency shelters with current capacity and occupancy.",
+        "responses": {
+          "200": {
+            "description": "Shelter capacity data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "shelters": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": { "type": "string" },
+                          "address": { "type": "string" },
+                          "status": { "type": "string", "enum": ["open", "closed", "full", "standby"] },
+                          "capacity": { "type": "integer" },
+                          "current_occupancy": { "type": "integer" },
+                          "special_needs": { "type": "boolean" },
+                          "pet_friendly": { "type": "boolean" }
+                        }
+                      }
+                    },
+                    "total_capacity": { "type": "integer" },
+                    "total_occupancy": { "type": "integer" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "servers": [
+    { "url": "https://dispatch.exampleville.gov/api/v1" }
+  ]
+}

@@ -1,0 +1,218 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Exampleville Appointment Scheduling API",
+    "version": "1.0.0",
+    "description": "Check availability, book, and cancel city service appointments for residents of City of Exampleville."
+  },
+  "servers": [
+    {
+      "url": "https://appointments.exampleville.gov/api/v1",
+      "description": "City of Exampleville Appointment Services"
+    }
+  ],
+  "paths": {
+    "/appointments/availability": {
+      "get": {
+        "operationId": "CheckAvailability",
+        "summary": "Check available appointment slots",
+        "description": "Returns available appointment slots for a given service and date. Returns up to 8 time slots.",
+        "parameters": [
+          {
+            "name": "service",
+            "in": "query",
+            "required": true,
+            "description": "The service type for the appointment",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "BUILDING_INSPECTION",
+                "BENEFITS_COUNSELING",
+                "BUSINESS_LICENSE",
+                "DMV_SERVICES",
+                "HOUSING_INTAKE",
+                "ZONING_CONSULTATION",
+                "FOOD_PERMIT_INSPECTION"
+              ]
+            }
+          },
+          {
+            "name": "date",
+            "in": "query",
+            "required": true,
+            "description": "Preferred date in YYYY-MM-DD format",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "example": "2024-06-15"
+            }
+          },
+          {
+            "name": "location",
+            "in": "query",
+            "required": false,
+            "description": "Preferred office location (NORTH, SOUTH, EAST, WEST, DOWNTOWN). Defaults to all locations.",
+            "schema": {
+              "type": "string",
+              "enum": ["NORTH", "SOUTH", "EAST", "WEST", "DOWNTOWN"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Available slots returned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "service": { "type": "string" },
+                    "date": { "type": "string", "format": "date" },
+                    "availableSlots": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "slotId": { "type": "string" },
+                          "time": { "type": "string", "example": "10:00 AM" },
+                          "location": { "type": "string" },
+                          "address": { "type": "string" },
+                          "durationMinutes": { "type": "integer" }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No availability found for the requested date and service"
+          }
+        }
+      }
+    },
+    "/appointments": {
+      "post": {
+        "operationId": "BookAppointment",
+        "summary": "Book an appointment",
+        "description": "Books a specific appointment slot for a resident. Returns a confirmation number.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["slotId", "residentName", "phone", "service"],
+                "properties": {
+                  "slotId": {
+                    "type": "string",
+                    "description": "The slot ID from CheckAvailability response"
+                  },
+                  "residentName": {
+                    "type": "string",
+                    "description": "Full name of the resident"
+                  },
+                  "phone": {
+                    "type": "string",
+                    "description": "Contact phone number"
+                  },
+                  "email": {
+                    "type": "string",
+                    "description": "Optional email for confirmation"
+                  },
+                  "service": {
+                    "type": "string",
+                    "description": "Service type being booked"
+                  },
+                  "notes": {
+                    "type": "string",
+                    "description": "Optional notes or special requirements"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Appointment booked successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "confirmationNumber": {
+                      "type": "string",
+                      "example": "APT-2024-889234"
+                    },
+                    "service": { "type": "string" },
+                    "date": { "type": "string", "format": "date" },
+                    "time": { "type": "string" },
+                    "location": { "type": "string" },
+                    "address": { "type": "string" },
+                    "residentName": { "type": "string" },
+                    "whatToBring": {
+                      "type": "array",
+                      "items": { "type": "string" }
+                    },
+                    "cancellationDeadline": {
+                      "type": "string",
+                      "description": "Cancel by this date/time to avoid a no-show fee"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Slot no longer available — call CheckAvailability again"
+          }
+        }
+      }
+    },
+    "/appointments/{appointmentId}": {
+      "delete": {
+        "operationId": "CancelAppointment",
+        "summary": "Cancel an existing appointment",
+        "description": "Cancels the specified appointment. Cancellations made less than 24 hours before the appointment may incur a no-show fee for some services.",
+        "parameters": [
+          {
+            "name": "appointmentId",
+            "in": "path",
+            "required": true,
+            "description": "The confirmation number (e.g., APT-2024-889234)",
+            "schema": {
+              "type": "string",
+              "example": "APT-2024-889234"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Appointment cancelled successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "confirmationNumber": { "type": "string" },
+                    "status": { "type": "string", "example": "CANCELLED" },
+                    "cancelledAt": { "type": "string", "format": "date-time" },
+                    "refundEligible": {
+                      "type": "boolean",
+                      "description": "Whether any prepaid fees are refundable"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Appointment not found"
+          }
+        }
+      }
+    }
+  }
+}

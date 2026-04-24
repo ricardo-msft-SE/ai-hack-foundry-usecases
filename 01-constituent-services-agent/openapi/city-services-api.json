@@ -1,0 +1,107 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "City Services API",
+    "version": "1.0.0",
+    "description": "API to retrieve information about city services and frequently asked questions"
+  },
+  "paths": {
+    "/services/{serviceName}": {
+      "get": {
+        "operationId": "GetServiceInfo",
+        "summary": "Get information about a specific city service",
+        "description": "Returns details about a city service including eligibility criteria, hours of operation, office location, and contact information.",
+        "parameters": [
+          {
+            "name": "serviceName",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "The name of the city service (e.g., 'recycling', 'food-assistance', 'business-license', 'parking-permit')"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Service information retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "name": { "type": "string", "description": "Official service name" },
+                    "description": { "type": "string", "description": "Service description" },
+                    "eligibility": { "type": "string", "description": "Who is eligible for this service" },
+                    "hours": { "type": "string", "description": "Office or service hours" },
+                    "location": { "type": "string", "description": "Physical address" },
+                    "phone": { "type": "string", "description": "Contact phone number" },
+                    "website": { "type": "string", "description": "Service website URL" },
+                    "documents_required": {
+                      "type": "array",
+                      "items": { "type": "string" },
+                      "description": "List of required documents"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Service not found"
+          }
+        }
+      }
+    },
+    "/faq": {
+      "get": {
+        "operationId": "GetFAQ",
+        "summary": "Get frequently asked questions by topic",
+        "description": "Returns a list of FAQs for a given topic category.",
+        "parameters": [
+          {
+            "name": "topic",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Topic to retrieve FAQs for (e.g., 'permits', 'recycling', 'benefits', 'parking', 'utilities')"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 5 },
+            "description": "Maximum number of FAQs to return (default: 5)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "FAQ list retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "topic": { "type": "string" },
+                    "faqs": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "question": { "type": "string" },
+                          "answer": { "type": "string" },
+                          "last_updated": { "type": "string", "format": "date" }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "servers": [
+    { "url": "https://api.exampleville.gov/v1" }
+  ]
+}

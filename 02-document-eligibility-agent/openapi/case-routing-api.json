@@ -1,0 +1,120 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Case Routing API",
+    "version": "1.0.0",
+    "description": "API to route processed eligibility cases to staff queues and check case status"
+  },
+  "paths": {
+    "/cases": {
+      "post": {
+        "operationId": "RouteCase",
+        "summary": "Route a processed eligibility case to a staff queue",
+        "description": "Submits a processed eligibility case with extracted document data and eligibility determination to the appropriate staff queue for final review.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["program_type", "priority"],
+                "properties": {
+                  "applicant_name": {
+                    "type": "string",
+                    "description": "Applicant full name"
+                  },
+                  "program_type": {
+                    "type": "string",
+                    "enum": ["SNAP", "HEAP", "UNEMPLOYMENT", "HOUSING", "MEDICAID"],
+                    "description": "The benefit program being applied for"
+                  },
+                  "priority": {
+                    "type": "string",
+                    "enum": ["STANDARD", "URGENT", "EXPEDITED"],
+                    "description": "Case priority level"
+                  },
+                  "eligibility_status": {
+                    "type": "string",
+                    "enum": ["LIKELY_ELIGIBLE", "LIKELY_INELIGIBLE", "NEEDS_FURTHER_REVIEW"],
+                    "description": "Preliminary eligibility assessment from document review"
+                  },
+                  "documents_reviewed": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "description": "List of document types reviewed (e.g., ['W-2', 'Utility Bill'])"
+                  },
+                  "notes": {
+                    "type": "string",
+                    "description": "Case notes from the document review agent"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Case routed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "case_id": { "type": "string", "description": "Unique case identifier (e.g., CA-2024-001)" },
+                    "assigned_queue": { "type": "string", "description": "Staff queue name" },
+                    "assigned_worker": { "type": "string", "description": "Assigned staff member name" },
+                    "estimated_review_date": { "type": "string", "format": "date" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/cases/{caseId}": {
+      "get": {
+        "operationId": "GetCaseStatus",
+        "summary": "Check the status of a routed case",
+        "description": "Returns the current processing status of a case by its ID.",
+        "parameters": [
+          {
+            "name": "caseId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "The case ID (e.g., CA-2024-001)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Case status retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "case_id": { "type": "string" },
+                    "status": {
+                      "type": "string",
+                      "enum": ["PENDING_REVIEW", "IN_REVIEW", "APPROVED", "DENIED", "ADDITIONAL_DOCS_REQUIRED"]
+                    },
+                    "assigned_worker": { "type": "string" },
+                    "last_updated": { "type": "string", "format": "date-time" },
+                    "notes": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Case not found"
+          }
+        }
+      }
+    }
+  },
+  "servers": [
+    { "url": "https://api.exampleville.gov/v1" }
+  ]
+}

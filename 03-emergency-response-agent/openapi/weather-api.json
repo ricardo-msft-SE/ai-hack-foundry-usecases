@@ -1,0 +1,122 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Weather API",
+    "version": "1.0.0",
+    "description": "API to retrieve current weather conditions, forecasts, and severe weather alerts for emergency response planning"
+  },
+  "paths": {
+    "/weather/current": {
+      "get": {
+        "operationId": "GetCurrentConditions",
+        "summary": "Get current weather conditions for a location",
+        "description": "Returns real-time weather data including temperature, wind speed, precipitation, and visibility.",
+        "parameters": [
+          {
+            "name": "location",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "City name or zone identifier (e.g., 'Exampleville', 'coastal-zone-a', 'downtown')"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current weather conditions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "location": { "type": "string" },
+                    "timestamp": { "type": "string", "format": "date-time" },
+                    "temperature_f": { "type": "number" },
+                    "wind_speed_mph": { "type": "number" },
+                    "wind_direction": { "type": "string" },
+                    "wind_gust_mph": { "type": "number" },
+                    "precipitation_inches_hr": { "type": "number" },
+                    "visibility_miles": { "type": "number" },
+                    "humidity_pct": { "type": "number" },
+                    "conditions": { "type": "string" },
+                    "active_alerts": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "type": { "type": "string" },
+                          "severity": { "type": "string", "enum": ["watch", "warning", "emergency"] },
+                          "description": { "type": "string" },
+                          "expires": { "type": "string", "format": "date-time" }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/weather/forecast": {
+      "get": {
+        "operationId": "GetWeatherForecast",
+        "summary": "Get weather forecast for emergency planning",
+        "description": "Returns a 72-hour weather forecast with hourly detail for the first 24 hours, including hazard assessments.",
+        "parameters": [
+          {
+            "name": "location",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Location to forecast"
+          },
+          {
+            "name": "hours",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 72, "maximum": 120 },
+            "description": "Forecast horizon in hours (default: 72, max: 120)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Weather forecast data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "location": { "type": "string" },
+                    "forecast_generated": { "type": "string", "format": "date-time" },
+                    "hourly_forecasts": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "hour": { "type": "string", "format": "date-time" },
+                          "temperature_f": { "type": "number" },
+                          "wind_speed_mph": { "type": "number" },
+                          "precipitation_probability_pct": { "type": "number" },
+                          "precipitation_inches": { "type": "number" },
+                          "conditions": { "type": "string" }
+                        }
+                      }
+                    },
+                    "peak_wind_mph": { "type": "number" },
+                    "total_precipitation_inches": { "type": "number" },
+                    "flood_risk": { "type": "string", "enum": ["LOW", "MODERATE", "HIGH", "EXTREME"] },
+                    "power_outage_risk_pct": { "type": "number" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "servers": [
+    { "url": "https://weather.exampleville.gov/api/v2" }
+  ]
+}

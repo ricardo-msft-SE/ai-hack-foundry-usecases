@@ -1,0 +1,111 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Exampleville Permit Status API",
+    "version": "1.0.0",
+    "description": "Look up permit status and available permit types for the City of Exampleville."
+  },
+  "servers": [
+    {
+      "url": "https://permits.exampleville.gov/api/v1",
+      "description": "City of Exampleville Permit Services"
+    }
+  ],
+  "paths": {
+    "/permits/{permitId}": {
+      "get": {
+        "operationId": "GetPermitStatus",
+        "summary": "Get the status of a specific permit",
+        "description": "Returns the current status, applicant name, address, and estimated completion date for the specified permit.",
+        "parameters": [
+          {
+            "name": "permitId",
+            "in": "path",
+            "required": true,
+            "description": "The permit ID (e.g., P-2024-001892)",
+            "schema": {
+              "type": "string",
+              "example": "P-2024-001892"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Permit details returned successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "permitId": { "type": "string" },
+                    "permitType": { "type": "string" },
+                    "applicantName": { "type": "string" },
+                    "propertyAddress": { "type": "string" },
+                    "status": {
+                      "type": "string",
+                      "enum": ["RECEIVED", "UNDER_REVIEW", "APPROVED", "ISSUED", "INSPECTION_PENDING", "INSPECTION_PASSED", "CLOSED", "REJECTED"]
+                    },
+                    "submittedDate": { "type": "string", "format": "date" },
+                    "estimatedCompletionDate": { "type": "string", "format": "date" },
+                    "assignedInspector": { "type": "string" },
+                    "notes": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Permit not found"
+          }
+        }
+      }
+    },
+    "/permit-types": {
+      "get": {
+        "operationId": "ListPermitTypes",
+        "summary": "List all available permit types",
+        "description": "Returns all permit categories available in the City of Exampleville, with processing time estimates and fees.",
+        "parameters": [
+          {
+            "name": "category",
+            "in": "query",
+            "required": false,
+            "description": "Filter by category (CONSTRUCTION, BUSINESS, FOOD, EVENT, OTHER)",
+            "schema": {
+              "type": "string",
+              "enum": ["CONSTRUCTION", "BUSINESS", "FOOD", "EVENT", "OTHER"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Permit types returned successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "permitTypeCode": { "type": "string" },
+                      "permitTypeName": { "type": "string" },
+                      "category": { "type": "string" },
+                      "description": { "type": "string" },
+                      "estimatedProcessingDays": { "type": "integer" },
+                      "baseFee": { "type": "number" },
+                      "requiredDocuments": {
+                        "type": "array",
+                        "items": { "type": "string" }
+                      },
+                      "applyOnlineUrl": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
