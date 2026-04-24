@@ -66,6 +66,39 @@ The **Foundry-first approach** replaces all of that with native portal features:
 
 ---
 
+## Visual Documentation Site (Jekyll + GitHub Pages)
+
+This repo now includes a visually-rich Jekyll site under `docs/` with:
+
+- A polished landing page with accelerator cards
+- One documentation page per accelerator
+- Direct links to each accelerator's `README.md`, `step_by_step.md`, `system_prompt.txt`, OpenAPI specs, and knowledge files
+
+### Enable GitHub Pages
+
+1. Go to **Settings** in this GitHub repository
+2. Open **Pages**
+3. Under **Build and deployment**, set:
+    - **Source:** Deploy from a branch
+    - **Branch:** `main`
+    - **Folder:** `/docs`
+4. Save
+
+GitHub will publish the site automatically after a short build.
+
+### Local Preview (optional)
+
+From the repo root:
+
+```bash
+cd docs
+bundle exec jekyll serve
+```
+
+Then open `http://localhost:4000`.
+
+---
+
 ## Folder Structure
 
 Each accelerator folder contains:

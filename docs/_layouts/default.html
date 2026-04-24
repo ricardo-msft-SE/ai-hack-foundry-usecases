@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% if page.title %}{{ page.title }} | {% endif %}{{ site.title }}</title>
+    <meta name="description" content="{{ page.excerpt | strip_html | strip_newlines | truncate: 160 | default: site.description }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Spectral:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ '/assets/css/site.css' | relative_url }}">
+  </head>
+  <body>
+    <div class="background-glow background-glow-a"></div>
+    <div class="background-glow background-glow-b"></div>
+
+    <header class="site-header">
+      <a class="brand" href="{{ '/' | relative_url }}">{{ site.title }}</a>
+      <nav class="main-nav">
+        <a href="{{ '/' | relative_url }}" {% if page.url == '/' %}class="active"{% endif %}>Home</a>
+        <a href="{{ '/guides/' | relative_url }}" {% if page.url contains '/guides/' %}class="active"{% endif %}>Guides</a>
+        <a href="https://github.com/ricardo-msft-SE/ai-hack-foundry-usecases" target="_blank" rel="noreferrer">Repository</a>
+      </nav>
+    </header>
+
+    <main>
+      {{ content }}
+    </main>
+
+    <footer class="site-footer">
+      <p>Built for GitHub Pages with Jekyll. Focused on Azure AI Foundry-first implementation patterns.</p>
+    </footer>
+  </body>
+</html>

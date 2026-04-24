@@ -1,0 +1,22 @@
+title: AI Hack Foundry Use Cases
+description: Foundry-first recreations of seven government-focused accelerators.
+baseurl: ""
+url: ""
+markdown: kramdown
+highlighter: rouge
+permalink: pretty
+collections:
+  guides:
+    output: true
+    permalink: /guides/:name/
+defaults:
+  - scope:
+      path: ""
+      type: guides
+    values:
+      layout: guide
+      section: guide
+  - scope:
+      path: ""
+    values:
+      layout: default

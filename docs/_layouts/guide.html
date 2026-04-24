@@ -1,0 +1,19 @@
+---
+layout: default
+---
+<article class="guide-page">
+  <header class="guide-hero">
+    <p class="eyebrow">Accelerator {{ page.order }}</p>
+    <h1>{{ page.title }}</h1>
+    <p class="lede">{{ page.tagline }}</p>
+    <div class="chip-row">
+      {% for feature in page.foundry_features %}
+      <span class="chip">{{ feature }}</span>
+      {% endfor %}
+    </div>
+  </header>
+
+  <section class="panel">
+    {{ content }}
+  </section>
+</article>
