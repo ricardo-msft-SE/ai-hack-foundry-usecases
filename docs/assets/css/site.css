@@ -1,14 +1,16 @@
 :root {
-  --bg: #0b1220;
-  --bg-soft: #111b2f;
-  --panel: rgba(12, 26, 47, 0.7);
-  --panel-solid: #13223d;
-  --text: #eef4ff;
-  --muted: #adc0df;
-  --accent: #3dd6c6;
-  --accent-2: #ffb457;
-  --border: rgba(182, 208, 245, 0.24);
-  --shadow: 0 24px 60px rgba(1, 8, 19, 0.45);
+  --bg: #f3f8ff;
+  --bg-soft: #e6f0ff;
+  --panel: rgba(255, 255, 255, 0.88);
+  --panel-solid: #ffffff;
+  --text: #0f2746;
+  --muted: #36567f;
+  --accent: #0e9f90;
+  --accent-2: #d97b00;
+  --link: #005fcc;
+  --link-hover: #00499c;
+  --border: rgba(31, 81, 145, 0.2);
+  --shadow: 0 16px 45px rgba(45, 90, 150, 0.16);
 }
 
 * {
@@ -19,9 +21,9 @@ body {
   margin: 0;
   min-height: 100vh;
   font-family: "Space Grotesk", "Trebuchet MS", sans-serif;
-  background: radial-gradient(circle at 16% 12%, #1a3f66 0%, var(--bg) 42%),
-    radial-gradient(circle at 88% 8%, #27325d 0%, transparent 36%),
-    linear-gradient(160deg, #08101d 0%, #0f1a2f 100%);
+  background: radial-gradient(circle at 12% 8%, #dff0ff 0%, transparent 34%),
+    radial-gradient(circle at 88% 10%, #ffeccd 0%, transparent 32%),
+    linear-gradient(165deg, #f6fbff 0%, #ecf4ff 55%, #f8fbff 100%);
   color: var(--text);
   line-height: 1.6;
   padding: 1.1rem;
@@ -45,13 +47,13 @@ main {
 .background-glow-a {
   left: -50px;
   top: 16vh;
-  background: rgba(61, 214, 198, 0.28);
+  background: rgba(14, 159, 144, 0.18);
 }
 
 .background-glow-b {
   right: -80px;
   top: 34vh;
-  background: rgba(255, 180, 87, 0.2);
+  background: rgba(217, 123, 0, 0.16);
 }
 
 .site-header {
@@ -95,11 +97,11 @@ main {
 .main-nav a.active {
   border-color: var(--border);
   color: var(--text);
-  background: rgba(20, 42, 75, 0.8);
+  background: rgba(230, 241, 255, 0.95);
 }
 
 .hero {
-  background: linear-gradient(135deg, rgba(61, 214, 198, 0.12), rgba(255, 180, 87, 0.1));
+  background: linear-gradient(135deg, rgba(14, 159, 144, 0.13), rgba(217, 123, 0, 0.12));
   border: 1px solid var(--border);
   border-radius: 20px;
   padding: 2.2rem 1.4rem;
@@ -167,8 +169,8 @@ main {
 .card a {
   display: inline-block;
   text-decoration: none;
-  color: var(--bg);
-  background: linear-gradient(90deg, var(--accent), #8de6dc);
+  color: #ffffff;
+  background: linear-gradient(90deg, #0e8f83, #0a6f9c);
   border-radius: 999px;
   padding: 0.3rem 0.72rem;
   font-weight: 700;
@@ -205,11 +207,23 @@ main {
 }
 
 .panel code {
-  background: #081326;
-  border: 1px solid #203456;
+  background: #eef4ff;
+  border: 1px solid #c3d8f5;
   padding: 0.06rem 0.35rem;
   border-radius: 6px;
-  color: #d9ecff;
+  color: #143f7a;
+}
+
+.panel a {
+  color: var(--link);
+  text-decoration-color: rgba(0, 95, 204, 0.45);
+  text-underline-offset: 0.12rem;
+  transition: color 0.15s ease, text-decoration-color 0.15s ease;
+}
+
+.panel a:hover {
+  color: var(--link-hover);
+  text-decoration-color: var(--link-hover);
 }
 
 .quick-links {
@@ -223,7 +237,7 @@ main {
   text-decoration: none;
   border: 1px solid var(--border);
   border-radius: 12px;
-  background: rgba(20, 36, 63, 0.7);
+  background: rgba(255, 255, 255, 0.82);
   padding: 0.68rem 0.85rem;
   transition: transform 0.2s ease;
 }
@@ -235,7 +249,7 @@ main {
 .guide-hero {
   border: 1px solid var(--border);
   border-radius: 20px;
-  background: linear-gradient(140deg, rgba(255, 180, 87, 0.11), rgba(61, 214, 198, 0.08));
+  background: linear-gradient(140deg, rgba(217, 123, 0, 0.12), rgba(14, 159, 144, 0.1));
   padding: 1.4rem;
   margin-bottom: 1rem;
   box-shadow: var(--shadow);
@@ -251,7 +265,7 @@ main {
 .chip {
   border: 1px solid var(--border);
   border-radius: 999px;
-  background: rgba(20, 42, 75, 0.85);
+  background: rgba(236, 245, 255, 0.95);
   color: var(--text);
   padding: 0.23rem 0.62rem;
   font-size: 0.8rem;
@@ -280,7 +294,7 @@ td {
 
 th {
   color: var(--text);
-  background: #132847;
+  background: #dcecff;
 }
 
 @keyframes intro-rise {
