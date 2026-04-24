@@ -34,3 +34,7 @@ A resident uses the city portal to ask questions about services **and to book ap
 - **Knowledge** — replaces `document_retrieval_plugin.py`
 - **Actions (OpenAPI)** — replaces `scheduling_plugin.py`
 - **Evaluation** — replaces custom logging and assertion scripts
+
+## Source
+
+Foundry-first recreation of the [python-virtual-citizen-assistant](https://github.com/msftsean/ai-hackathon-use-cases/tree/main/python-virtual-citizen-assistant) accelerator.

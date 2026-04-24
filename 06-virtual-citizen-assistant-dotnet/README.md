@@ -34,3 +34,7 @@ A resident visits the city portal and asks questions about permits, services, an
 - **Knowledge** — replaces SearchClient + RAG pipeline
 - **Actions (OpenAPI)** — replaces .NET plugin methods
 - **Evaluation** — replaces custom logging/telemetry scripts
+
+## Source
+
+Foundry-first recreation of the [.NET-API-Virtual-Citizen-Assistant](https://github.com/msftsean/ai-hackathon-use-cases/tree/main/.NET-API-Virtual-Citizen-Assistant) accelerator.
