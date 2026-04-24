@@ -1,7 +1,7 @@
 title: AI Hack Foundry Use Cases
 description: Foundry-first recreations of seven government-focused accelerators.
-baseurl: ""
-url: ""
+baseurl: "/ai-hack-foundry-usecases"
+url: "https://ricardo-msft-se.github.io"
 markdown: kramdown
 highlighter: rouge
 permalink: pretty
