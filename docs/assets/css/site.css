@@ -177,6 +177,11 @@ main {
   font-size: 0.86rem;
 }
 
+.card a:hover {
+  color: #ffffff;
+  filter: brightness(0.95);
+}
+
 .card .meta {
   color: var(--accent-2);
   font-size: 0.8rem;
@@ -224,6 +229,12 @@ main {
 .panel a:hover {
   color: var(--link-hover);
   text-decoration-color: var(--link-hover);
+}
+
+.panel .card a,
+.panel .card a:hover {
+  color: #ffffff;
+  text-decoration: none;
 }
 
 .quick-links {
