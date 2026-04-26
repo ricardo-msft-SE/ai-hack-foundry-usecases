@@ -36,6 +36,52 @@ accelerators:
     summary: Migration path from Flask and plugins to a Foundry-native assistant.
 
 questions:
+  - id: tooling
+    prompt: What's your primary technology focus?
+    options:
+      - id: document-intelligence
+        label: Document intelligence—extract and process submitted forms and documents
+        weights:
+          document-eligibility-agent: 5
+          policy-compliance-checker: 2
+          constituent-services-agent: 1
+        reasons:
+          document-eligibility-agent: This is purpose-built for document extraction and intelligent processing.
+          policy-compliance-checker: This also supports document-based compliance analysis.
+      - id: multi-agent
+        label: Multi-agent solutions—coordinate multiple specialists or teams
+        weights:
+          emergency-response-agent: 5
+          inter-agency-knowledge-hub: 4
+          policy-compliance-checker: 1
+        reasons:
+          emergency-response-agent: This is the strongest fit for coordinated multi-agent workflows.
+          inter-agency-knowledge-hub: This handles cross-team coordination with access control.
+      - id: chatbot
+        label: Conversational AI—build a chatbot or intelligent assistant
+        weights:
+          constituent-services-agent: 5
+          virtual-citizen-assistant-dotnet: 5
+          virtual-citizen-assistant-python: 5
+          inter-agency-knowledge-hub: 2
+        reasons:
+          constituent-services-agent: This is optimized for high-quality assistant conversations.
+          virtual-citizen-assistant-dotnet: This is a ready-made migration blueprint for chatbots.
+          virtual-citizen-assistant-python: This is a ready-made migration blueprint for chatbots.
+      - id: public-facing
+        label: Public-facing services—deliver solutions to residents or citizens
+        weights:
+          constituent-services-agent: 5
+          virtual-citizen-assistant-dotnet: 4
+          virtual-citizen-assistant-python: 4
+          document-eligibility-agent: 3
+          inter-agency-knowledge-hub: 2
+        reasons:
+          constituent-services-agent: This is built for resident-facing service delivery.
+          virtual-citizen-assistant-dotnet: This supports public-facing citizen assistant delivery.
+          virtual-citizen-assistant-python: This supports public-facing citizen assistant delivery.
+          document-eligibility-agent: This can power intake and eligibility services for the public.
+
   - id: organization
     prompt: Where do you want to create business impact first?
     options:
@@ -147,53 +193,6 @@ questions:
           document-eligibility-agent: 2
         reasons:
           policy-compliance-checker: This best supports consistent scoring and leadership reporting.
-
-  - id: tooling
-    prompt: What's your primary technology focus?
-    options:
-      - id: document-intelligence
-        label: Document intelligence—extract and process submitted forms and documents
-        weights:
-          document-eligibility-agent: 5
-          policy-compliance-checker: 2
-          constituent-services-agent: 1
-        reasons:
-          document-eligibility-agent: This is purpose-built for document extraction and intelligent processing.
-          policy-compliance-checker: This also supports document-based compliance analysis.
-      - id: multi-agent
-        label: Multi-agent solutions—coordinate multiple specialists or teams
-        weights:
-          emergency-response-agent: 5
-          inter-agency-knowledge-hub: 4
-          policy-compliance-checker: 1
-        reasons:
-          emergency-response-agent: This is the strongest fit for coordinated multi-agent workflows.
-          inter-agency-knowledge-hub: This handles cross-team coordination with access control.
-      - id: chatbot
-        label: Conversational AI—build a chatbot or intelligent assistant
-        weights:
-          constituent-services-agent: 5
-          virtual-citizen-assistant-dotnet: 5
-          virtual-citizen-assistant-python: 5
-          inter-agency-knowledge-hub: 2
-        reasons:
-          constituent-services-agent: This is optimized for high-quality assistant conversations.
-          virtual-citizen-assistant-dotnet: This is a ready-made migration blueprint for chatbots.
-          virtual-citizen-assistant-python: This is a ready-made migration blueprint for chatbots.
-      - id: public-facing
-        label: Public-facing services—deliver solutions to residents or citizens
-        weights:
-          constituent-services-agent: 5
-          virtual-citizen-assistant-dotnet: 4
-          virtual-citizen-assistant-python: 4
-          document-eligibility-agent: 3
-          inter-agency-knowledge-hub: 2
-        reasons:
-          constituent-services-agent: This is built for resident-facing service delivery.
-          virtual-citizen-assistant-dotnet: This supports public-facing citizen assistant delivery.
-          virtual-citizen-assistant-python: This supports public-facing citizen assistant delivery.
-          document-eligibility-agent: This can power intake and eligibility services for the public.
-
   - id: migration
     prompt: Which best describes your current stage?
     options:
