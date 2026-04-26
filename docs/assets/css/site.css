@@ -352,10 +352,10 @@ th {
 .result-link {
   display: inline-block;
   text-decoration: none;
-  color: #ffffff;
-  background: linear-gradient(90deg, #0e8f83, #0a6f9c);
+  color: #12365f;
+  background: linear-gradient(90deg, #d5f1ec, #d6e8fb);
   border-radius: 999px;
-  border: 0;
+  border: 1px solid #9fc3e8;
   padding: 0.45rem 0.85rem;
   font-weight: 700;
   font-size: 0.9rem;
@@ -365,13 +365,33 @@ th {
 .start-cta:hover,
 .survey-btn:hover,
 .result-link:hover {
-  color: #ffffff;
-  filter: brightness(0.95);
+  color: #0f2746;
+  filter: brightness(0.98);
 }
 
 .start-cta.alt,
 .survey-btn.secondary {
-  background: linear-gradient(90deg, #d97b00, #ba6200);
+  color: #6d3f05;
+  background: linear-gradient(90deg, #ffe8c7, #ffe0b7);
+  border-color: #efc58f;
+}
+
+.panel a.start-cta,
+.panel a.result-link,
+.panel a.start-cta:hover,
+.panel a.result-link:hover {
+  color: #12365f;
+  text-decoration: none;
+}
+
+.panel a.start-cta.alt,
+.panel a.start-cta.alt:hover {
+  color: #6d3f05;
+}
+
+.panel .survey-btn,
+.panel .survey-btn:hover {
+  text-decoration: none;
 }
 
 .advisor-app {
