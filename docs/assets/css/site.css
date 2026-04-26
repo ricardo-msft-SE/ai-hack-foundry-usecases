@@ -320,6 +320,164 @@ th {
   }
 }
 
+.start-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.2rem;
+}
+
+.start-card {
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--panel);
+  backdrop-filter: blur(9px);
+  box-shadow: var(--shadow);
+  padding: 1.2rem;
+}
+
+.start-card h2 {
+  margin-top: 0;
+  margin-bottom: 0.6rem;
+  line-height: 1.2;
+}
+
+.start-card p {
+  margin-top: 0;
+  color: var(--muted);
+}
+
+.start-cta,
+.survey-btn,
+.result-link {
+  display: inline-block;
+  text-decoration: none;
+  color: #ffffff;
+  background: linear-gradient(90deg, #0e8f83, #0a6f9c);
+  border-radius: 999px;
+  border: 0;
+  padding: 0.45rem 0.85rem;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.start-cta:hover,
+.survey-btn:hover,
+.result-link:hover {
+  color: #ffffff;
+  filter: brightness(0.95);
+}
+
+.start-cta.alt,
+.survey-btn.secondary {
+  background: linear-gradient(90deg, #d97b00, #ba6200);
+}
+
+.advisor-app {
+  min-height: 320px;
+}
+
+.survey-progress {
+  color: var(--accent-2);
+  font-size: 0.82rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.survey-question {
+  margin-top: 0.45rem;
+  margin-bottom: 0.9rem;
+}
+
+.survey-form fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.survey-option {
+  display: grid;
+  grid-template-columns: 1.2rem 1fr;
+  align-items: start;
+  gap: 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.72rem 0.8rem;
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.survey-option:has(input:checked) {
+  border-color: rgba(14, 159, 144, 0.7);
+  background: rgba(223, 248, 245, 0.9);
+}
+
+.survey-option input {
+  margin-top: 0.2rem;
+}
+
+.survey-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+
+.survey-btn[disabled] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.result-hero {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(14, 159, 144, 0.13), rgba(217, 123, 0, 0.12));
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.result-score {
+  color: var(--text);
+  margin-top: 0;
+}
+
+.result-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.8rem;
+}
+
+.result-card {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.86);
+  padding: 0.85rem;
+}
+
+.result-card h3 {
+  margin-top: 0;
+  margin-bottom: 0.3rem;
+}
+
+.result-card p {
+  color: var(--muted);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 @media (max-width: 760px) {
   body {
     padding: 0.7rem;
@@ -332,5 +490,16 @@ th {
 
   .main-nav {
     width: 100%;
+  }
+
+  .survey-controls {
+    flex-direction: column;
+  }
+
+  .survey-btn,
+  .result-link,
+  .start-cta {
+    width: 100%;
+    text-align: center;
   }
 }

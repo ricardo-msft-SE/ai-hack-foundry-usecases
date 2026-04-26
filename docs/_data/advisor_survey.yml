@@ -1,0 +1,225 @@
+accelerators:
+  - id: constituent-services-agent
+    title: Constituent Services Agent
+    order: 1
+    url: /guides/01-constituent-services-agent/
+    summary: Resident-facing assistant for benefits, permits, schedules, and civic FAQs.
+  - id: document-eligibility-agent
+    title: Document Eligibility Agent
+    order: 2
+    url: /guides/02-document-eligibility-agent/
+    summary: Document intake, extraction, and eligibility triage for program workflows.
+  - id: emergency-response-agent
+    title: Emergency Response Agent
+    order: 3
+    url: /guides/03-emergency-response-agent/
+    summary: Multi-agent emergency coordination using weather and resource readiness signals.
+  - id: policy-compliance-checker
+    title: Policy Compliance Checker
+    order: 4
+    url: /guides/04-policy-compliance-checker/
+    summary: Governance and compliance scoring with weighted remediation planning.
+  - id: inter-agency-knowledge-hub
+    title: Inter-Agency Knowledge Hub
+    order: 5
+    url: /guides/05-inter-agency-knowledge-hub/
+    summary: Cross-department retrieval with RBAC-aware information boundaries.
+  - id: virtual-citizen-assistant-dotnet
+    title: Virtual Citizen Assistant (.NET to Foundry)
+    order: 6
+    url: /guides/06-virtual-citizen-assistant-dotnet/
+    summary: Migration path from ASP.NET and plugins to a Foundry-native assistant.
+  - id: virtual-citizen-assistant-python
+    title: Virtual Citizen Assistant (Python to Foundry)
+    order: 7
+    url: /guides/07-virtual-citizen-assistant-python/
+    summary: Migration path from Flask and plugins to a Foundry-native assistant.
+
+questions:
+  - id: organization
+    prompt: Which environment best matches your team?
+    options:
+      - id: city-services
+        label: Municipal service desk or constituent support
+        weights:
+          constituent-services-agent: 5
+          virtual-citizen-assistant-dotnet: 3
+          virtual-citizen-assistant-python: 3
+          inter-agency-knowledge-hub: 2
+          document-eligibility-agent: 2
+        reasons:
+          constituent-services-agent: Your team focus aligns with citizen-facing service guidance.
+          virtual-citizen-assistant-dotnet: You may need a migration-oriented citizen assistant blueprint.
+          virtual-citizen-assistant-python: You may need a migration-oriented citizen assistant blueprint.
+      - id: social-intake
+        label: Social services intake and case routing
+        weights:
+          document-eligibility-agent: 5
+          constituent-services-agent: 2
+          inter-agency-knowledge-hub: 2
+          virtual-citizen-assistant-python: 2
+        reasons:
+          document-eligibility-agent: Intake plus eligibility triage is the strongest match for this workflow.
+      - id: meteorology-emergency
+        label: Meteorology center, emergency management, or dispatch planning
+        weights:
+          emergency-response-agent: 5
+          inter-agency-knowledge-hub: 2
+          policy-compliance-checker: 1
+        reasons:
+          emergency-response-agent: Weather and resource coordination requirements map directly to this accelerator.
+      - id: governance-office
+        label: Policy, risk, audit, or AI governance office
+        weights:
+          policy-compliance-checker: 5
+          inter-agency-knowledge-hub: 2
+          document-eligibility-agent: 1
+        reasons:
+          policy-compliance-checker: Compliance scoring and remediation planning are central to your mission.
+
+  - id: outcome
+    prompt: What is your primary outcome?
+    options:
+      - id: answers-and-actions
+        label: Resident Q&A with direct action API calls
+        weights:
+          constituent-services-agent: 5
+          virtual-citizen-assistant-dotnet: 4
+          virtual-citizen-assistant-python: 4
+          inter-agency-knowledge-hub: 2
+        reasons:
+          constituent-services-agent: This use case is built for grounded Q&A plus service actions.
+      - id: extract-and-route
+        label: Extract fields from submitted documents and route decisions
+        weights:
+          document-eligibility-agent: 5
+          policy-compliance-checker: 2
+          constituent-services-agent: 1
+        reasons:
+          document-eligibility-agent: Document extraction and eligibility routing are first-class features here.
+      - id: phased-response
+        label: Build a phased emergency response plan from live signals
+        weights:
+          emergency-response-agent: 5
+          inter-agency-knowledge-hub: 2
+        reasons:
+          emergency-response-agent: This accelerator is designed for multi-agent response planning.
+      - id: compliance-report
+        label: Produce weighted compliance findings and remediation roadmap
+        weights:
+          policy-compliance-checker: 5
+          inter-agency-knowledge-hub: 2
+          document-eligibility-agent: 1
+        reasons:
+          policy-compliance-checker: Weighted scoring and remediation outputs are core to this accelerator.
+
+  - id: architecture
+    prompt: Which architecture style do you want to emphasize?
+    options:
+      - id: single-agent
+        label: Single assistant with knowledge plus APIs
+        weights:
+          constituent-services-agent: 4
+          document-eligibility-agent: 4
+          virtual-citizen-assistant-dotnet: 3
+          virtual-citizen-assistant-python: 3
+        reasons:
+          constituent-services-agent: The implementation focuses on one grounded assistant with tools.
+      - id: connected-specialists
+        label: Connected specialist agents coordinated by an orchestrator
+        weights:
+          emergency-response-agent: 5
+          inter-agency-knowledge-hub: 3
+        reasons:
+          emergency-response-agent: Connected specialists are a defining pattern in this scenario.
+      - id: multi-index-rbac
+        label: Multi-index retrieval with role-based access boundaries
+        weights:
+          inter-agency-knowledge-hub: 5
+          policy-compliance-checker: 2
+          emergency-response-agent: 1
+        reasons:
+          inter-agency-knowledge-hub: Federated knowledge and RBAC boundaries are core requirements here.
+      - id: scoring-analytics
+        label: Structured scoring and analytics-style outputs
+        weights:
+          policy-compliance-checker: 5
+          document-eligibility-agent: 2
+        reasons:
+          policy-compliance-checker: The model is optimized for transparent scoring and ranked findings.
+
+  - id: tooling
+    prompt: Which Foundry capability is most important for your first demo?
+    options:
+      - id: openapi-actions
+        label: OpenAPI actions to call external systems
+        weights:
+          constituent-services-agent: 4
+          document-eligibility-agent: 3
+          emergency-response-agent: 4
+          virtual-citizen-assistant-dotnet: 3
+          virtual-citizen-assistant-python: 3
+        reasons:
+          emergency-response-agent: Tool integration depth is a strong fit for this scenario.
+      - id: document-intelligence
+        label: Built-in document extraction and interpretation
+        weights:
+          document-eligibility-agent: 5
+          policy-compliance-checker: 2
+        reasons:
+          document-eligibility-agent: Document Intelligence is central to this accelerator.
+      - id: evaluation-focus
+        label: Evaluation runs and quality benchmarking
+        weights:
+          policy-compliance-checker: 4
+          constituent-services-agent: 3
+          virtual-citizen-assistant-dotnet: 3
+          virtual-citizen-assistant-python: 3
+          inter-agency-knowledge-hub: 2
+        reasons:
+          policy-compliance-checker: Evaluation-heavy quality gates align with this model.
+      - id: entra-rbac
+        label: Entra ID role boundaries and access segmentation
+        weights:
+          inter-agency-knowledge-hub: 5
+          policy-compliance-checker: 2
+        reasons:
+          inter-agency-knowledge-hub: Access-scoped retrieval is the hallmark of this accelerator.
+
+  - id: migration
+    prompt: Which statement best describes your implementation context?
+    options:
+      - id: new-build
+        label: New Foundry-first implementation from scratch
+        weights:
+          constituent-services-agent: 3
+          document-eligibility-agent: 3
+          emergency-response-agent: 3
+          policy-compliance-checker: 3
+          inter-agency-knowledge-hub: 3
+        reasons:
+          constituent-services-agent: This is a strong starting point for a greenfield assistant build.
+      - id: modernize-dotnet
+        label: Modernizing an existing .NET assistant stack
+        weights:
+          virtual-citizen-assistant-dotnet: 5
+          constituent-services-agent: 2
+          policy-compliance-checker: 1
+        reasons:
+          virtual-citizen-assistant-dotnet: This accelerator is purpose-built for .NET to Foundry migration.
+      - id: modernize-python
+        label: Modernizing an existing Python assistant stack
+        weights:
+          virtual-citizen-assistant-python: 5
+          constituent-services-agent: 2
+          document-eligibility-agent: 1
+        reasons:
+          virtual-citizen-assistant-python: This accelerator is purpose-built for Python to Foundry migration.
+      - id: cross-agency
+        label: Coordinating multiple departments with policy boundaries
+        weights:
+          inter-agency-knowledge-hub: 5
+          emergency-response-agent: 2
+          policy-compliance-checker: 2
+        reasons:
+          inter-agency-knowledge-hub: Multi-department orchestration with boundaries is the strongest fit.
