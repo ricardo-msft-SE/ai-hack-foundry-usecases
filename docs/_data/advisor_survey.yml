@@ -149,42 +149,50 @@ questions:
           policy-compliance-checker: This best supports consistent scoring and leadership reporting.
 
   - id: tooling
-    prompt: Which business capability is most important for your first release?
+    prompt: What's your primary technology focus?
     options:
-      - id: openapi-actions
-        label: Complete actions in connected systems from one workflow
-        weights:
-          constituent-services-agent: 4
-          document-eligibility-agent: 3
-          emergency-response-agent: 4
-          virtual-citizen-assistant-dotnet: 3
-          virtual-citizen-assistant-python: 3
-        reasons:
-          emergency-response-agent: This scenario excels when coordinated actions drive outcomes.
       - id: document-intelligence
-        label: Process submitted forms and documents with less manual effort
+        label: Document intelligence—extract and process submitted forms and documents
         weights:
           document-eligibility-agent: 5
           policy-compliance-checker: 2
+          constituent-services-agent: 1
         reasons:
-          document-eligibility-agent: This is the strongest fit for document-heavy operations.
-      - id: evaluation-focus
-        label: Track quality and prove value with measurable outcomes
+          document-eligibility-agent: This is purpose-built for document extraction and intelligent processing.
+          policy-compliance-checker: This also supports document-based compliance analysis.
+      - id: multi-agent
+        label: Multi-agent solutions—coordinate multiple specialists or teams
         weights:
-          policy-compliance-checker: 4
-          constituent-services-agent: 3
-          virtual-citizen-assistant-dotnet: 3
-          virtual-citizen-assistant-python: 3
+          emergency-response-agent: 5
+          inter-agency-knowledge-hub: 4
+          policy-compliance-checker: 1
+        reasons:
+          emergency-response-agent: This is the strongest fit for coordinated multi-agent workflows.
+          inter-agency-knowledge-hub: This handles cross-team coordination with access control.
+      - id: chatbot
+        label: Conversational AI—build a chatbot or intelligent assistant
+        weights:
+          constituent-services-agent: 5
+          virtual-citizen-assistant-dotnet: 5
+          virtual-citizen-assistant-python: 5
           inter-agency-knowledge-hub: 2
         reasons:
-          policy-compliance-checker: This is ideal when quality measurement is a top priority.
-      - id: entra-rbac
-        label: Enforce role-based access across teams and agencies
+          constituent-services-agent: This is optimized for high-quality assistant conversations.
+          virtual-citizen-assistant-dotnet: This is a ready-made migration blueprint for chatbots.
+          virtual-citizen-assistant-python: This is a ready-made migration blueprint for chatbots.
+      - id: public-facing
+        label: Public-facing services—deliver solutions to residents or citizens
         weights:
-          inter-agency-knowledge-hub: 5
-          policy-compliance-checker: 2
+          constituent-services-agent: 5
+          virtual-citizen-assistant-dotnet: 4
+          virtual-citizen-assistant-python: 4
+          document-eligibility-agent: 3
+          inter-agency-knowledge-hub: 2
         reasons:
-          inter-agency-knowledge-hub: This is built for role-based boundaries at scale.
+          constituent-services-agent: This is built for resident-facing service delivery.
+          virtual-citizen-assistant-dotnet: This supports public-facing citizen assistant delivery.
+          virtual-citizen-assistant-python: This supports public-facing citizen assistant delivery.
+          document-eligibility-agent: This can power intake and eligibility services for the public.
 
   - id: migration
     prompt: Which best describes your current stage?
