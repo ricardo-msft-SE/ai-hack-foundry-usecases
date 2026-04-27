@@ -1,6 +1,6 @@
 ---
 title: Document Eligibility Agent
-order: 02
+order: 2
 tagline: Document intake, extraction, and program eligibility triage without custom OCR code.
 foundry_features:
   - Agent Service

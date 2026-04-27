@@ -1,6 +1,6 @@
 ---
 title: Policy Compliance Checker
-order: 04
+order: 4
 tagline: Structured compliance scoring and remediation planning for public-sector AI solutions.
 foundry_features:
   - Agent Service

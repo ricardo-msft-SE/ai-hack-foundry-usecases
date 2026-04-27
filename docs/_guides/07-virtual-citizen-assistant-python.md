@@ -1,6 +1,6 @@
 ---
 title: Virtual Citizen Assistant (Python to Foundry)
-order: 07
+order: 7
 tagline: Replace Flask and Semantic Kernel plugins with a Foundry-native appointment-capable assistant.
 foundry_features:
   - Agent Service

@@ -1,6 +1,6 @@
 ---
 title: Emergency Response Agent
-order: 03
+order: 3
 tagline: Multi-agent emergency coordination across weather signals and resource readiness.
 foundry_features:
   - Agent Service

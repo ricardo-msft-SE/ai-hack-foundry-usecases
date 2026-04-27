@@ -1,6 +1,6 @@
 ---
 title: Virtual Citizen Assistant (.NET to Foundry)
-order: 06
+order: 6
 tagline: Replace ASP.NET Core and Semantic Kernel orchestration with direct Foundry agent delivery.
 foundry_features:
   - Agent Service

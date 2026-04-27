@@ -1,6 +1,6 @@
 ---
 title: Unemployment Claims Processor
-order: 09
+order: 9
 tagline: Rapid UI and workers' compensation claims processing with Document Intelligence
 ---
 

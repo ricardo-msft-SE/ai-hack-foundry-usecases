@@ -1,6 +1,6 @@
 ---
 title: Inter-Agency Knowledge Hub
-order: 05
+order: 5
 tagline: Federated cross-department retrieval with RBAC-aware information boundaries.
 foundry_features:
   - Agent Service

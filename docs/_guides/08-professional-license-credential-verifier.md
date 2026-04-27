@@ -1,6 +1,6 @@
 ---
 title: Professional License Credential Verifier
-order: 08
+order: 8
 tagline: Automated credential extraction and validation for state licensing boards
 ---
 
