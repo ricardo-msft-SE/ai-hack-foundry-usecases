@@ -1,12 +1,44 @@
 ---
 title: Unemployment Claims Processor
 order: 9
-tagline: Rapid UI and workers' compensation claims processing with Document Intelligence
+tagline: Rapid UI and workers' compensation claims processing with Document Intelligence.
+foundry_features:
+  - Agent Service
+  - Document Intelligence Tool
+  - Code Interpreter
+  - Knowledge
+  - OpenAPI Actions
 ---
 
-# Unemployment Claims Processor
+{% assign repo = site.github.repository_url | default: 'https://github.com/ricardo-msft-SE/ai-hack-foundry-usecases' %}
 
-Process unemployment insurance (UI) and workers' compensation (WC) claims in 24–48 hours instead of 3–6 weeks.
+## Scenario
+A state UI-WC agency agent that extracts claim documents, calculates weekly benefits using Code Interpreter, auto-approves 60–70% of claims within 24–48 hours, detects overpayments, and routes complex cases to hearing officers.
+
+## Foundry Build Focus
+- Enable Document Intelligence to extract wages, separation letters, and medical injury reports.
+- Use Code Interpreter to calculate weekly benefit amounts, disability percentages, and overpayment flags using state formulas.
+- Ground eligibility decisions on uploaded UI and WC requirements.
+- Route approved claims, escalations, and overpayment referrals via OpenAPI actions.
+
+## Repo Artifacts
+- [README]({{ repo }}/blob/main/09-unemployment-claims-processor/README.md)
+- [Step-by-step]({{ repo }}/blob/main/09-unemployment-claims-processor/step_by_step.md)
+- [System prompt]({{ repo }}/blob/main/09-unemployment-claims-processor/system_prompt.txt)
+- [OpenAPI: unemployment-api.json]({{ repo }}/blob/main/09-unemployment-claims-processor/openapi/unemployment-api.json)
+- [Knowledge: unemployment-requirements.md]({{ repo }}/blob/main/09-unemployment-claims-processor/knowledge/unemployment-requirements.md)
+
+## Claim Types Supported
+- **UI — Layoff / reduction in force**
+- **UI — Voluntary quit** (with or without good cause)
+- **UI — Discharge for misconduct**
+- **UI — Partial unemployment** (reduced hours)
+- **WC — Acute work-related injury**
+- **WC — Occupational disease** (cumulative exposure)
+- **WC — Aggravation** of pre-existing condition
+
+## Suggested Demo Prompt
+"Here is this claimant's separation letter, last 4 pay stubs, and WC injury report. Calculate their weekly benefit amount, check eligibility, and flag any overpayment risk."
 
 ## The Challenge
 

@@ -42,12 +42,31 @@ title: Foundry-First Accelerator Documentation
   <h2>Accelerators</h2>
   <div class="card-grid">
     {% for guide in ordered_guides %}
+    {% if guide.order <= 7 %}
     <article class="card">
       <p class="meta">Accelerator {{ guide.order }}</p>
       <h3>{{ guide.title }}</h3>
       <p>{{ guide.tagline }}</p>
       <a href="{{ guide.url | relative_url }}">Open Guide</a>
     </article>
+    {% endif %}
+    {% endfor %}
+  </div>
+</section>
+
+<section id="bonus-accelerators" class="panel panel-bonus">
+  <h2>Bonus Accelerators</h2>
+  <p class="lede-small">These two accelerators extend the portfolio with deep Document Intelligence focus—automated credential verification and claims processing for specialized government workflows.</p>
+  <div class="card-grid">
+    {% for guide in ordered_guides %}
+    {% if guide.order >= 8 %}
+    <article class="card card-bonus">
+      <p class="meta">Bonus Accelerator {{ guide.order }}</p>
+      <h3>{{ guide.title }}</h3>
+      <p>{{ guide.tagline }}</p>
+      <a href="{{ guide.url | relative_url }}">Open Guide</a>
+    </article>
+    {% endif %}
     {% endfor %}
   </div>
 </section>

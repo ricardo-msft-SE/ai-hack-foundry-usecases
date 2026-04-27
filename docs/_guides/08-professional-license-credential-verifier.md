@@ -1,72 +1,38 @@
 ---
 title: Professional License Credential Verifier
 order: 8
-tagline: Automated credential extraction and validation for state licensing boards
+tagline: Automated credential extraction and validation for state licensing boards.
+foundry_features:
+  - Agent Service
+  - Document Intelligence Tool
+  - Knowledge
+  - OpenAPI Actions
+  - Entra ID RBAC
 ---
 
-# Professional License Credential Verifier
+{% assign repo = site.github.repository_url | default: 'https://github.com/ricardo-msft-SE/ai-hack-foundry-usecases' %}
 
-Extract, validate, and auto-approve professional license credentials in hours instead of weeks.
+## Scenario
+A state licensing board agent that extracts credentials from submitted transcripts, exam results, and background checks, validates them against licensing rules, and auto-approves 70–80% of applications within 2–4 hours instead of 2–4 weeks.
 
-## The Challenge
+## Foundry Build Focus
+- Enable Document Intelligence to replace manual credential scanning across transcripts, exam scores, and background check documents.
+- Ground eligibility decisions on uploaded licensure requirements for each license type (MD, JD, RN, Contractors).
+- Auto-approve, escalate, or reject via OpenAPI action calls to the state licensing database.
+- Enforce staff access tiers with Entra ID RBAC (reviewers vs. final approvers).
 
-State licensing boards process 10,000+ credential applications annually—transcripts, exam results, background checks. Manual review takes 2–4 weeks per application, delaying professional licensing and frustrating applicants.
-
-## The Solution
-
-Use Azure AI Foundry to build a **Professional License Credential Verifier** agent that:
-- Extracts credentials using Document Intelligence (transcripts, exam scores, background checks)
-- Validates against state licensing rules in real-time
-- Auto-approves routine applications (70–80%)
-- Escalates complex cases to licensing staff
-
-## Expected Outcome
-- **70–80% of applications auto-approved** within 2–4 hours
-- **2–4 hours processing time** vs. 2–4 weeks manual review
-- **Staff focus shifts** to exception handling and appeals
-
----
-
-## Artifacts
-
-- **[README](../08-professional-license-credential-verifier/)** — Full scenario, setup checklist, supported license types
-- **[Step-by-Step Guide](../08-professional-license-credential-verifier/step_by_step.md)** — Deploy in Foundry in 6 steps
-- **[System Prompt](../08-professional-license-credential-verifier/system_prompt.txt)** — Copy-paste agent instructions
-- **[OpenAPI Spec](../08-professional-license-credential-verifier/openapi/licensing-api.json)** — State licensing database API
-- **[Knowledge Base](../08-professional-license-credential-verifier/knowledge/licensure-requirements.md)** — License requirements reference (MD, JD, RN, Contractors)
-
----
-
-## Technology Stack
-
-| Component | Purpose |
-| --- | --- |
-| **Document Intelligence** | Extract credentials from transcripts, exam results, background checks |
-| **Knowledge (RAG)** | Query licensing requirements database |
-| **Code Interpreter** | Calculate education equivalency (optional) |
-| **Actions (OpenAPI)** | Connect to state licensing system |
-| **Entra ID RBAC** | Staff access control & audit trails |
-
----
+## Repo Artifacts
+- [README]({{ repo }}/blob/main/08-professional-license-credential-verifier/README.md)
+- [Step-by-step]({{ repo }}/blob/main/08-professional-license-credential-verifier/step_by_step.md)
+- [System prompt]({{ repo }}/blob/main/08-professional-license-credential-verifier/system_prompt.txt)
+- [OpenAPI: licensing-api.json]({{ repo }}/blob/main/08-professional-license-credential-verifier/openapi/licensing-api.json)
+- [Knowledge: licensure-requirements.md]({{ repo }}/blob/main/08-professional-license-credential-verifier/knowledge/licensure-requirements.md)
 
 ## Supported License Types
+- **Medical (MD/DO)** — USMLE/COMLEX scores ≥ 230, accredited program, reciprocity check
+- **Legal (JD)** — UBE score ≥ 270, ABA-accredited law school, character & fitness
+- **Nursing (RN/LPN)** — NCLEX ≥ 205, approved nursing program, multistate compact
+- **Contractors** — Apprenticeship hours, journeyperson exam ≥ 70%, state CE credits
 
-- **Medical (MD/DO)** — USMLE/COMLEX scores, accreditation, reciprocity
-- **Legal (JD)** — Bar exam, law school accreditation, character & fitness
-- **Nursing (RN/LPN)** — NCLEX scores, nursing degree, multistate compact
-- **Contractors** — Apprenticeship hours, journeyperson exams, state CE
-
----
-
-## Next Steps
-
-1. Start with [Step-by-Step Guide](../08-professional-license-credential-verifier/step_by_step.md)
-2. Copy [System Prompt](../08-professional-license-credential-verifier/system_prompt.txt) into Foundry agent **Instructions**
-3. Upload [OpenAPI Spec](../08-professional-license-credential-verifier/openapi/licensing-api.json) as an **Action**
-4. Create knowledge index using [Knowledge Base](../08-professional-license-credential-verifier/knowledge/licensure-requirements.md)
-5. Test with sample credential documents (transcripts, exam results)
-6. Deploy to your licensing board staff
-
----
-
-**Estimated Setup Time:** 30–45 minutes | **Complexity:** Intermediate | **Quick Win:** Yes (can launch in week 1)
+## Suggested Demo Prompt
+"Review this transcript, USMLE score report, and background check. Does this applicant meet MD licensure requirements for our state? Submit the decision."
