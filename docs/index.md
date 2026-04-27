@@ -12,11 +12,11 @@ title: Foundry-First Accelerator Documentation
 
 <section class="metric-grid">
   <div class="metric">
-    <strong>7</strong>
+    <strong>9</strong>
     Accelerator tracks
   </div>
   <div class="metric">
-    <strong>42+</strong>
+    <strong>55+</strong>
     Files mapped into docs
   </div>
   <div class="metric">
