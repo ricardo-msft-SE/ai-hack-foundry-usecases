@@ -45,6 +45,20 @@ accelerators:
     url: /guides/09-unemployment-claims-processor/
     summary: Rapid UI and workers' compensation claims processing with Document Intelligence.
 
+unsure_behavior:
+  option_id: not-sure
+  threshold: 3
+  simplicity_bias:
+    constituent-services-agent:
+      weight: 6
+      reason: Because several answers were uncertain, this is a simpler and more flexible accelerator to start with.
+    policy-compliance-checker:
+      weight: 4
+      reason: This is also a relatively straightforward accelerator for a first implementation.
+    document-eligibility-agent:
+      weight: 3
+      reason: This is another approachable option when you want a focused document-driven workflow.
+
 questions:
   - id: tooling
     prompt: What's your primary technology focus?
@@ -95,6 +109,14 @@ questions:
           virtual-citizen-assistant-dotnet: This supports public-facing citizen assistant delivery.
           virtual-citizen-assistant-python: This supports public-facing citizen assistant delivery.
           document-eligibility-agent: This can power intake and eligibility services for the public.
+      - id: not-sure
+        label: I'm not sure yet
+        weights:
+          constituent-services-agent: 1
+          policy-compliance-checker: 1
+          document-eligibility-agent: 1
+        reasons:
+          constituent-services-agent: If you're still narrowing the problem, this is a simple and flexible place to begin.
 
   - id: organization
     prompt: Where do you want to create business impact first?
@@ -138,6 +160,14 @@ questions:
           document-eligibility-agent: 1
         reasons:
           policy-compliance-checker: This maps directly to governance, scoring, and remediation needs.
+      - id: not-sure
+        label: I'm not sure yet
+        weights:
+          constituent-services-agent: 1
+          policy-compliance-checker: 1
+          document-eligibility-agent: 1
+        reasons:
+          constituent-services-agent: If you're still narrowing the business problem, this is a practical place to start.
 
   - id: outcome
     prompt: What result matters most in the next 90 days?
@@ -178,6 +208,14 @@ questions:
           document-eligibility-agent: 1
         reasons:
           policy-compliance-checker: This delivers structured compliance findings and next-step priorities.
+      - id: not-sure
+        label: I'm not sure yet
+        weights:
+          constituent-services-agent: 1
+          policy-compliance-checker: 1
+          document-eligibility-agent: 1
+        reasons:
+          constituent-services-agent: This is a safe starting point when short-term outcomes are still being defined.
 
   - id: architecture
     prompt: How will your team mainly use this accelerator?
@@ -218,6 +256,14 @@ questions:
           document-eligibility-agent: 2
         reasons:
           policy-compliance-checker: This best supports consistent scoring and leadership reporting.
+      - id: not-sure
+        label: I'm not sure yet
+        weights:
+          constituent-services-agent: 1
+          policy-compliance-checker: 1
+          document-eligibility-agent: 1
+        reasons:
+          constituent-services-agent: This remains a simple option when the delivery model is still evolving.
 
   - id: migration
     prompt: What is your current build or migration starting point?
@@ -260,3 +306,11 @@ questions:
           emergency-response-agent: 1
         reasons:
           inter-agency-knowledge-hub: This is built for cross-agency collaboration and knowledge sharing.
+      - id: not-sure
+        label: I'm not sure yet
+        weights:
+          constituent-services-agent: 1
+          policy-compliance-checker: 1
+          document-eligibility-agent: 1
+        reasons:
+          constituent-services-agent: This is a practical first step when your build path is not fully defined yet.

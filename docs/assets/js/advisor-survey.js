@@ -16,6 +16,7 @@
 
   var questions = survey.questions || [];
   var accelerators = survey.accelerators || [];
+  var unsureBehavior = survey.unsure_behavior || {};
   var answers = {};
   var questionIndex = 0;
   var baseUrl = app.getAttribute("data-baseurl") || "";
@@ -56,6 +57,7 @@
     var scores = {};
     var reasons = {};
     var i;
+    var unsureCount = 0;
 
     for (i = 0; i < accelerators.length; i += 1) {
       scores[accelerators[i].id] = 0;
@@ -75,6 +77,10 @@
         continue;
       }
 
+      if (unsureBehavior.option_id && option.id === unsureBehavior.option_id) {
+        unsureCount += 1;
+      }
+
       var weights = option.weights || {};
       var optionReasons = option.reasons || {};
       var acceleratorIds = Object.keys(weights);
@@ -91,6 +97,26 @@
 
         if (optionReasons[acceleratorId]) {
           reasons[acceleratorId].push(optionReasons[acceleratorId]);
+        }
+      }
+    }
+
+    if (unsureCount >= (Number(unsureBehavior.threshold) || 0)) {
+      var simplicityBias = unsureBehavior.simplicity_bias || {};
+      var biasIds = Object.keys(simplicityBias);
+
+      for (i = 0; i < biasIds.length; i += 1) {
+        var biasId = biasIds[i];
+        var bias = simplicityBias[biasId] || {};
+
+        if (!(biasId in scores)) {
+          continue;
+        }
+
+        scores[biasId] += Number(bias.weight) || 0;
+
+        if (bias.reason) {
+          reasons[biasId].push(bias.reason);
         }
       }
     }
