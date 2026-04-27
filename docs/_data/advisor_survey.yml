@@ -111,17 +111,17 @@ questions:
           constituent-services-agent: This aligns with improving front-door resident service outcomes.
           virtual-citizen-assistant-dotnet: This can also fit a resident assistant modernization path.
           virtual-citizen-assistant-python: This can also fit a resident assistant modernization path.
-      - idunemployment-claims-processor: 5
+      - id: social-intake
+        label: Accelerate benefits and social services delivery
+        weights:
+          document-eligibility-agent: 5
+          unemployment-claims-processor: 5
           constituent-services-agent: 2
           inter-agency-knowledge-hub: 2
           virtual-citizen-assistant-python: 2
         reasons:
           document-eligibility-agent: This is the strongest fit for intake throughput and eligibility decisions.
-          unemployment-claims-processor: Designed for rapid UI and workers' compensation claim intake and routing
-          inter-agency-knowledge-hub: 2
-          virtual-citizen-assistant-python: 2
-        reasons:
-          document-eligibility-agent: This is the strongest fit for intake throughput and eligibility decisions.
+          unemployment-claims-processor: Designed for rapid UI and workers' compensation claim intake and routing.
       - id: meteorology-emergency
         label: Improve emergency readiness and coordinated response
         weights:
@@ -153,16 +153,16 @@ questions:
           constituent-services-agent: This accelerator is optimized for faster resident support outcomes.
       - id: extract-and-route
         label: Shorter intake cycle times for submitted documents
-        weunemployment-claims-processor: 5
+        weights:
+          document-eligibility-agent: 5
+          unemployment-claims-processor: 5
           professional-license-credential-verifier: 4
           policy-compliance-checker: 2
           constituent-services-agent: 1
         reasons:
           document-eligibility-agent: This directly reduces manual review and routing effort.
           unemployment-claims-processor: Processes UI/WC claims in 24-48 hours via rapid extraction and routing.
-          professional-license-credential-verifier: Routes credentials to licensing database within hours, not weeks
-        reasons:
-          document-eligibility-agent: This directly reduces manual review and routing effort.
+          professional-license-credential-verifier: Routes credentials to licensing database within hours, not weeks.
       - id: phased-response
         label: Better real-time decisions during incidents
         weights:
@@ -181,20 +181,19 @@ questions:
 
   - id: architecture
     prompt: How will your team mainly use this accelerator?
-    optionprofessional-license-credential-verifier: 4
+    options:
+      - id: single-agent
+        label: A single high-value assistant experience
+        weights:
+          constituent-services-agent: 5
+          professional-license-credential-verifier: 4
           unemployment-claims-processor: 4
           virtual-citizen-assistant-dotnet: 3
           virtual-citizen-assistant-python: 3
         reasons:
           constituent-services-agent: This is a strong fit for a single high-value assistant experience.
           professional-license-credential-verifier: Single agent handles all credential verification tasks.
-          unemployment-claims-processor: Single agent processes all UI and WC claims efficiently
-          constituent-services-agent: 4
-          document-eligibility-agent: 4
-          virtual-citizen-assistant-dotnet: 3
-          virtual-citizen-assistant-python: 3
-        reasons:
-          constituent-services-agent: This is a strong fit for a single high-value assistant experience.
+          unemployment-claims-processor: Single agent processes all UI and WC claims efficiently.
       - id: connected-specialists
         label: Multiple specialists working together on complex cases
         weights:
@@ -209,9 +208,9 @@ questions:
           policy-compliance-checker: 2
           unemployment-claims-processor: 2
         reasons:
-          policy-compliance-checker: This best supports consistent scoring and leadership reporting.
-          unemployment-claims-processor: Provides standardized benefit calculations and overpayment detection reports
           inter-agency-knowledge-hub: This is designed for cross-department collaboration with clear boundaries.
+          policy-compliance-checker: This best supports consistent scoring and leadership reporting.
+          unemployment-claims-processor: Provides standardized benefit calculations and overpayment detection reports.
       - id: scoring-analytics
         label: Standardized scoring and executive-ready reporting
         weights:
@@ -219,23 +218,24 @@ questions:
           document-eligibility-agent: 2
         reasons:
           policy-compliance-checker: This best supports consistent scoring and leadership reporting.
+
   - id: migration
-    prom  professional-license-credential-verifier: 3
-          unemployment-claims-processor: 3
-        reasons:
-          constituent-services-agent: This is a practical quick-win starting point for new programs.
-          professional-license-credential-verifier: Delivers quick wins with 70-80% auto-approval in first week.
-          unemployment-claims-processor: Rapid deployment with 24-48 hour claim processing from day one
+    prompt: What is your current build or migration starting point?
+    options:
       - id: new-build
         label: Starting a new initiative and need a quick win
         weights:
           constituent-services-agent: 3
           document-eligibility-agent: 3
-          emergency-response-agent: 3
-          policy-compliance-checker: 3
-          inter-agency-knowledge-hub: 3
+          professional-license-credential-verifier: 3
+          unemployment-claims-processor: 3
+          emergency-response-agent: 2
+          policy-compliance-checker: 2
+          inter-agency-knowledge-hub: 2
         reasons:
           constituent-services-agent: This is a practical quick-win starting point for new programs.
+          professional-license-credential-verifier: Delivers quick wins with 70-80% auto-approval in first week.
+          unemployment-claims-processor: Rapid deployment with 24-48 hour claim processing from day one.
       - id: modernize-dotnet
         label: Modernizing an existing .NET solution
         weights:
@@ -256,7 +256,7 @@ questions:
         label: Aligning multiple agencies around a shared service model
         weights:
           inter-agency-knowledge-hub: 5
-          emergency-response-agent: 2
           policy-compliance-checker: 2
+          emergency-response-agent: 1
         reasons:
-          inter-agency-knowledge-hub: This is the strongest fit for coordinated multi-agency delivery.
+          inter-agency-knowledge-hub: This is built for cross-agency collaboration and knowledge sharing.
