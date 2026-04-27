@@ -2,6 +2,7 @@ title: Foundry-First Accelerators for Government
 description: Foundry-first recreations of seven government-focused accelerators.
 baseurl: "/ai-hack-foundry-usecases"
 url: "https://ricardo-msft-se.github.io"
+theme: jekyll-theme-primer
 markdown: kramdown
 highlighter: rouge
 permalink: pretty
