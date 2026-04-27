@@ -1,0 +1,394 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "State Unemployment & Workers' Compensation API",
+    "description": "RESTful API for processing UI and WC claims, calculating benefits, detecting overpayments, and routing to hearing officers.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://unemployment.exampleville.gov/api/v1",
+      "description": "Production unemployment benefits database"
+    }
+  ],
+  "paths": {
+    "/calculate-benefit": {
+      "post": {
+        "summary": "Calculate weekly UI or WC benefit amount",
+        "operationId": "CalculateBenefit",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "claim_type": {
+                    "type": "string",
+                    "enum": ["UI", "WC"]
+                  },
+                  "average_weekly_wage": {
+                    "type": "number"
+                  },
+                  "disability_percentage": {
+                    "type": "number",
+                    "description": "For WC only: 0-100 (percentage of disability)"
+                  },
+                  "state": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Benefit amount calculated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "weekly_benefit": {
+                      "type": "number"
+                    },
+                    "maximum_duration_weeks": {
+                      "type": "integer"
+                    },
+                    "total_estimated_benefit": {
+                      "type": "number"
+                    },
+                    "calculation_details": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/check-eligibility": {
+      "post": {
+        "summary": "Check UI or WC eligibility based on claim details",
+        "operationId": "CheckEligibility",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "claim_type": {
+                    "type": "string",
+                    "enum": ["UI", "WC"]
+                  },
+                  "separation_reason": {
+                    "type": "string",
+                    "description": "For UI: layoff, quit, discharge, temporary_layoff, illness"
+                  },
+                  "injury_type": {
+                    "type": "string",
+                    "description": "For WC: acute, occupational_disease, aggravation, mental_health"
+                  },
+                  "disqualifying_factors": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "state": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Eligibility determination",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "eligible": {
+                      "type": "boolean"
+                    },
+                    "reason": {
+                      "type": "string"
+                    },
+                    "disqualification_weeks": {
+                      "type": "integer",
+                      "description": "Number of weeks to deny if eligible but disqualified"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/submit-claim": {
+      "post": {
+        "summary": "Submit a UI or WC claim decision",
+        "operationId": "SubmitClaim",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "claim_id": {
+                    "type": "string"
+                  },
+                  "claimant_name": {
+                    "type": "string"
+                  },
+                  "claim_type": {
+                    "type": "string",
+                    "enum": ["UI", "WC"]
+                  },
+                  "decision": {
+                    "type": "string",
+                    "enum": ["APPROVE", "ESCALATE", "DENY"]
+                  },
+                  "weekly_benefit": {
+                    "type": "number"
+                  },
+                  "maximum_duration_weeks": {
+                    "type": "integer"
+                  },
+                  "reasoning": {
+                    "type": "string"
+                  },
+                  "extracted_data": {
+                    "type": "object"
+                  },
+                  "next_step": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Claim submitted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "claim_id": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/detect-overpayment": {
+      "post": {
+        "summary": "Detect potential UI overpayments (double-income weeks, etc.)",
+        "operationId": "DetectOverpayment",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "claim_id": {
+                    "type": "string"
+                  },
+                  "weeks_data": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "week_ending": {
+                          "type": "string",
+                          "format": "date"
+                        },
+                        "ui_benefit_paid": {
+                          "type": "number"
+                        },
+                        "earnings_that_week": {
+                          "type": "number"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Overpayment detection results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "overpayment_detected": {
+                      "type": "boolean"
+                    },
+                    "total_overpayment_amount": {
+                      "type": "number"
+                    },
+                    "flagged_weeks": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "recovery_recommendation": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/route-to-hearing": {
+      "post": {
+        "summary": "Route a claim to hearing officer for contested decision",
+        "operationId": "RouteToHearing",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "claim_id": {
+                    "type": "string"
+                  },
+                  "claimant_name": {
+                    "type": "string"
+                  },
+                  "reason_for_escalation": {
+                    "type": "string"
+                  },
+                  "supporting_documents": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Claim routed to hearing officer",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "hearing_id": {
+                      "type": "string"
+                    },
+                    "hearing_officer_assigned": {
+                      "type": "string"
+                    },
+                    "estimated_hearing_date": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "status": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/claim-status": {
+      "get": {
+        "summary": "Get claim status and decision history",
+        "operationId": "GetClaimStatus",
+        "parameters": [
+          {
+            "name": "claim_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Claim status retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "claim_id": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": ["submitted", "processing", "approved", "escalated", "hearing", "denied", "appealed"]
+                    },
+                    "decision_history": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "decision": {
+                            "type": "string"
+                          },
+                          "timestamp": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "reasoning": {
+                            "type": "string"
+                          },
+                          "weekly_benefit": {
+                            "type": "number"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

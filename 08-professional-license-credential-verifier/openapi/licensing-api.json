@@ -1,0 +1,333 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "State Licensing Authority API",
+    "description": "RESTful API for querying license requirements, validating credentials, and submitting licensing decisions.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://licensing.exampleville.gov/api/v1",
+      "description": "Production licensing database"
+    }
+  ],
+  "paths": {
+    "/license-requirements": {
+      "get": {
+        "summary": "Query license requirements",
+        "operationId": "QueryLicenseRequirements",
+        "parameters": [
+          {
+            "name": "license_type",
+            "in": "query",
+            "required": true,
+            "description": "Type of license (e.g., MD, JD, RN, LPN, HVAC, Electrical, Plumbing)",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "License requirements retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "license_type": {
+                      "type": "string"
+                    },
+                    "education_requirements": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "exam_requirements": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "exam_name": {
+                            "type": "string"
+                          },
+                          "minimum_score": {
+                            "type": "number"
+                          }
+                        }
+                      }
+                    },
+                    "reciprocity_agreements": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "disqualifying_factors": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "continuing_education_hours": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/validate-credentials": {
+      "post": {
+        "summary": "Validate extracted credentials against license requirements",
+        "operationId": "ValidateCredentials",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "license_type": {
+                    "type": "string"
+                  },
+                  "degree_institution": {
+                    "type": "string"
+                  },
+                  "degree_type": {
+                    "type": "string"
+                  },
+                  "graduation_date": {
+                    "type": "string"
+                  },
+                  "gpa": {
+                    "type": "number"
+                  },
+                  "exam_name": {
+                    "type": "string"
+                  },
+                  "exam_score": {
+                    "type": "number"
+                  },
+                  "exam_date": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Credentials validated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "valid": {
+                      "type": "boolean"
+                    },
+                    "validation_details": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "credential": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": ["pass", "fail", "warning"]
+                          },
+                          "message": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/check-reciprocity": {
+      "get": {
+        "summary": "Check reciprocity eligibility",
+        "operationId": "CheckReciprocity",
+        "parameters": [
+          {
+            "name": "license_type",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "original_state",
+            "in": "query",
+            "required": true,
+            "description": "State where applicant is currently licensed or education was obtained",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Reciprocity information retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "eligible_for_reciprocity": {
+                      "type": "boolean"
+                    },
+                    "reciprocity_type": {
+                      "type": "string",
+                      "enum": ["multistate_compact", "bilateral_agreement", "equivalency_review", "none"]
+                    },
+                    "additional_requirements": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/submit-decision": {
+      "post": {
+        "summary": "Submit a licensing decision (Approve/Escalate/Reject)",
+        "operationId": "SubmitDecision",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "application_id": {
+                    "type": "string"
+                  },
+                  "applicant_name": {
+                    "type": "string"
+                  },
+                  "license_type": {
+                    "type": "string"
+                  },
+                  "decision": {
+                    "type": "string",
+                    "enum": ["APPROVE", "ESCALATE", "REJECT"]
+                  },
+                  "reasoning": {
+                    "type": "string"
+                  },
+                  "extracted_credentials": {
+                    "type": "object"
+                  },
+                  "next_step": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Decision recorded successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "decision_id": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/application-status": {
+      "get": {
+        "summary": "Get application status and decision history",
+        "operationId": "GetApplicationStatus",
+        "parameters": [
+          {
+            "name": "application_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Application status retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "application_id": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": ["submitted", "under_review", "approved", "escalated", "rejected"]
+                    },
+                    "decision_history": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "decision": {
+                            "type": "string"
+                          },
+                          "timestamp": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "reasoning": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

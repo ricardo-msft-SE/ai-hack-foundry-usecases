@@ -34,6 +34,16 @@ accelerators:
     order: 7
     url: /guides/07-virtual-citizen-assistant-python/
     summary: Migration path from Flask and plugins to a Foundry-native assistant.
+  - id: professional-license-credential-verifier
+    title: Professional License Credential Verifier
+    order: 8
+    url: /guides/08-professional-license-credential-verifier/
+    summary: Automated credential extraction and validation for state licensing boards.
+  - id: unemployment-claims-processor
+    title: Unemployment Claims Processor
+    order: 9
+    url: /guides/09-unemployment-claims-processor/
+    summary: Rapid UI and workers' compensation claims processing with Document Intelligence.
 
 questions:
   - id: tooling
@@ -43,10 +53,14 @@ questions:
         label: Document intelligence—extract and process submitted forms and documents
         weights:
           document-eligibility-agent: 5
+          professional-license-credential-verifier: 5
+          unemployment-claims-processor: 5
           policy-compliance-checker: 2
           constituent-services-agent: 1
         reasons:
           document-eligibility-agent: This is purpose-built for document extraction and intelligent processing.
+          professional-license-credential-verifier: Extracts credentials from transcripts, exam results, and background checks.
+          unemployment-claims-processor: Extracts wage data, separation letters, and medical reports for rapid processing.
           policy-compliance-checker: This also supports document-based compliance analysis.
       - id: multi-agent
         label: Multi-agent solutions—coordinate multiple specialists or teams
@@ -97,11 +111,13 @@ questions:
           constituent-services-agent: This aligns with improving front-door resident service outcomes.
           virtual-citizen-assistant-dotnet: This can also fit a resident assistant modernization path.
           virtual-citizen-assistant-python: This can also fit a resident assistant modernization path.
-      - id: social-intake
-        label: Speed up social program intake and case routing
-        weights:
-          document-eligibility-agent: 5
+      - idunemployment-claims-processor: 5
           constituent-services-agent: 2
+          inter-agency-knowledge-hub: 2
+          virtual-citizen-assistant-python: 2
+        reasons:
+          document-eligibility-agent: This is the strongest fit for intake throughput and eligibility decisions.
+          unemployment-claims-processor: Designed for rapid UI and workers' compensation claim intake and routing
           inter-agency-knowledge-hub: 2
           virtual-citizen-assistant-python: 2
         reasons:
@@ -137,10 +153,14 @@ questions:
           constituent-services-agent: This accelerator is optimized for faster resident support outcomes.
       - id: extract-and-route
         label: Shorter intake cycle times for submitted documents
-        weights:
-          document-eligibility-agent: 5
+        weunemployment-claims-processor: 5
+          professional-license-credential-verifier: 4
           policy-compliance-checker: 2
           constituent-services-agent: 1
+        reasons:
+          document-eligibility-agent: This directly reduces manual review and routing effort.
+          unemployment-claims-processor: Processes UI/WC claims in 24-48 hours via rapid extraction and routing.
+          professional-license-credential-verifier: Routes credentials to licensing database within hours, not weeks
         reasons:
           document-eligibility-agent: This directly reduces manual review and routing effort.
       - id: phased-response
@@ -161,10 +181,14 @@ questions:
 
   - id: architecture
     prompt: How will your team mainly use this accelerator?
-    options:
-      - id: single-agent
-        label: One assistant used by staff or residents for daily requests
-        weights:
+    optionprofessional-license-credential-verifier: 4
+          unemployment-claims-processor: 4
+          virtual-citizen-assistant-dotnet: 3
+          virtual-citizen-assistant-python: 3
+        reasons:
+          constituent-services-agent: This is a strong fit for a single high-value assistant experience.
+          professional-license-credential-verifier: Single agent handles all credential verification tasks.
+          unemployment-claims-processor: Single agent processes all UI and WC claims efficiently
           constituent-services-agent: 4
           document-eligibility-agent: 4
           virtual-citizen-assistant-dotnet: 3
@@ -183,8 +207,10 @@ questions:
         weights:
           inter-agency-knowledge-hub: 5
           policy-compliance-checker: 2
-          emergency-response-agent: 1
+          unemployment-claims-processor: 2
         reasons:
+          policy-compliance-checker: This best supports consistent scoring and leadership reporting.
+          unemployment-claims-processor: Provides standardized benefit calculations and overpayment detection reports
           inter-agency-knowledge-hub: This is designed for cross-department collaboration with clear boundaries.
       - id: scoring-analytics
         label: Standardized scoring and executive-ready reporting
@@ -194,8 +220,12 @@ questions:
         reasons:
           policy-compliance-checker: This best supports consistent scoring and leadership reporting.
   - id: migration
-    prompt: Which best describes your current stage?
-    options:
+    prom  professional-license-credential-verifier: 3
+          unemployment-claims-processor: 3
+        reasons:
+          constituent-services-agent: This is a practical quick-win starting point for new programs.
+          professional-license-credential-verifier: Delivers quick wins with 70-80% auto-approval in first week.
+          unemployment-claims-processor: Rapid deployment with 24-48 hour claim processing from day one
       - id: new-build
         label: Starting a new initiative and need a quick win
         weights:
