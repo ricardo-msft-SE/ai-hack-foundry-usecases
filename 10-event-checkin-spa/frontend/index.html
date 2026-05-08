@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hackathon Registration - State of Ohio</title>
+    <link rel="stylesheet" href="./assets/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="top-bar">
+        <div>
+          <p class="eyebrow">State of Ohio Event Kiosk</p>
+          <h1>Hackathon Registration - State of Ohio</h1>
+        </div>
+        <div class="segmented" role="tablist" aria-label="Views">
+          <button id="tabCheckIn" class="segment active" role="tab" aria-selected="true" type="button">Check-In</button>
+          <button id="tabCurrent" class="segment" role="tab" aria-selected="false" type="button">Current Registration</button>
+        </div>
+      </header>
+
+      <main>
+        <section id="checkInView" class="view active" aria-labelledby="tabCheckIn">
+          <article class="panel">
+            <h2>Find Attendee by Last Name Initial</h2>
+            <p class="hint">Only initials that have matching registrants are shown.</p>
+            <div id="initialButtons" class="initial-grid" aria-live="polite"></div>
+          </article>
+
+          <div class="split-grid">
+            <article class="panel">
+              <h2>Matching Registrants</h2>
+              <div id="attendeeList" class="attendee-list" aria-live="polite"></div>
+            </article>
+
+            <article class="panel detail-panel">
+              <h2>Registration Detail</h2>
+              <div id="attendeeDetail" class="detail-empty">Select a registrant to view details.</div>
+            </article>
+          </div>
+        </section>
+
+        <section id="currentView" class="view" aria-labelledby="tabCurrent">
+          <article class="panel import-panel">
+            <h2>Import Registrations (CSV or Excel)</h2>
+            <p class="hint">Use this to load your full registration export after the initial screenshot seed.</p>
+            <div class="import-row">
+              <label for="importFile" class="sr-only">Registration file</label>
+              <input id="importFile" type="file" accept=".csv,.xlsx,.xls" />
+              <button id="importButton" type="button" class="primary-btn">Import File</button>
+              <button id="exportButton" type="button" class="secondary-btn">Download Checked-In CSV</button>
+            </div>
+            <p id="importStatus" class="hint"></p>
+          </article>
+
+          <div class="kpi-row">
+            <article class="kpi-card">
+              <span>Total Registrants</span>
+              <strong id="kpiTotalRegistrants">0</strong>
+            </article>
+            <article class="kpi-card">
+              <span>Total Checked-In</span>
+              <strong id="kpiTotalCheckedIn">0</strong>
+            </article>
+          </div>
+
+          <article class="panel">
+            <h2>Track Totals</h2>
+            <div id="trackButtons" class="track-grid"></div>
+            <p id="unknownTrackInfo" class="hint"></p>
+          </article>
+
+          <article class="panel">
+            <h2>Registrants by Agency</h2>
+            <div id="agencyAccordion" class="accordion" aria-live="polite"></div>
+          </article>
+        </section>
+      </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="./assets/env.js"></script>
+    <script type="module" src="./assets/app.js"></script>
+  </body>
+</html>

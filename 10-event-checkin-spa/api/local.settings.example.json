@@ -1,0 +1,11 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "FUNCTIONS_WORKER_RUNTIME": "node",
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "EVENT_ID": "hackathon-registration-state-ohio",
+    "USE_TABLE_STORAGE": "false",
+    "AZURE_TABLE_CONNECTION_STRING": "",
+    "AZURE_TABLE_NAME": "Registrations"
+  }
+}
