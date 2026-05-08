@@ -92,7 +92,7 @@ Accepted columns (case-insensitive fallback supported):
 - `POST /api/attendees/{registrationId}/checkin`
 - `GET /api/dashboard`
 - `GET /api/tracks/{track}/agencies`
-- `POST /api/admin/import`
+- `POST /api/import`
 
 ## Azure Deployment Direction
 

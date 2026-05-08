@@ -192,7 +192,7 @@ app.http("getTrackAgenciesByQuery", {
 app.http("importRegistrations", {
   methods: ["POST"],
   authLevel: "anonymous",
-  route: "admin/import",
+  route: "import",
   handler: async (request) => {
     let payload;
 

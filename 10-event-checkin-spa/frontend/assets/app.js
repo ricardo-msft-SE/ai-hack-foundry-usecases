@@ -113,7 +113,7 @@ async function handleImport() {
     }
 
     importStatus.textContent = "Uploading records...";
-    const result = await apiPost("/admin/import", { attendees: records });
+    const result = await apiPost("/import", { attendees: records });
     importStatus.textContent = `Import complete: ${result.imported} rows processed. Total registrants: ${result.total}.`;
 
     await Promise.all([loadInitials(), loadDashboard()]);
