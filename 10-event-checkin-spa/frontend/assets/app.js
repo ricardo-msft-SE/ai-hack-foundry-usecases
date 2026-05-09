@@ -25,6 +25,28 @@ const importFile = document.getElementById("importFile");
 const importButton = document.getElementById("importButton");
 const exportButton = document.getElementById("exportButton");
 const importStatus = document.getElementById("importStatus");
+const manualName = document.getElementById("manualName");
+const manualTitle = document.getElementById("manualTitle");
+const manualAgency = document.getElementById("manualAgency");
+const manualTrack = document.getElementById("manualTrack");
+const manualRegisterButton = document.getElementById("manualRegisterButton");
+const manualStatus = document.getElementById("manualStatus");
+
+function formatDisplayName(fullName) {
+  const trimmed = String(fullName || "").trim();
+  if (!trimmed) {
+    return "";
+  }
+
+  const parts = trimmed.split(/\s+/);
+  if (parts.length < 2) {
+    return trimmed;
+  }
+
+  const lastName = parts[parts.length - 1];
+  const firstNames = parts.slice(0, -1).join(" ");
+  return `${lastName}, ${firstNames}`;
+}
 
 async function apiGet(path) {
   const response = await fetch(`${apiBase}${path}`);
@@ -233,11 +255,10 @@ function renderAttendees() {
     .map(
       (attendee) => `
       <article class="attendee-card">
-        <strong>${attendee.name}</strong>
-        <p class="attendee-meta">${attendee.title}</p>
-        <p class="attendee-meta">${attendee.agency}</p>
-        <p class="attendee-meta">Track: ${attendee.trackSelected}</p>
-        <span class="status-pill ${attendee.status === "Checked-In" ? "checked" : ""}">${attendee.status}</span>
+        <div class="attendee-main">
+          <strong>${formatDisplayName(attendee.name)}</strong>
+          <span class="status-pill ${attendee.status === "Checked-In" ? "checked" : ""}">${attendee.status}</span>
+        </div>
         <button type="button" class="secondary-btn" data-id="${attendee.registrationId}">Select</button>
       </article>
     `
@@ -269,23 +290,24 @@ function renderAttendeeDetail() {
       <div class="detail-row"><span class="detail-label">Agency</span>${attendee.agency}</div>
       <div class="detail-row"><span class="detail-label">Track Selected</span><strong>${attendee.trackSelected}</strong></div>
       <div class="detail-row"><span class="detail-label">Status</span><span class="status-pill ${checked ? "checked" : ""}">${attendee.status}</span></div>
-      <button type="button" id="checkInButton" class="primary-btn" ${checked ? "disabled" : ""}>
-        ${checked ? "Already Checked-In" : "Check-In Attendee"}
+      <button type="button" id="checkInButton" class="primary-btn">
+        ${checked ? "Check Out" : "Check-In Attendee"}
       </button>
     </div>
   `;
 
   const checkInButton = document.getElementById("checkInButton");
-  if (!checkInButton || checked) {
+  if (!checkInButton) {
     return;
   }
 
   checkInButton.addEventListener("click", async () => {
     checkInButton.disabled = true;
-    checkInButton.textContent = "Checking In...";
+    checkInButton.textContent = checked ? "Checking Out..." : "Checking In...";
 
     try {
-      const payload = await apiPost(`/checkin?id=${encodeURIComponent(attendee.registrationId)}`);
+      const endpoint = checked ? "/checkout" : "/checkin";
+      const payload = await apiPost(`${endpoint}?id=${encodeURIComponent(attendee.registrationId)}`);
       state.selectedAttendee = payload.attendee;
       const idx = state.attendees.findIndex((item) => item.registrationId === payload.attendee.registrationId);
       if (idx >= 0) {
@@ -318,6 +340,10 @@ function renderTrackButtons(dashboard) {
     .join("");
 
   const unknownCount = dashboard.trackCounts?.Unknown || 0;
+  const checkedByTrack = dashboard.checkedInTrackCounts || { "No Code": 0, "Low Code": 0, "Pro Code": 0 };
+
+  kpiTotalCheckedIn.innerHTML = `${dashboard.totalCheckedIn || 0}<span class="kpi-sub">(No Code: ${checkedByTrack["No Code"] || 0}, Low Code: ${checkedByTrack["Low Code"] || 0}, Pro Code: ${checkedByTrack["Pro Code"] || 0})</span>`;
+
   unknownTrackInfo.textContent = unknownCount
     ? `${unknownCount} registrants currently have Track Selected set to Unknown (from screenshot seed data).`
     : "";
@@ -386,10 +412,45 @@ async function loadAttendees(initial) {
 async function loadDashboard() {
   const payload = await apiGet("/dashboard");
   kpiTotalRegistrants.textContent = String(payload.totalRegistrants || 0);
-  kpiTotalCheckedIn.textContent = String(payload.totalCheckedIn || 0);
 
   renderTrackButtons(payload);
   await loadTrackAgencies(state.selectedTrack);
+}
+
+async function handleManualRegistration() {
+  const name = String(manualName?.value || "").trim();
+  const title = String(manualTitle?.value || "").trim();
+  const agency = String(manualAgency?.value || "").trim();
+  const trackSelected = String(manualTrack?.value || "Unknown");
+
+  if (!name) {
+    manualStatus.textContent = "Name is required.";
+    return;
+  }
+
+  manualRegisterButton.disabled = true;
+  manualStatus.textContent = "Registering attendee...";
+
+  try {
+    await apiPost("/register", {
+      name,
+      title,
+      agency,
+      trackSelected
+    });
+
+    manualStatus.textContent = "Manual registration added.";
+    manualName.value = "";
+    manualTitle.value = "";
+    manualAgency.value = "";
+    manualTrack.value = "No Code";
+
+    await Promise.all([loadInitials(), loadDashboard()]);
+  } catch (error) {
+    manualStatus.textContent = `Manual registration failed: ${error.message}`;
+  } finally {
+    manualRegisterButton.disabled = false;
+  }
 }
 
 async function loadTrackAgencies(track) {
@@ -413,6 +474,14 @@ async function initialize() {
     exportButton.addEventListener("click", () => {
       handleExport().catch(() => {
         importStatus.textContent = "Export failed due to an unexpected error.";
+      });
+    });
+  }
+
+  if (manualRegisterButton) {
+    manualRegisterButton.addEventListener("click", () => {
+      handleManualRegistration().catch(() => {
+        manualStatus.textContent = "Manual registration failed due to an unexpected error.";
       });
     });
   }

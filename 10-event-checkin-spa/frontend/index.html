@@ -9,13 +9,19 @@
   <body>
     <div class="app-shell">
       <header class="top-bar">
-        <div>
+        <div class="brand-wrap">
+          <img class="ohio-seal" src="https://www.ulc.org/assets/ulc/wedding-laws/state-seals/state-seal-of-ohio.png" alt="Seal of the State of Ohio" />
+          <div>
           <p class="eyebrow">State of Ohio Event Kiosk</p>
           <h1>Hackathon Registration - State of Ohio</h1>
+          </div>
         </div>
-        <div class="segmented" role="tablist" aria-label="Views">
-          <button id="tabCheckIn" class="segment active" role="tab" aria-selected="true" type="button">Check-In</button>
-          <button id="tabCurrent" class="segment" role="tab" aria-selected="false" type="button">Current Registration</button>
+        <div class="header-right">
+          <img class="ms-logo" src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg" alt="Microsoft logo" />
+          <div class="segmented" role="tablist" aria-label="Views">
+            <button id="tabCheckIn" class="segment active" role="tab" aria-selected="true" type="button">Check-In</button>
+            <button id="tabCurrent" class="segment" role="tab" aria-selected="false" type="button">Current Registration</button>
+          </div>
         </div>
       </header>
 
@@ -30,6 +36,7 @@
           <div class="split-grid">
             <article class="panel">
               <h2>Matching Registrants</h2>
+              <p class="hint">Name, status, and selection only. Full details appear after selection.</p>
               <div id="attendeeList" class="attendee-list" aria-live="polite"></div>
             </article>
 
@@ -38,6 +45,52 @@
               <div id="attendeeDetail" class="detail-empty">Select a registrant to view details.</div>
             </article>
           </div>
+
+          <article class="panel manual-panel">
+            <h2>Manual Day-Of Registration</h2>
+            <p class="hint">For attendees who did not pre-register.</p>
+            <div class="manual-grid">
+              <label>Name
+                <input id="manualName" type="text" placeholder="First Last" />
+              </label>
+              <label>Title
+                <input id="manualTitle" type="text" placeholder="Optional" />
+              </label>
+              <label>Agency
+                <input id="manualAgency" type="text" placeholder="Agency" />
+              </label>
+              <label>Track Selected
+                <select id="manualTrack">
+                  <option>No Code</option>
+                  <option>Low Code</option>
+                  <option>Pro Code</option>
+                </select>
+              </label>
+            </div>
+            <div class="manual-actions">
+              <button id="manualRegisterButton" type="button" class="primary-btn">Register Attendee</button>
+              <span id="manualStatus" class="hint"></span>
+            </div>
+          </article>
+
+          <footer class="copilot-credit" aria-label="Creator attribution">
+            <a
+              href="https://yt3.googleusercontent.com/bT2aS9gYus5611X-ZgGOIZeGnec_lA2RdJd6xY0nsC6giFnc54lN4z8dObhBVBBxSMdhIu2fYA=s160-c-k-c0x00ffffff-no-rj"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Open full Ricardo Wilkins logo"
+            >
+              <img
+                class="copilot-credit-logo"
+                src="https://yt3.googleusercontent.com/bT2aS9gYus5611X-ZgGOIZeGnec_lA2RdJd6xY0nsC6giFnc54lN4z8dObhBVBBxSMdhIu2fYA=s160-c-k-c0x00ffffff-no-rj"
+                alt="Ricardo Wilkins logo"
+              />
+            </a>
+            <small>
+              Created with Github Copilot by Ricardo Wilkins:
+              <a href="https://aka.ms/ricardowilkins" target="_blank" rel="noopener noreferrer">aka.ms/ricardowilkins</a>
+            </small>
+          </footer>
         </section>
 
         <section id="currentView" class="view" aria-labelledby="tabCurrent">

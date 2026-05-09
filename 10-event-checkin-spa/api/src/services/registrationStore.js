@@ -94,6 +94,27 @@ function normalizeImportRecord(input, index = 0) {
   };
 }
 
+function buildCheckedInTrackCounts(records) {
+  const checkedInTrackCounts = {
+    "No Code": 0,
+    "Low Code": 0,
+    "Pro Code": 0
+  };
+
+  for (const record of records) {
+    if (record.status !== "Checked-In") {
+      continue;
+    }
+
+    const track = record.trackSelected || "Unknown";
+    if (checkedInTrackCounts[track] !== undefined) {
+      checkedInTrackCounts[track] += 1;
+    }
+  }
+
+  return checkedInTrackCounts;
+}
+
 async function readSeedData() {
   for (const candidate of seedDataPathCandidates) {
     try {
@@ -190,6 +211,23 @@ class LocalFileStore {
     return current;
   }
 
+  async checkOut(registrationId) {
+    const records = await this.loadRecords();
+    const idx = records.findIndex((record) => record.registrationId === registrationId);
+
+    if (idx < 0) {
+      return null;
+    }
+
+    const current = records[idx];
+    current.status = "Pending";
+    current.checkedInAtUtc = "";
+    records[idx] = current;
+    await this.saveRecords(records);
+
+    return current;
+  }
+
   async getDashboard() {
     const records = await this.loadRecords();
     const totalRegistrants = records.length;
@@ -213,7 +251,8 @@ class LocalFileStore {
     return {
       totalRegistrants,
       totalCheckedIn,
-      trackCounts
+      trackCounts,
+      checkedInTrackCounts: buildCheckedInTrackCounts(records)
     };
   }
 
@@ -259,6 +298,25 @@ class LocalFileStore {
       imported,
       total: byId.size
     };
+  }
+
+  async registerAttendee(input) {
+    const records = await this.loadRecords();
+    const normalized = normalizeImportRecord(
+      {
+        ...input,
+        status: "Pending"
+      },
+      records.length
+    );
+
+    if (!normalized) {
+      throw new Error("Name is required.");
+    }
+
+    records.push(normalized);
+    await this.saveRecords(records);
+    return normalized;
   }
 
   async listCheckedIn() {
@@ -405,6 +463,18 @@ class TableStore {
     return record;
   }
 
+  async checkOut(registrationId) {
+    const record = await this.getById(registrationId);
+    if (!record) {
+      return null;
+    }
+
+    record.status = "Pending";
+    record.checkedInAtUtc = "";
+    await this.client.upsertEntity(this.entityFromRecord(record), "Replace");
+    return record;
+  }
+
   async getDashboard() {
     const records = await this.listAll();
     const totalRegistrants = records.length;
@@ -428,7 +498,8 @@ class TableStore {
     return {
       totalRegistrants,
       totalCheckedIn,
-      trackCounts
+      trackCounts,
+      checkedInTrackCounts: buildCheckedInTrackCounts(records)
     };
   }
 
@@ -472,6 +543,24 @@ class TableStore {
       imported,
       total: records.length
     };
+  }
+
+  async registerAttendee(input) {
+    const existing = await this.listAll();
+    const normalized = normalizeImportRecord(
+      {
+        ...input,
+        status: "Pending"
+      },
+      existing.length
+    );
+
+    if (!normalized) {
+      throw new Error("Name is required.");
+    }
+
+    await this.client.upsertEntity(this.entityFromRecord(normalized), "Replace");
+    return normalized;
   }
 
   async listCheckedIn() {

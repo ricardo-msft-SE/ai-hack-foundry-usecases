@@ -236,3 +236,45 @@ app.http("checkInAttendeeByQuery", {
     return json({ attendee });
   }
 });
+
+app.http("checkOutAttendeeByQuery", {
+  methods: ["POST"],
+  authLevel: "anonymous",
+  route: "checkout",
+  handler: async (request) => {
+    const id = request.query.get("id") || "";
+    if (!id) {
+      return badRequest("Missing required query parameter: id");
+    }
+
+    const store = await getRegistrationStore();
+    const attendee = await store.checkOut(id);
+    if (!attendee) {
+      return json({ error: "Attendee not found" }, 404);
+    }
+
+    return json({ attendee });
+  }
+});
+
+app.http("registerAttendee", {
+  methods: ["POST"],
+  authLevel: "anonymous",
+  route: "register",
+  handler: async (request) => {
+    let payload;
+    try {
+      payload = await request.json();
+    } catch {
+      return badRequest("Invalid JSON body.");
+    }
+
+    if (!payload?.name) {
+      return badRequest("Field 'name' is required.");
+    }
+
+    const store = await getRegistrationStore();
+    const attendee = await store.registerAttendee(payload);
+    return json({ attendee }, 201);
+  }
+});
