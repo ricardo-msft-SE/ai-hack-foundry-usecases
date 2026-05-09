@@ -1,4 +1,5 @@
 import fs from "node:fs/promises";
+import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { DefaultAzureCredential } from "@azure/identity";
@@ -8,7 +9,12 @@ import { config } from "../config.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const projectRoot = path.resolve(__dirname, "..", "..");
-const localDataDir = path.join(projectRoot, "data");
+const isAzureHosted = Boolean(process.env.WEBSITE_INSTANCE_ID || process.env.WEBSITE_SITE_NAME);
+const localDataDir = process.env.EVENT_CHECKIN_DATA_DIR
+  ? path.resolve(process.env.EVENT_CHECKIN_DATA_DIR)
+  : isAzureHosted
+    ? path.join(os.tmpdir(), "event-checkin-spa")
+    : path.join(projectRoot, "data");
 const localDataPath = path.join(localDataDir, "registrations.local.json");
 const seedDataPathCandidates = [
   path.resolve(projectRoot, "sample-data", "initial-registrations.json"),
@@ -128,7 +134,8 @@ async function readSeedData() {
     }
   }
 
-  throw new Error("Seed data file was not found in expected locations.");
+  // Keep the API available even if packaged seed data is missing.
+  return [];
 }
 
 class LocalFileStore {
@@ -140,9 +147,18 @@ class LocalFileStore {
     await this.initialize();
     try {
       const raw = await fs.readFile(localDataPath, "utf-8");
-      return JSON.parse(raw);
+      if (!raw.trim()) {
+        return [];
+      }
+
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
     } catch (error) {
       if (error.code === "ENOENT") {
+        return [];
+      }
+      if (error instanceof SyntaxError) {
+        await fs.writeFile(localDataPath, "[]", "utf-8");
         return [];
       }
       throw error;
@@ -578,12 +594,22 @@ export async function getRegistrationStore() {
     return singletonStore;
   }
 
-  if (config.useTableStorage && (config.tableConnectionString || config.tableAccountName)) {
-    singletonStore = new TableStore();
-  } else {
-    singletonStore = new LocalFileStore();
+  const hasTableConfig = Boolean(config.tableConnectionString || config.tableAccountName);
+  const shouldUseTableStorage = hasTableConfig && (config.useTableStorage || isAzureHosted);
+
+  if (shouldUseTableStorage) {
+    try {
+      singletonStore = new TableStore();
+      await singletonStore.initialize();
+      await singletonStore.seedIfEmpty();
+      return singletonStore;
+    } catch (error) {
+      console.warn("Table storage unavailable; falling back to local storage.", error?.message || error);
+      singletonStore = null;
+    }
   }
 
+  singletonStore = new LocalFileStore();
   await singletonStore.initialize();
   await singletonStore.seedIfEmpty();
   return singletonStore;

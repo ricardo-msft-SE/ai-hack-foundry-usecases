@@ -59,12 +59,13 @@ body {
 }
 
 .ms-logo {
-  width: 126px;
-  height: auto;
+  width: 62px;
+  height: 62px;
+  object-fit: contain;
   background: #fff;
   border: 1px solid var(--color-border);
   border-radius: 10px;
-  padding: 0.3rem 0.45rem;
+  padding: 0.35rem;
 }
 
 .eyebrow {

@@ -9,6 +9,9 @@
     "start": "func start",
     "seed-local": "node src/scripts/seedLocal.js"
   },
+  "engines": {
+    "node": ">=24.0.0"
+  },
   "dependencies": {
     "@azure/identity": "^4.6.0",
     "@azure/data-tables": "^13.3.1",

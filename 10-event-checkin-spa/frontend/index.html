@@ -3,21 +3,30 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#bb0000" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="OH Event Kiosk" />
     <title>Hackathon Registration - State of Ohio</title>
     <link rel="stylesheet" href="./assets/styles.css" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" type="image/png" sizes="192x192" href="./assets/ms-logo-192.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="./assets/ms-logo-512.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="./assets/ms-logo-180.png" />
   </head>
   <body>
     <div class="app-shell">
       <header class="top-bar">
         <div class="brand-wrap">
           <img class="ohio-seal" src="https://www.ulc.org/assets/ulc/wedding-laws/state-seals/state-seal-of-ohio.png" alt="Seal of the State of Ohio" />
+          <img class="ms-logo" src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg" alt="Microsoft logo" />
           <div>
           <p class="eyebrow">State of Ohio Event Kiosk</p>
           <h1>Hackathon Registration - State of Ohio</h1>
           </div>
         </div>
         <div class="header-right">
-          <img class="ms-logo" src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg" alt="Microsoft logo" />
           <div class="segmented" role="tablist" aria-label="Views">
             <button id="tabCheckIn" class="segment active" role="tab" aria-selected="true" type="button">Check-In</button>
             <button id="tabCurrent" class="segment" role="tab" aria-selected="false" type="button">Current Registration</button>
@@ -94,18 +103,6 @@
         </section>
 
         <section id="currentView" class="view" aria-labelledby="tabCurrent">
-          <article class="panel import-panel">
-            <h2>Import Registrations (CSV or Excel)</h2>
-            <p class="hint">Use this to load your full registration export after the initial screenshot seed.</p>
-            <div class="import-row">
-              <label for="importFile" class="sr-only">Registration file</label>
-              <input id="importFile" type="file" accept=".csv,.xlsx,.xls" />
-              <button id="importButton" type="button" class="primary-btn">Import File</button>
-              <button id="exportButton" type="button" class="secondary-btn">Download Checked-In CSV</button>
-            </div>
-            <p id="importStatus" class="hint"></p>
-          </article>
-
           <div class="kpi-row">
             <article class="kpi-card">
               <span>Total Registrants</span>
@@ -127,6 +124,37 @@
             <h2>Registrants by Agency</h2>
             <div id="agencyAccordion" class="accordion" aria-live="polite"></div>
           </article>
+
+          <article class="panel import-panel">
+            <h2>Import Registrations (CSV or Excel)</h2>
+            <p class="hint">Use this to load your full registration export after the initial screenshot seed.</p>
+            <div class="import-row">
+              <label for="importFile" class="sr-only">Registration file</label>
+              <input id="importFile" type="file" accept=".csv,.xlsx,.xls" />
+              <button id="importButton" type="button" class="primary-btn">Import File</button>
+              <button id="exportButton" type="button" class="secondary-btn">Download Checked-In CSV</button>
+            </div>
+            <p id="importStatus" class="hint"></p>
+          </article>
+
+          <footer class="copilot-credit" aria-label="Creator attribution">
+            <a
+              href="https://yt3.googleusercontent.com/bT2aS9gYus5611X-ZgGOIZeGnec_lA2RdJd6xY0nsC6giFnc54lN4z8dObhBVBBxSMdhIu2fYA=s160-c-k-c0x00ffffff-no-rj"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Open full Ricardo Wilkins logo"
+            >
+              <img
+                class="copilot-credit-logo"
+                src="https://yt3.googleusercontent.com/bT2aS9gYus5611X-ZgGOIZeGnec_lA2RdJd6xY0nsC6giFnc54lN4z8dObhBVBBxSMdhIu2fYA=s160-c-k-c0x00ffffff-no-rj"
+                alt="Ricardo Wilkins logo"
+              />
+            </a>
+            <small>
+              Created with Github Copilot by Ricardo Wilkins:
+              <a href="https://aka.ms/ricardowilkins" target="_blank" rel="noopener noreferrer">aka.ms/ricardowilkins</a>
+            </small>
+          </footer>
         </section>
       </main>
     </div>

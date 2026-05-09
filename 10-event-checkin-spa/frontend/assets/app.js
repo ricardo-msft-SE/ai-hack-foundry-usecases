@@ -49,27 +49,58 @@ function formatDisplayName(fullName) {
 }
 
 async function apiGet(path) {
-  const response = await fetch(`${apiBase}${path}`);
-  if (!response.ok) {
-    throw new Error(`Request failed: ${response.status}`);
-  }
-  return response.json();
+  return requestWithRetry(path, { method: "GET" });
 }
 
 async function apiPost(path, body = null) {
-  const response = await fetch(`${apiBase}${path}`, {
+  return requestWithRetry(path, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
     },
     body: body ? JSON.stringify(body) : undefined
   });
+}
 
-  if (!response.ok) {
-    throw new Error(`Request failed: ${response.status}`);
+function delay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function shouldRetryStatus(status) {
+  return status >= 500 || status === 429;
+}
+
+async function requestWithRetry(path, options) {
+  const maxAttempts = 4;
+  let attempt = 0;
+  let lastError = null;
+
+  while (attempt < maxAttempts) {
+    attempt += 1;
+
+    try {
+      const response = await fetch(`${apiBase}${path}`, options);
+      if (response.ok) {
+        return response.json();
+      }
+
+      const status = response.status;
+      lastError = new Error(`Request failed: ${status}`);
+      if (!shouldRetryStatus(status) || attempt >= maxAttempts) {
+        throw lastError;
+      }
+    } catch (error) {
+      lastError = error;
+      if (attempt >= maxAttempts) {
+        throw lastError;
+      }
+    }
+
+    // Short exponential backoff for transient API outages.
+    await delay(250 * 2 ** (attempt - 1));
   }
 
-  return response.json();
+  throw lastError || new Error("Request failed");
 }
 
 function parseCsvText(text) {
@@ -493,3 +524,11 @@ initialize().catch(() => {
   attendeeList.innerHTML = "<p class='hint'>Unable to load data. Ensure the API is running.</p>";
   agencyAccordion.innerHTML = "<p class='hint'>Unable to load dashboard.</p>";
 });
+
+if ("serviceWorker" in navigator && window.isSecureContext) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js").catch(() => {
+      // Keep app behavior unchanged if service worker registration fails.
+    });
+  });
+}

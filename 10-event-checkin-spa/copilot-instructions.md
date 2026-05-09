@@ -124,6 +124,43 @@ Set context once:
 az account set --subscription ee0073ce-de38-45ed-a940-4dbfd9435dc1
 ```
 
+Validate production reliability settings before any deploy:
+
+```powershell
+az functionapp config show --name hackreg-ohio-func-2041 --resource-group rg-hackreg-ohio --query "{alwaysOn:alwaysOn,linuxFxVersion:linuxFxVersion}" -o json
+az functionapp config appsettings list --name hackreg-ohio-func-2041 --resource-group rg-hackreg-ohio --query "[?name=='AzureWebJobsStorage' || name=='AzureWebJobsStorage__accountName' || name=='AzureWebJobsStorage__credential' || name=='USE_TABLE_STORAGE' || name=='AZURE_TABLE_ACCOUNT_NAME' || name=='AZURE_TABLE_NAME']" -o table
+```
+
+Required values:
+
+- `alwaysOn=true`
+- `AzureWebJobsStorage` is empty string
+- `AzureWebJobsStorage__accountName=hackregohio2041`
+- `AzureWebJobsStorage__credential=managedidentity`
+- `USE_TABLE_STORAGE=true`
+- `AZURE_TABLE_ACCOUNT_NAME=hackregohio2041`
+- `AZURE_TABLE_NAME=Registrations`
+
+If identity storage settings drifted, re-apply and restart:
+
+```powershell
+$rg = "rg-hackreg-ohio"
+$func = "hackreg-ohio-func-2041"
+$storage = "hackregohio2041"
+$storageId = az storage account show --name $storage --resource-group $rg --query id -o tsv
+
+az functionapp identity assign --name $func --resource-group $rg | Out-Null
+$principalId = az functionapp identity show --name $func --resource-group $rg --query principalId -o tsv
+
+az role assignment create --assignee-object-id $principalId --assignee-principal-type ServicePrincipal --role "Storage Blob Data Owner" --scope $storageId | Out-Null
+az role assignment create --assignee-object-id $principalId --assignee-principal-type ServicePrincipal --role "Storage Queue Data Contributor" --scope $storageId | Out-Null
+az role assignment create --assignee-object-id $principalId --assignee-principal-type ServicePrincipal --role "Storage Table Data Contributor" --scope $storageId | Out-Null
+
+az functionapp config appsettings set --name $func --resource-group $rg --settings AzureWebJobsStorage= AzureWebJobsStorage__accountName=$storage AzureWebJobsStorage__credential=managedidentity USE_TABLE_STORAGE=true AZURE_TABLE_ACCOUNT_NAME=$storage AZURE_TABLE_NAME=Registrations | Out-Null
+az functionapp config set --name $func --resource-group $rg --always-on true | Out-Null
+az functionapp restart --name $func --resource-group $rg | Out-Null
+```
+
 Deploy API updates:
 
 ```powershell
@@ -131,12 +168,52 @@ Set-Location "10-event-checkin-spa/api"
 func azure functionapp publish hackreg-ohio-func-2041 --javascript
 ```
 
+Create a production data snapshot before every deploy:
+
+```powershell
+$base = "https://hackreg-ohio-func-2041.azurewebsites.net/api"
+$stamp = Get-Date -Format "yyyyMMdd-HHmmss"
+$snapshotDir = "10-event-checkin-spa/snapshots"
+$snapshotPath = Join-Path $snapshotDir "attendees-$stamp.json"
+
+New-Item -ItemType Directory -Path $snapshotDir -Force | Out-Null
+$initials = (Invoke-RestMethod -Uri "$base/initials" -Method Get).initials
+$all = @()
+foreach ($i in $initials) {
+  $all += (Invoke-RestMethod -Uri "$base/attendees?initial=$($i.initial)" -Method Get).attendees
+}
+
+$all | ConvertTo-Json -Depth 8 | Set-Content -Path $snapshotPath -Encoding utf8
+Write-Host "Snapshot saved: $snapshotPath"
+Write-Host ("Rows: " + $all.Count)
+```
+
+If post-deploy data is missing/corrupt, restore immediately from latest snapshot:
+
+```powershell
+$base = "https://hackreg-ohio-func-2041.azurewebsites.net/api"
+$snapshotPath = Get-ChildItem "10-event-checkin-spa/snapshots/attendees-*.json" | Sort-Object LastWriteTimeUtc -Descending | Select-Object -First 1 -ExpandProperty FullName
+$rows = Get-Content $snapshotPath -Raw | ConvertFrom-Json
+
+Invoke-RestMethod -Uri "$base/import" -Method Post -ContentType "application/json" -Body (@{ attendees = @($rows) } | ConvertTo-Json -Depth 10)
+Write-Host "Restored from: $snapshotPath"
+```
+
 Deploy frontend updates:
 
 ```powershell
 $token = az staticwebapp secrets list --name hackreg-ohio-swa-2041 --resource-group rg-hackreg-ohio --query properties.apiKey -o tsv
-Set-Location "10-event-checkin-spa"
-swa deploy --app-location frontend --output-location frontend --deployment-token $token --env production --no-use-keychain
+Set-Location ".."
+swa deploy 10-event-checkin-spa/frontend --deployment-token $token --env production
+```
+
+Notes:
+
+- Run the frontend deploy from repository root (`ai-hack-foundry-usecases`) to avoid SWA CLI path-resolution failures.
+- If `swa deploy` fails, reinstall CLI and retry:
+
+```powershell
+npm install -g @azure/static-web-apps-cli@latest
 ```
 
 ## Production Smoke Test Checklist
@@ -148,6 +225,33 @@ $base = "https://hackreg-ohio-func-2041.azurewebsites.net/api"
 Invoke-RestMethod -Uri "$base/health" -Method Get
 Invoke-RestMethod -Uri "$base/initials" -Method Get
 Invoke-RestMethod -Uri "$base/dashboard" -Method Get
+```
+
+Stability probes (catch intermittent failures):
+
+```powershell
+1..20 | ForEach-Object {
+  $h = curl.exe -s -o NUL -w "%{http_code}" "https://hackreg-ohio-func-2041.azurewebsites.net/api/health"
+  $i = curl.exe -s -o NUL -w "%{http_code}" "https://hackreg-ohio-func-2041.azurewebsites.net/api/initials"
+  $d = curl.exe -s -o NUL -w "%{http_code}" "https://hackreg-ohio-func-2041.azurewebsites.net/api/dashboard"
+  Write-Host ("check[{0}] health={1} initials={2} dashboard={3}" -f $_, $h, $i, $d)
+}
+```
+
+All probe results must be `200` before declaring deployment healthy.
+
+Data integrity checks (must pass):
+
+```powershell
+$base = "https://hackreg-ohio-func-2041.azurewebsites.net/api"
+$initials = (Invoke-RestMethod -Uri "$base/initials").initials
+$all = @()
+foreach ($i in $initials) {
+  $all += (Invoke-RestMethod -Uri "$base/attendees?initial=$($i.initial)").attendees
+}
+
+Write-Host ("Total attendees: " + $all.Count)
+$all | Group-Object agency | Sort-Object Name | Select-Object Name,Count | Format-Table -AutoSize
 ```
 
 Behavior checks:

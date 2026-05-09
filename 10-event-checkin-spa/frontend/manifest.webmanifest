@@ -1,0 +1,28 @@
+{
+  "name": "Ohio Event Kiosk",
+  "short_name": "OH Kiosk",
+  "description": "State of Ohio kiosk app for hackathon event registration and check-in.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f3f6f9",
+  "theme_color": "#bb0000",
+  "icons": [
+    {
+      "src": "./assets/ms-logo-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "./assets/ms-logo-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "./assets/ms-logo-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

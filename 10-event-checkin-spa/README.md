@@ -129,6 +129,39 @@ Provisioned resources:
 - Application Insights
 - Static Web App (Free tier)
 
+## Deployment Safety Snapshot (Required)
+
+Before any production deployment, capture a full attendee snapshot:
+
+```powershell
+$base = "https://hackreg-ohio-func-2041.azurewebsites.net/api"
+$stamp = Get-Date -Format "yyyyMMdd-HHmmss"
+$snapshotDir = "10-event-checkin-spa/snapshots"
+$snapshotPath = Join-Path $snapshotDir "attendees-$stamp.json"
+
+New-Item -ItemType Directory -Path $snapshotDir -Force | Out-Null
+$initials = (Invoke-RestMethod -Uri "$base/initials" -Method Get).initials
+$all = @()
+foreach ($i in $initials) {
+  $all += (Invoke-RestMethod -Uri "$base/attendees?initial=$($i.initial)" -Method Get).attendees
+}
+
+$all | ConvertTo-Json -Depth 8 | Set-Content -Path $snapshotPath -Encoding utf8
+Write-Host "Snapshot saved: $snapshotPath"
+Write-Host ("Rows: " + $all.Count)
+```
+
+If any attendees are missing after deployment, restore from snapshot:
+
+```powershell
+$base = "https://hackreg-ohio-func-2041.azurewebsites.net/api"
+$snapshotPath = Get-ChildItem "10-event-checkin-spa/snapshots/attendees-*.json" | Sort-Object LastWriteTimeUtc -Descending | Select-Object -First 1 -ExpandProperty FullName
+$rows = Get-Content $snapshotPath -Raw | ConvertFrom-Json
+
+Invoke-RestMethod -Uri "$base/import" -Method Post -ContentType "application/json" -Body (@{ attendees = @($rows) } | ConvertTo-Json -Depth 10)
+Write-Host "Restored from: $snapshotPath"
+```
+
 ## Live Deployment Details
 
 - Frontend URL: `https://lively-cliff-0c767c51e.7.azurestaticapps.net`
