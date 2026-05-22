@@ -429,6 +429,79 @@ summary {
   padding-top: 0.45rem;
 }
 
+.credentials-table-wrap {
+  margin-top: 0.6rem;
+  overflow-x: auto;
+}
+
+.credentials-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 780px;
+}
+
+.credentials-table th,
+.credentials-table td {
+  border-bottom: 1px solid var(--color-border);
+  padding: 0.55rem 0.45rem;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.credentials-table th {
+  font-size: 0.85rem;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.credentials-table select {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: white;
+  color: var(--color-text);
+  padding: 0.3rem 0.45rem;
+}
+
+.credential-primary {
+  font-weight: 700;
+}
+
+.credential-secondary {
+  margin-top: 0.25rem;
+  color: var(--color-muted);
+  font-size: 0.82rem;
+  word-break: break-all;
+}
+
+.credential-secrets-cell {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.credential-secrets-cell .secondary-btn {
+  min-height: 40px;
+}
+
+.credential-secrets {
+  display: none;
+  padding: 0.5rem 0.6rem;
+  border-radius: 10px;
+  background: #f7f7fa;
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  font-size: 0.85rem;
+  line-height: 1.45;
+  word-break: break-all;
+}
+
+.credential-secrets.visible {
+  display: grid;
+  gap: 0.25rem;
+}
+
 @media (max-width: 980px) {
   .top-bar {
     flex-direction: column;
@@ -450,5 +523,9 @@ summary {
 
   .kpi-row {
     grid-template-columns: 1fr;
+  }
+
+  .credentials-table {
+    min-width: 980px;
   }
 }

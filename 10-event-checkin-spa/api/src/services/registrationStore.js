@@ -16,6 +16,7 @@ const localDataDir = process.env.EVENT_CHECKIN_DATA_DIR
     ? path.join(os.tmpdir(), "event-checkin-spa")
     : path.join(projectRoot, "data");
 const localDataPath = path.join(localDataDir, "registrations.local.json");
+const localCredentialsPath = path.join(localDataDir, "credentials.local.json");
 const seedDataPathCandidates = [
   path.resolve(projectRoot, "sample-data", "initial-registrations.json"),
   path.resolve(projectRoot, "..", "sample-data", "initial-registrations.json")
@@ -23,6 +24,182 @@ const seedDataPathCandidates = [
 
 const TRACKS = ["No Code", "Low Code", "Pro Code"];
 const TRACK_SET = new Set([...TRACKS, "Unknown"]);
+const CREDENTIALS_PARTITION_SUFFIX = "-credentials";
+const CREDENTIAL_FAMILY_TYPES = ["Azure", "GitHub", "Cloud PC"];
+
+function firstDefined(...values) {
+  for (const value of values) {
+    if (value !== undefined && value !== null) {
+      return value;
+    }
+  }
+
+  return undefined;
+}
+
+function slugify(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+function toBoolean(value) {
+  const normalized = String(value || "").trim().toLowerCase();
+  return normalized === "y" || normalized === "yes" || normalized === "true" || normalized === "1";
+}
+
+function makeCredentialId(type, credential) {
+  const typeSlug = slugify(type) || "unknown";
+  const credentialSlug = slugify(credential) || "credential";
+  return `cred-${typeSlug}-${credentialSlug}`;
+}
+
+function extractLocalPart(value) {
+  const raw = String(value || "").trim();
+  if (!raw) {
+    return "";
+  }
+
+  return raw.split("@")[0].trim();
+}
+
+function makeCredentialFamilyId(sourceLogin) {
+  return `family-${slugify(sourceLogin) || "credential"}`;
+}
+
+function getCredentialForType(type, sourceLogin) {
+  const localPart = extractLocalPart(sourceLogin);
+
+  if (type === "GitHub") {
+    return localPart ? `${localPart}_clabs` : "";
+  }
+
+  return String(sourceLogin || "").trim();
+}
+
+function normalizeCredentialType(inputType) {
+  const raw = String(inputType || "").trim();
+  if (!raw) {
+    return "";
+  }
+
+  const normalized = raw.toLowerCase();
+  if (normalized === "cloud pc" || normalized === "cloudpc") {
+    return "Cloud PC";
+  }
+  if (normalized === "github") {
+    return "GitHub";
+  }
+  if (normalized === "azure") {
+    return "Azure";
+  }
+
+  return raw;
+}
+
+function normalizeCredentialCore(input) {
+  const type = normalizeCredentialType(firstDefined(input.type, input.Type));
+  const sourceUserPrincipalName = String(
+    firstDefined(
+      input.sourceUserPrincipalName,
+      input.SourceUserPrincipalName,
+      input.userPrincipalName,
+      input.UserPrincipalName,
+      input.upn,
+      input.UPN,
+      input.login,
+      input.Login,
+      input.username,
+      input.Username,
+      input.credential,
+      input.Credential
+    ) || ""
+  ).trim();
+  const credential = String(
+    firstDefined(input.credential, input.Credential, input.username, input.Username, input.login, input.Login) || ""
+  ).trim();
+
+  if (!credential || !type) {
+    return null;
+  }
+
+  const now = new Date().toISOString();
+  const userAssignmentRegistrationId = String(
+    firstDefined(
+      input.userAssignmentRegistrationId,
+      input.UserAssignmentRegistrationId,
+      input.userAssignment,
+      input.UserAssignment,
+      input.assignedRegistrationId,
+      input.AssignedRegistrationId
+    ) || ""
+  ).trim();
+
+  return {
+    credentialId: String(firstDefined(input.credentialId, input.CredentialId) || "").trim() || makeCredentialId(type, credential),
+    credential,
+    type,
+    sourceUserPrincipalName,
+    credentialFamilyId: String(
+      firstDefined(input.credentialFamilyId, input.CredentialFamilyId, input.familyId, input.FamilyId) || ""
+    ).trim() || makeCredentialFamilyId(sourceUserPrincipalName || credential),
+    userAssignmentRegistrationId,
+    userAssignmentDisplayName: String(
+      firstDefined(input.userAssignmentDisplayName, input.UserAssignmentDisplayName) || ""
+    ).trim(),
+    inUse: toBoolean(firstDefined(input.inUse, input.InUse, input["In Use"], input["In Use (Y/N)"], false)),
+    tested: toBoolean(firstDefined(input.tested, input.Tested, input["Tested"], input["Tested (Y/N)"], false)),
+    password: String(firstDefined(input.password, input.Password) || "").trim(),
+    tap: String(firstDefined(input.tap, input.Tap) || "").trim(),
+    createdAtUtc: String(firstDefined(input.createdAtUtc, input.CreatedAtUtc) || now),
+    updatedAtUtc: now
+  };
+}
+
+function normalizeCredentialRecord(input) {
+  return normalizeCredentialCore(input);
+}
+
+function expandCredentialImportRecords(input) {
+  const sourceUserPrincipalName = String(
+    firstDefined(input.userPrincipalName, input.UserPrincipalName, input.sourceUserPrincipalName, input.SourceUserPrincipalName) || ""
+  ).trim();
+
+  if (!sourceUserPrincipalName) {
+    const normalized = normalizeCredentialRecord(input);
+    return normalized ? [normalized] : [];
+  }
+
+  return CREDENTIAL_FAMILY_TYPES.map((type) =>
+    normalizeCredentialCore({
+      ...input,
+      type,
+      credential: getCredentialForType(type, sourceUserPrincipalName),
+      sourceUserPrincipalName,
+      credentialFamilyId: makeCredentialFamilyId(sourceUserPrincipalName)
+    })
+  ).filter(Boolean);
+}
+
+function groupCredentialsByType(records) {
+  const groups = new Map();
+
+  for (const record of records) {
+    if (!groups.has(record.type)) {
+      groups.set(record.type, []);
+    }
+    groups.get(record.type).push(record);
+  }
+
+  return [...groups.entries()]
+    .sort((a, b) => a[0].localeCompare(b[0]))
+    .map(([type, credentials]) => ({
+      type,
+      credentials: credentials.sort((a, b) => a.credential.localeCompare(b.credential))
+    }));
+}
 
 function extractLastName(fullName) {
   const trimmed = (fullName || "").trim();
@@ -168,6 +345,33 @@ class LocalFileStore {
   async saveRecords(records) {
     await this.initialize();
     await fs.writeFile(localDataPath, JSON.stringify(records, null, 2), "utf-8");
+  }
+
+  async loadCredentials() {
+    await this.initialize();
+    try {
+      const raw = await fs.readFile(localCredentialsPath, "utf-8");
+      if (!raw.trim()) {
+        return [];
+      }
+
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (error) {
+      if (error.code === "ENOENT") {
+        return [];
+      }
+      if (error instanceof SyntaxError) {
+        await fs.writeFile(localCredentialsPath, "[]", "utf-8");
+        return [];
+      }
+      throw error;
+    }
+  }
+
+  async saveCredentials(records) {
+    await this.initialize();
+    await fs.writeFile(localCredentialsPath, JSON.stringify(records, null, 2), "utf-8");
   }
 
   async seedIfEmpty() {
@@ -341,6 +545,129 @@ class LocalFileStore {
       .filter((record) => record.status === "Checked-In")
       .sort((a, b) => a.lastName.localeCompare(b.lastName));
   }
+
+  async listAllAttendees() {
+    const records = await this.loadRecords();
+    return records.sort((a, b) => {
+      const byLastName = (a.lastName || "").localeCompare(b.lastName || "");
+      if (byLastName !== 0) {
+        return byLastName;
+      }
+      return (a.name || "").localeCompare(b.name || "");
+    });
+  }
+
+  async listCredentialsGroupedByType() {
+    const credentials = await this.loadCredentials();
+    return groupCredentialsByType(credentials);
+  }
+
+  async importCredentials(inputRecords) {
+    const existing = await this.loadCredentials();
+    const byId = new Map(existing.map((item) => [item.credentialId, item]));
+    let imported = 0;
+
+    for (const input of inputRecords) {
+      const expandedRecords = expandCredentialImportRecords(input);
+      for (const normalized of expandedRecords) {
+        const current = byId.get(normalized.credentialId);
+        byId.set(normalized.credentialId, {
+          ...current,
+          ...normalized,
+          createdAtUtc: current?.createdAtUtc || normalized.createdAtUtc
+        });
+        imported += 1;
+      }
+    }
+
+    const updated = [...byId.values()];
+    await this.saveCredentials(updated);
+    return {
+      imported,
+      total: updated.length
+    };
+  }
+
+  async assignCredential(credentialId, registrationId) {
+    const credentials = await this.loadCredentials();
+    const idx = credentials.findIndex((item) => item.credentialId === credentialId);
+    if (idx < 0) {
+      return null;
+    }
+
+    const attendees = await this.loadRecords();
+    const normalizedRegistrationId = String(registrationId || "").trim();
+    const assignee = normalizedRegistrationId
+      ? attendees.find((item) => item.registrationId === normalizedRegistrationId)
+      : null;
+
+    if (normalizedRegistrationId && !assignee) {
+      throw new Error("Assigned registrant was not found.");
+    }
+
+    const target = credentials[idx];
+    const now = new Date().toISOString();
+
+    for (let i = 0; i < credentials.length; i += 1) {
+      if (i === idx) {
+        continue;
+      }
+
+      const current = credentials[i];
+      if (current.type === target.type && current.userAssignmentRegistrationId === normalizedRegistrationId && normalizedRegistrationId) {
+        credentials[i] = {
+          ...current,
+          userAssignmentRegistrationId: "",
+          userAssignmentDisplayName: "",
+          updatedAtUtc: now
+        };
+      }
+    }
+
+    credentials[idx] = {
+      ...target,
+      userAssignmentRegistrationId: normalizedRegistrationId,
+      userAssignmentDisplayName: assignee?.name || "",
+      updatedAtUtc: now
+    };
+
+    await this.saveCredentials(credentials);
+    return credentials[idx];
+  }
+
+  async setCredentialInUse(credentialId, inUse) {
+    const credentials = await this.loadCredentials();
+    const idx = credentials.findIndex((item) => item.credentialId === credentialId);
+    if (idx < 0) {
+      return null;
+    }
+
+    credentials[idx] = {
+      ...credentials[idx],
+      inUse: Boolean(inUse),
+      updatedAtUtc: new Date().toISOString()
+    };
+
+    await this.saveCredentials(credentials);
+    return credentials[idx];
+  }
+
+  async setCredentialTested(credentialId, tested) {
+    const credentials = await this.loadCredentials();
+    const idx = credentials.findIndex((item) => item.credentialId === credentialId);
+    if (idx < 0) {
+      return null;
+    }
+
+    credentials[idx] = {
+      ...credentials[idx],
+      tested: Boolean(tested),
+      updatedAtUtc: new Date().toISOString()
+    };
+
+    await this.saveCredentials(credentials);
+    return credentials[idx];
+  }
 }
 
 class TableStore {
@@ -354,6 +681,8 @@ class TableStore {
     } else {
       this.client = TableClient.fromConnectionString(config.tableConnectionString, config.tableName);
     }
+
+    this.credentialsPartitionKey = `${config.eventId}${CREDENTIALS_PARTITION_SUFFIX}`;
   }
 
   async initialize() {
@@ -397,6 +726,43 @@ class TableStore {
     };
   }
 
+  credentialEntityFromRecord(record) {
+    return {
+      partitionKey: this.credentialsPartitionKey,
+      rowKey: record.credentialId,
+      credential: record.credential,
+      type: record.type,
+      sourceUserPrincipalName: record.sourceUserPrincipalName || "",
+      credentialFamilyId: record.credentialFamilyId || "",
+      userAssignmentRegistrationId: record.userAssignmentRegistrationId || "",
+      userAssignmentDisplayName: record.userAssignmentDisplayName || "",
+      inUse: Boolean(record.inUse),
+      tested: Boolean(record.tested),
+      password: record.password || "",
+      tap: record.tap || "",
+      createdAtUtc: record.createdAtUtc || new Date().toISOString(),
+      updatedAtUtc: record.updatedAtUtc || new Date().toISOString()
+    };
+  }
+
+  credentialRecordFromEntity(entity) {
+    return {
+      credentialId: entity.rowKey,
+      credential: entity.credential,
+      type: entity.type,
+      sourceUserPrincipalName: entity.sourceUserPrincipalName || "",
+      credentialFamilyId: entity.credentialFamilyId || "",
+      userAssignmentRegistrationId: entity.userAssignmentRegistrationId || "",
+      userAssignmentDisplayName: entity.userAssignmentDisplayName || "",
+      inUse: Boolean(entity.inUse),
+      tested: Boolean(entity.tested),
+      password: entity.password || "",
+      tap: entity.tap || "",
+      createdAtUtc: entity.createdAtUtc || "",
+      updatedAtUtc: entity.updatedAtUtc || ""
+    };
+  }
+
   async listAll() {
     const entities = this.client.listEntities({
       queryOptions: {
@@ -407,6 +773,21 @@ class TableStore {
     const records = [];
     for await (const entity of entities) {
       records.push(this.recordFromEntity(entity));
+    }
+
+    return records;
+  }
+
+  async listAllCredentials() {
+    const entities = this.client.listEntities({
+      queryOptions: {
+        filter: `PartitionKey eq '${this.credentialsPartitionKey}'`
+      }
+    });
+
+    const records = [];
+    for await (const entity of entities) {
+      records.push(this.credentialRecordFromEntity(entity));
     }
 
     return records;
@@ -584,6 +965,133 @@ class TableStore {
     return records
       .filter((record) => record.status === "Checked-In")
       .sort((a, b) => a.lastName.localeCompare(b.lastName));
+  }
+
+  async listAllAttendees() {
+    const records = await this.listAll();
+    return records.sort((a, b) => {
+      const byLastName = (a.lastName || "").localeCompare(b.lastName || "");
+      if (byLastName !== 0) {
+        return byLastName;
+      }
+      return (a.name || "").localeCompare(b.name || "");
+    });
+  }
+
+  async listCredentialsGroupedByType() {
+    const credentials = await this.listAllCredentials();
+    return groupCredentialsByType(credentials);
+  }
+
+  async importCredentials(inputRecords) {
+    let imported = 0;
+
+    for (const input of inputRecords) {
+      const expandedRecords = expandCredentialImportRecords(input);
+      for (const normalized of expandedRecords) {
+        try {
+          const existing = await this.client.getEntity(this.credentialsPartitionKey, normalized.credentialId);
+          normalized.createdAtUtc = existing.createdAtUtc || normalized.createdAtUtc;
+        } catch {
+          // No existing entity found; keep normalized timestamps.
+        }
+
+        await this.client.upsertEntity(this.credentialEntityFromRecord(normalized), "Replace");
+        imported += 1;
+      }
+    }
+
+    const total = (await this.listAllCredentials()).length;
+    return {
+      imported,
+      total
+    };
+  }
+
+  async assignCredential(credentialId, registrationId) {
+    const credentials = await this.listAllCredentials();
+    const idx = credentials.findIndex((item) => item.credentialId === credentialId);
+    if (idx < 0) {
+      return null;
+    }
+
+    const attendees = await this.listAll();
+    const normalizedRegistrationId = String(registrationId || "").trim();
+    const assignee = normalizedRegistrationId
+      ? attendees.find((item) => item.registrationId === normalizedRegistrationId)
+      : null;
+
+    if (normalizedRegistrationId && !assignee) {
+      throw new Error("Assigned registrant was not found.");
+    }
+
+    const target = credentials[idx];
+    const now = new Date().toISOString();
+    const updates = [];
+
+    for (const credential of credentials) {
+      if (
+        credential.credentialId !== target.credentialId &&
+        credential.type === target.type &&
+        credential.userAssignmentRegistrationId === normalizedRegistrationId &&
+        normalizedRegistrationId
+      ) {
+        updates.push({
+          ...credential,
+          userAssignmentRegistrationId: "",
+          userAssignmentDisplayName: "",
+          updatedAtUtc: now
+        });
+      }
+    }
+
+    const updatedTarget = {
+      ...target,
+      userAssignmentRegistrationId: normalizedRegistrationId,
+      userAssignmentDisplayName: assignee?.name || "",
+      updatedAtUtc: now
+    };
+    updates.push(updatedTarget);
+
+    for (const update of updates) {
+      await this.client.upsertEntity(this.credentialEntityFromRecord(update), "Replace");
+    }
+
+    return updatedTarget;
+  }
+
+  async setCredentialInUse(credentialId, inUse) {
+    const credentials = await this.listAllCredentials();
+    const target = credentials.find((item) => item.credentialId === credentialId);
+    if (!target) {
+      return null;
+    }
+
+    const updated = {
+      ...target,
+      inUse: Boolean(inUse),
+      updatedAtUtc: new Date().toISOString()
+    };
+
+    await this.client.upsertEntity(this.credentialEntityFromRecord(updated), "Replace");
+    return updated;
+  }
+
+  async setCredentialTested(credentialId, tested) {
+    const credentials = await this.listAllCredentials();
+    const target = credentials.find((item) => item.credentialId === credentialId);
+    if (!target) {
+      return null;
+    }
+
+    const updated = {
+      ...target,
+      tested: Boolean(tested),
+      updatedAtUtc: new Date().toISOString()
+    };
+
+    await this.client.upsertEntity(this.credentialEntityFromRecord(updated), "Replace");
+    return updated;
   }
 }
 

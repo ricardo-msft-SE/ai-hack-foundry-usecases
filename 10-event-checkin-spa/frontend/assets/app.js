@@ -2,15 +2,20 @@ const state = {
   selectedInitial: "",
   attendees: [],
   selectedAttendee: null,
-  selectedTrack: "No Code"
+  selectedTrack: "No Code",
+  credentialsGroups: [],
+  registrants: [],
+  revealedCredentialIds: new Set()
 };
 
 const apiBase = window.__API_BASE__ || "/api";
 
 const checkInView = document.getElementById("checkInView");
 const currentView = document.getElementById("currentView");
+const credentialsView = document.getElementById("credentialsView");
 const tabCheckIn = document.getElementById("tabCheckIn");
 const tabCurrent = document.getElementById("tabCurrent");
+const tabCredentials = document.getElementById("tabCredentials");
 
 const initialButtons = document.getElementById("initialButtons");
 const attendeeList = document.getElementById("attendeeList");
@@ -25,6 +30,11 @@ const importFile = document.getElementById("importFile");
 const importButton = document.getElementById("importButton");
 const exportButton = document.getElementById("exportButton");
 const importStatus = document.getElementById("importStatus");
+const credentialsFile = document.getElementById("credentialsFile");
+const credentialsImportButton = document.getElementById("credentialsImportButton");
+const credentialsExportButton = document.getElementById("credentialsExportButton");
+const credentialsStatus = document.getElementById("credentialsStatus");
+const credentialsAccordion = document.getElementById("credentialsAccordion");
 const manualName = document.getElementById("manualName");
 const manualTitle = document.getElementById("manualTitle");
 const manualAgency = document.getElementById("manualAgency");
@@ -46,6 +56,32 @@ function formatDisplayName(fullName) {
   const lastName = parts[parts.length - 1];
   const firstNames = parts.slice(0, -1).join(" ");
   return `${lastName}, ${firstNames}`;
+}
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function renderCredentialSecrets(credential) {
+  const isRevealed = state.revealedCredentialIds.has(credential.credentialId);
+  const buttonLabel = isRevealed ? "Hide Pwd" : "Show Pwd";
+  const password = credential.password || "";
+  const tap = credential.tap || "";
+
+  return `
+    <div class="credential-secrets-cell">
+      <button type="button" class="secondary-btn credential-reveal" data-credential-id="${credential.credentialId}">${buttonLabel}</button>
+      <div class="credential-secrets ${isRevealed ? "visible" : ""}">
+        <div><strong>Password:</strong> ${escapeHtml(password || "Not provided")}</div>
+        <div><strong>TAP:</strong> ${escapeHtml(tap || "Not provided")}</div>
+      </div>
+    </div>
+  `;
 }
 
 async function apiGet(path) {
@@ -169,7 +205,7 @@ async function handleImport() {
     const result = await apiPost("/import", { attendees: records });
     importStatus.textContent = `Import complete: ${result.imported} rows processed. Total registrants: ${result.total}.`;
 
-    await Promise.all([loadInitials(), loadDashboard()]);
+    await Promise.all([loadInitials(), loadDashboard(), loadCredentials()]);
   } catch (error) {
     importStatus.textContent = `Import failed: ${error.message}`;
   } finally {
@@ -238,16 +274,279 @@ async function handleExport() {
   }
 }
 
+function renderRegistrantOptions(selectedRegistrationId) {
+  const options = ["<option value=''>Unassigned</option>"];
+
+  for (const registrant of state.registrants) {
+    const isSelected = registrant.registrationId === selectedRegistrationId;
+    options.push(
+      `<option value="${registrant.registrationId}" ${isSelected ? "selected" : ""}>${formatDisplayName(registrant.name)}</option>`
+    );
+  }
+
+  return options.join("");
+}
+
+function renderCredentials() {
+  if (!state.credentialsGroups.length) {
+    credentialsAccordion.innerHTML = "<p class='hint'>No credentials loaded yet.</p>";
+    return;
+  }
+
+  credentialsAccordion.innerHTML = state.credentialsGroups
+    .map(
+      (group) => `
+      <details open>
+        <summary>${group.type} (${group.credentials.length})</summary>
+        <div class="credentials-table-wrap">
+          <table class="credentials-table">
+            <thead>
+              <tr>
+                <th>Credential</th>
+                <th>Type</th>
+                <th>User Assignment</th>
+                <th>In Use (Y/N)</th>
+                <th>Tested (Y/N)</th>
+                <th>Secrets</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${group.credentials
+                .map(
+                  (credential) => `
+                <tr>
+                  <td>
+                    <div class="credential-primary">${escapeHtml(credential.credential || "")}</div>
+                    ${credential.sourceUserPrincipalName ? `<div class="credential-secondary">Source: ${escapeHtml(credential.sourceUserPrincipalName)}</div>` : ""}
+                  </td>
+                  <td>${escapeHtml(credential.type || "")}</td>
+                  <td>
+                    <select class="credential-assignment" data-credential-id="${credential.credentialId}">
+                      ${renderRegistrantOptions(credential.userAssignmentRegistrationId)}
+                    </select>
+                  </td>
+                  <td>
+                    <select class="credential-inuse" data-credential-id="${credential.credentialId}">
+                      <option value="Y" ${credential.inUse ? "selected" : ""}>Y</option>
+                      <option value="N" ${credential.inUse ? "" : "selected"}>N</option>
+                    </select>
+                  </td>
+                  <td>
+                    <select class="credential-tested" data-credential-id="${credential.credentialId}">
+                      <option value="Y" ${credential.tested ? "selected" : ""}>Y</option>
+                      <option value="N" ${credential.tested ? "" : "selected"}>N</option>
+                    </select>
+                  </td>
+                  <td>
+                    ${renderCredentialSecrets(credential)}
+                  </td>
+                </tr>
+              `
+                )
+                .join("")}
+            </tbody>
+          </table>
+        </div>
+      </details>
+    `
+    )
+    .join("");
+
+  credentialsAccordion.querySelectorAll(".credential-assignment").forEach((select) => {
+    select.addEventListener("change", async () => {
+      const element = select;
+      element.disabled = true;
+      credentialsStatus.textContent = "Saving assignment...";
+
+      try {
+        await apiPost("/credentials/assign", {
+          credentialId: element.dataset.credentialId,
+          registrationId: element.value
+        });
+        await loadCredentials();
+        credentialsStatus.textContent = "Assignment saved.";
+      } catch (error) {
+        credentialsStatus.textContent = `Assignment failed: ${error.message}`;
+      } finally {
+        element.disabled = false;
+      }
+    });
+  });
+
+  credentialsAccordion.querySelectorAll(".credential-inuse").forEach((select) => {
+    select.addEventListener("change", async () => {
+      const element = select;
+      element.disabled = true;
+      credentialsStatus.textContent = "Saving In Use value...";
+
+      try {
+        await apiPost("/credentials/inuse", {
+          credentialId: element.dataset.credentialId,
+          inUse: element.value === "Y"
+        });
+        await loadCredentials();
+        credentialsStatus.textContent = "In Use value saved.";
+      } catch (error) {
+        credentialsStatus.textContent = `In Use update failed: ${error.message}`;
+      } finally {
+        element.disabled = false;
+      }
+    });
+  });
+
+  credentialsAccordion.querySelectorAll(".credential-tested").forEach((select) => {
+    select.addEventListener("change", async () => {
+      const element = select;
+      element.disabled = true;
+      credentialsStatus.textContent = "Saving Tested value...";
+
+      try {
+        await apiPost("/credentials/tested", {
+          credentialId: element.dataset.credentialId,
+          tested: element.value === "Y"
+        });
+        await loadCredentials();
+        credentialsStatus.textContent = "Tested value saved.";
+      } catch (error) {
+        credentialsStatus.textContent = `Tested update failed: ${error.message}`;
+      } finally {
+        element.disabled = false;
+      }
+    });
+  });
+
+  credentialsAccordion.querySelectorAll(".credential-reveal").forEach((button) => {
+    button.addEventListener("click", () => {
+      const credentialId = button.dataset.credentialId;
+      if (!credentialId) {
+        return;
+      }
+
+      if (state.revealedCredentialIds.has(credentialId)) {
+        state.revealedCredentialIds.delete(credentialId);
+      } else {
+        state.revealedCredentialIds.add(credentialId);
+      }
+
+      renderCredentials();
+    });
+  });
+}
+
+async function loadCredentials() {
+  const payload = await apiGet("/credentials");
+  state.credentialsGroups = payload.groups || [];
+  state.registrants = (payload.registrants || []).sort((a, b) => {
+    const byLastName = String(a.lastName || "").localeCompare(String(b.lastName || ""));
+    if (byLastName !== 0) {
+      return byLastName;
+    }
+    return String(a.name || "").localeCompare(String(b.name || ""));
+  });
+
+  renderCredentials();
+}
+
+async function handleCredentialsImport() {
+  if (!credentialsFile?.files?.length) {
+    credentialsStatus.textContent = "Select a CSV or Excel file before importing credentials.";
+    return;
+  }
+
+  credentialsImportButton.disabled = true;
+  credentialsStatus.textContent = "Parsing credential file...";
+
+  try {
+    const records = await parseImportFile(credentialsFile.files[0]);
+    if (!records.length) {
+      credentialsStatus.textContent = "No credential rows found in the selected file.";
+      return;
+    }
+
+    credentialsStatus.textContent = "Uploading credential records...";
+    const result = await apiPost("/credentials/import", { credentials: records });
+    credentialsStatus.textContent = `Credential import complete: ${result.imported} rows processed. Total credentials: ${result.total}.`;
+    await loadCredentials();
+  } catch (error) {
+    credentialsStatus.textContent = `Credential import failed: ${error.message}`;
+  } finally {
+    credentialsImportButton.disabled = false;
+  }
+}
+
+async function handleCredentialsExport() {
+  if (!credentialsExportButton) {
+    return;
+  }
+
+  credentialsExportButton.disabled = true;
+  credentialsStatus.textContent = "Preparing credentials assignment export...";
+
+  try {
+    const rows = [
+      ["Credential", "Source User Principal Name", "Type", "Credential Family Id", "User Assignment", "In Use (Y/N)", "Tested (Y/N)", "Password", "Tap", "User Assignment RegistrationId"]
+    ];
+
+    for (const group of state.credentialsGroups) {
+      for (const credential of group.credentials || []) {
+        rows.push([
+          credential.credential || "",
+          credential.sourceUserPrincipalName || "",
+          credential.type || "",
+          credential.credentialFamilyId || "",
+          credential.userAssignmentDisplayName || "",
+          credential.inUse ? "Y" : "N",
+          credential.tested ? "Y" : "N",
+          credential.password || "",
+          credential.tap || "",
+          credential.userAssignmentRegistrationId || ""
+        ]);
+      }
+    }
+
+    const csv = rows
+      .map((row) => row.map((value) => {
+        const text = String(value ?? "");
+        return text.includes(",") || text.includes("\n") || text.includes('"')
+          ? `"${text.replace(/"/g, '""')}"`
+          : text;
+      }).join(","))
+      .join("\n");
+
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = "credential-assignments.csv";
+    document.body.append(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
+
+    credentialsStatus.textContent = `Credential assignments export downloaded (${rows.length - 1} records).`;
+  } catch (error) {
+    credentialsStatus.textContent = `Credential export failed: ${error.message}`;
+  } finally {
+    credentialsExportButton.disabled = false;
+  }
+}
+
 function switchView(viewName) {
   const showCheckIn = viewName === "checkin";
+  const showCurrent = viewName === "current";
+  const showCredentials = viewName === "credentials";
+
   checkInView.classList.toggle("active", showCheckIn);
-  currentView.classList.toggle("active", !showCheckIn);
+  currentView.classList.toggle("active", showCurrent);
+  credentialsView.classList.toggle("active", showCredentials);
 
   tabCheckIn.classList.toggle("active", showCheckIn);
-  tabCurrent.classList.toggle("active", !showCheckIn);
+  tabCurrent.classList.toggle("active", showCurrent);
+  tabCredentials.classList.toggle("active", showCredentials);
 
   tabCheckIn.setAttribute("aria-selected", String(showCheckIn));
-  tabCurrent.setAttribute("aria-selected", String(!showCheckIn));
+  tabCurrent.setAttribute("aria-selected", String(showCurrent));
+  tabCredentials.setAttribute("aria-selected", String(showCredentials));
 }
 
 function renderInitials(initials) {
@@ -492,6 +791,7 @@ async function loadTrackAgencies(track) {
 async function initialize() {
   tabCheckIn.addEventListener("click", () => switchView("checkin"));
   tabCurrent.addEventListener("click", () => switchView("current"));
+  tabCredentials.addEventListener("click", () => switchView("credentials"));
 
   if (importButton) {
     importButton.addEventListener("click", () => {
@@ -517,12 +817,29 @@ async function initialize() {
     });
   }
 
-  await Promise.all([loadInitials(), loadDashboard()]);
+  if (credentialsImportButton) {
+    credentialsImportButton.addEventListener("click", () => {
+      handleCredentialsImport().catch(() => {
+        credentialsStatus.textContent = "Credential import failed due to an unexpected error.";
+      });
+    });
+  }
+
+  if (credentialsExportButton) {
+    credentialsExportButton.addEventListener("click", () => {
+      handleCredentialsExport().catch(() => {
+        credentialsStatus.textContent = "Credential export failed due to an unexpected error.";
+      });
+    });
+  }
+
+  await Promise.all([loadInitials(), loadDashboard(), loadCredentials()]);
 }
 
 initialize().catch(() => {
   attendeeList.innerHTML = "<p class='hint'>Unable to load data. Ensure the API is running.</p>";
   agencyAccordion.innerHTML = "<p class='hint'>Unable to load dashboard.</p>";
+  credentialsAccordion.innerHTML = "<p class='hint'>Unable to load credentials.</p>";
 });
 
 if ("serviceWorker" in navigator && window.isSecureContext) {

@@ -278,3 +278,139 @@ app.http("registerAttendee", {
     return json({ attendee }, 201);
   }
 });
+
+app.http("getCredentials", {
+  methods: ["GET"],
+  authLevel: "anonymous",
+  route: "credentials",
+  handler: async () => {
+    const store = await getRegistrationStore();
+    const groups = await store.listCredentialsGroupedByType();
+    const registrants = await store.listAllAttendees();
+
+    return json({
+      groups,
+      registrants
+    });
+  }
+});
+
+app.http("importCredentials", {
+  methods: ["POST"],
+  authLevel: "anonymous",
+  route: "credentials/import",
+  handler: async (request) => {
+    let payload;
+
+    try {
+      payload = await request.json();
+    } catch {
+      return badRequest("Invalid JSON body.");
+    }
+
+    const credentials = payload?.credentials;
+    if (!Array.isArray(credentials)) {
+      return badRequest("Body must include a credentials array.");
+    }
+
+    const store = await getRegistrationStore();
+    const result = await store.importCredentials(credentials);
+
+    return json({
+      message: "Credential import completed.",
+      ...result
+    });
+  }
+});
+
+app.http("assignCredential", {
+  methods: ["POST"],
+  authLevel: "anonymous",
+  route: "credentials/assign",
+  handler: async (request) => {
+    let payload;
+
+    try {
+      payload = await request.json();
+    } catch {
+      return badRequest("Invalid JSON body.");
+    }
+
+    const credentialId = String(payload?.credentialId || "").trim();
+    const registrationId = String(payload?.registrationId || "").trim();
+
+    if (!credentialId) {
+      return badRequest("Field 'credentialId' is required.");
+    }
+
+    const store = await getRegistrationStore();
+    try {
+      const credential = await store.assignCredential(credentialId, registrationId);
+      if (!credential) {
+        return json({ error: "Credential not found" }, 404);
+      }
+
+      return json({ credential });
+    } catch (error) {
+      return badRequest(error?.message || "Unable to assign credential.");
+    }
+  }
+});
+
+app.http("setCredentialInUse", {
+  methods: ["POST"],
+  authLevel: "anonymous",
+  route: "credentials/inuse",
+  handler: async (request) => {
+    let payload;
+
+    try {
+      payload = await request.json();
+    } catch {
+      return badRequest("Invalid JSON body.");
+    }
+
+    const credentialId = String(payload?.credentialId || "").trim();
+    if (!credentialId) {
+      return badRequest("Field 'credentialId' is required.");
+    }
+
+    const inUse = Boolean(payload?.inUse);
+    const store = await getRegistrationStore();
+    const credential = await store.setCredentialInUse(credentialId, inUse);
+    if (!credential) {
+      return json({ error: "Credential not found" }, 404);
+    }
+
+    return json({ credential });
+  }
+});
+
+app.http("setCredentialTested", {
+  methods: ["POST"],
+  authLevel: "anonymous",
+  route: "credentials/tested",
+  handler: async (request) => {
+    let payload;
+
+    try {
+      payload = await request.json();
+    } catch {
+      return badRequest("Invalid JSON body.");
+    }
+
+    const credentialId = String(payload?.credentialId || "").trim();
+    if (!credentialId) {
+      return badRequest("Field 'credentialId' is required.");
+    }
+
+    const tested = Boolean(payload?.tested);
+    const store = await getRegistrationStore();
+    const credential = await store.setCredentialTested(credentialId, tested);
+    if (!credential) {
+      return json({ error: "Credential not found" }, 404);
+    }
+
+    return json({ credential });
+  }
+});

@@ -30,6 +30,7 @@
           <div class="segmented" role="tablist" aria-label="Views">
             <button id="tabCheckIn" class="segment active" role="tab" aria-selected="true" type="button">Check-In</button>
             <button id="tabCurrent" class="segment" role="tab" aria-selected="false" type="button">Current Registration</button>
+            <button id="tabCredentials" class="segment" role="tab" aria-selected="false" type="button">Credentials</button>
           </div>
         </div>
       </header>
@@ -135,6 +136,44 @@
               <button id="exportButton" type="button" class="secondary-btn">Download Checked-In CSV</button>
             </div>
             <p id="importStatus" class="hint"></p>
+          </article>
+
+          <footer class="copilot-credit" aria-label="Creator attribution">
+            <a
+              href="https://yt3.googleusercontent.com/bT2aS9gYus5611X-ZgGOIZeGnec_lA2RdJd6xY0nsC6giFnc54lN4z8dObhBVBBxSMdhIu2fYA=s160-c-k-c0x00ffffff-no-rj"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Open full Ricardo Wilkins logo"
+            >
+              <img
+                class="copilot-credit-logo"
+                src="https://yt3.googleusercontent.com/bT2aS9gYus5611X-ZgGOIZeGnec_lA2RdJd6xY0nsC6giFnc54lN4z8dObhBVBBxSMdhIu2fYA=s160-c-k-c0x00ffffff-no-rj"
+                alt="Ricardo Wilkins logo"
+              />
+            </a>
+            <small>
+              Created with Github Copilot by Ricardo Wilkins:
+              <a href="https://aka.ms/ricardowilkins" target="_blank" rel="noopener noreferrer">aka.ms/ricardowilkins</a>
+            </small>
+          </footer>
+        </section>
+
+        <section id="credentialsView" class="view" aria-labelledby="tabCredentials">
+          <article class="panel import-panel">
+            <h2>Import Credentials (CSV or Excel)</h2>
+            <p class="hint">Upload rows with userPrincipalName, password, and tap. The app derives Azure, GitHub, and Cloud PC credentials automatically. Optional columns: In Use and Tested.</p>
+            <div class="import-row">
+              <label for="credentialsFile" class="sr-only">Credentials file</label>
+              <input id="credentialsFile" type="file" accept=".csv,.xlsx,.xls" />
+              <button id="credentialsImportButton" type="button" class="primary-btn">Import Credentials File</button>
+              <button id="credentialsExportButton" type="button" class="secondary-btn">Download Credential Assignments CSV</button>
+            </div>
+            <p id="credentialsStatus" class="hint"></p>
+          </article>
+
+          <article class="panel">
+            <h2>Credentials by Type</h2>
+            <div id="credentialsAccordion" class="accordion" aria-live="polite"></div>
           </article>
 
           <footer class="copilot-credit" aria-label="Creator attribution">
