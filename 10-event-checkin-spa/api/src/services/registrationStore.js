@@ -22,10 +22,73 @@ const seedDataPathCandidates = [
   path.resolve(projectRoot, "..", "sample-data", "initial-registrations.json")
 ];
 
-const TRACKS = ["No Code", "Low Code", "Pro Code"];
-const TRACK_SET = new Set([...TRACKS, "Unknown"]);
+const TRACKS = ["No Code", "Low Code", "Pro Code", "Unknown"];
+const TRACK_SET = new Set(TRACKS);
 const CREDENTIALS_PARTITION_SUFFIX = "-credentials";
 const CREDENTIAL_FAMILY_TYPES = ["Azure", "GitHub", "Cloud PC"];
+const AGENCY_CANONICAL_MAP = new Map([
+  ["microsoft", "Microsoft"],
+  ["dps", "Ohio Department of Public Safety"],
+  ["odps", "Ohio Department of Public Safety"],
+  ["departmentofpublicsafety", "Ohio Department of Public Safety"],
+  ["ohiodepartmentofpublicsafety", "Ohio Department of Public Safety"],
+  ["odjfs", "Ohio Department of Job and Family Services"],
+  ["ohiojobandfamilyservices", "Ohio Department of Job and Family Services"],
+  ["ohiodepartmentofjobandfamilyservices", "Ohio Department of Job and Family Services"],
+  ["stateofohiojobfamilyservices", "Ohio Department of Job and Family Services"],
+  ["stateofohiojobandfamilyservices", "Ohio Department of Job and Family Services"],
+  ["obm", "Ohio Office of Budget and Management"],
+  ["ohioofficeofbudgetandmanagement", "Ohio Office of Budget and Management"],
+  ["stateofohioofficeofbudgetandmanagement", "Ohio Office of Budget and Management"],
+  ["stateofohioobm", "Ohio Office of Budget and Management"],
+  ["das", "Department of Administrative Services"],
+  ["administrativeservices", "Department of Administrative Services"],
+  ["departmentofadministrativeservices", "Department of Administrative Services"],
+  ["deptofadministrativeservices", "Department of Administrative Services"],
+  ["deptofadministrativeservices", "Department of Administrative Services"],
+  ["bwc", "Ohio Bureau of Workers' Compensation"],
+  ["ohiobwc", "Ohio Bureau of Workers' Compensation"],
+  ["ohiobureauofworkerscompensation", "Ohio Bureau of Workers' Compensation"],
+  ["stateofohiobureauofworkerscompensation", "Ohio Bureau of Workers' Compensation"],
+  ["ohioepa", "Ohio Environmental Protection Agency"],
+  ["ohioenvironmentalprotectionagency", "Ohio Environmental Protection Agency"],
+  ["odot", "Ohio Department of Transportation"],
+  ["ohiodepartmentoftransportation", "Ohio Department of Transportation"],
+  ["ohiondepartmentoftransport", "Ohio Department of Transportation"],
+  ["ood", "Opportunities for Ohioans with Disabilities"],
+  ["opportunitiesforohioanswithdisabilities", "Opportunities for Ohioans with Disabilities"],
+  ["opportunitiesforohioanswithdisabilties", "Opportunities for Ohioans with Disabilities"],
+  ["insurance", "Ohio Department of Insurance"],
+  ["departmentofinsurance", "Ohio Department of Insurance"],
+  ["ohiodepartmentofinsurance", "Ohio Department of Insurance"],
+  ["deptofcommerce", "Ohio Department of Commerce"],
+  ["deptcommerce", "Ohio Department of Commerce"],
+  ["ohiodeptofcommerce", "Ohio Department of Commerce"],
+  ["ohiodepartmentofcommerce", "Ohio Department of Commerce"],
+  ["stateofohiocommerce", "Ohio Department of Commerce"],
+  ["treasurerofstate", "Ohio Treasurer of State"],
+  ["ohiotreasurerofstate", "Ohio Treasurer of State"],
+  ["ohiotreasurersoffice", "Ohio Treasurer of State"],
+  ["sco", "Supreme Court of Ohio"],
+  ["stateofohio", "State of Ohio"]
+]);
+
+function makeAgencyLookupKey(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "");
+}
+
+function normalizeAgencyName(value) {
+  const raw = String(value || "").trim();
+  if (!raw) {
+    return "";
+  }
+
+  const mapped = AGENCY_CANONICAL_MAP.get(makeAgencyLookupKey(raw));
+  return mapped || raw;
+}
 
 function firstDefined(...values) {
   for (const value of values) {
@@ -219,7 +282,7 @@ function normalizeSeedRecord(input) {
     status: input.status,
     name: input.name,
     title: input.title || "",
-    agency: input.agency || "",
+    agency: normalizeAgencyName(input.agency || ""),
     trackSelected: input.trackSelected || "Unknown",
     lastName,
     lastInitial: (lastName[0] || "").toUpperCase(),
@@ -258,7 +321,7 @@ function normalizeImportRecord(input, index = 0) {
   const status = statusRaw || "Pending";
   const trackSelected = normalizeTrackName(input.trackSelected || input.TrackSelected || input.Track || "Unknown");
   const title = String(input.title || input.Title || "").trim();
-  const agency = String(input.agency || input.Agency || "").trim();
+  const agency = normalizeAgencyName(String(input.agency || input.Agency || "").trim());
   const registrationId = String(input.registrationId || input.RegistrationId || "").trim() || makeRegistrationId(index);
   const lastName = extractLastName(name);
   const checkedInAtUtc = status === "Checked-In" ? String(input.checkedInAtUtc || input.CheckedInAtUtc || new Date().toISOString()) : "";
@@ -448,6 +511,37 @@ class LocalFileStore {
     return current;
   }
 
+  async updateAttendee(registrationId, updates = {}) {
+    const records = await this.loadRecords();
+    const idx = records.findIndex((record) => record.registrationId === registrationId);
+
+    if (idx < 0) {
+      return null;
+    }
+
+    const current = records[idx];
+    const nextStatus = updates.status !== undefined ? String(updates.status || "").trim() : current.status;
+    const nextTrack = updates.trackSelected !== undefined
+      ? normalizeTrackName(updates.trackSelected)
+      : current.trackSelected;
+
+    const updated = {
+      ...current,
+      status: nextStatus || current.status,
+      trackSelected: nextTrack || current.trackSelected
+    };
+
+    if (updated.status === "Checked-In") {
+      updated.checkedInAtUtc = updated.checkedInAtUtc || new Date().toISOString();
+    } else {
+      updated.checkedInAtUtc = "";
+    }
+
+    records[idx] = updated;
+    await this.saveRecords(records);
+    return updated;
+  }
+
   async getDashboard() {
     const records = await this.loadRecords();
     const totalRegistrants = records.length;
@@ -484,14 +578,24 @@ class LocalFileStore {
       if ((record.trackSelected || "Unknown") !== trackName) {
         continue;
       }
-      if (!groups.has(record.agency)) {
-        groups.set(record.agency, []);
+      const normalizedAgency = normalizeAgencyName(record.agency || "");
+      if (!groups.has(normalizedAgency)) {
+        groups.set(normalizedAgency, []);
       }
-      groups.get(record.agency).push(record);
+      groups.get(normalizedAgency).push({
+        ...record,
+        agency: normalizedAgency
+      });
     }
 
     return [...groups.entries()]
-      .sort((a, b) => a[0].localeCompare(b[0]))
+      .sort((a, b) => {
+        const byCount = b[1].length - a[1].length;
+        if (byCount !== 0) {
+          return byCount;
+        }
+        return a[0].localeCompare(b[0]);
+      })
       .map(([agency, attendees]) => ({
         agency,
         attendees: attendees.sort((a, b) => a.lastName.localeCompare(b.lastName))
@@ -517,6 +621,25 @@ class LocalFileStore {
     return {
       imported,
       total: byId.size
+    };
+  }
+
+  async replaceRecords(inputRecords) {
+    const normalized = [];
+
+    for (let i = 0; i < inputRecords.length; i += 1) {
+      const record = normalizeImportRecord(inputRecords[i], i);
+      if (!record) {
+        continue;
+      }
+      normalized.push(record);
+    }
+
+    await this.saveRecords(normalized);
+
+    return {
+      imported: normalized.length,
+      total: normalized.length
     };
   }
 
@@ -794,6 +917,12 @@ class TableStore {
   }
 
   async seedIfEmpty() {
+    // In Azure-hosted environments, never auto-seed from sample data.
+    // Production data must be loaded explicitly via POST /api/import.
+    if (isAzureHosted) {
+      return;
+    }
+
     const existing = await this.listAll();
     if (existing.length > 0) {
       return;
@@ -872,6 +1001,33 @@ class TableStore {
     return record;
   }
 
+  async updateAttendee(registrationId, updates = {}) {
+    const record = await this.getById(registrationId);
+    if (!record) {
+      return null;
+    }
+
+    const nextStatus = updates.status !== undefined ? String(updates.status || "").trim() : record.status;
+    const nextTrack = updates.trackSelected !== undefined
+      ? normalizeTrackName(updates.trackSelected)
+      : record.trackSelected;
+
+    const updated = {
+      ...record,
+      status: nextStatus || record.status,
+      trackSelected: nextTrack || record.trackSelected
+    };
+
+    if (updated.status === "Checked-In") {
+      updated.checkedInAtUtc = updated.checkedInAtUtc || new Date().toISOString();
+    } else {
+      updated.checkedInAtUtc = "";
+    }
+
+    await this.client.upsertEntity(this.entityFromRecord(updated), "Replace");
+    return updated;
+  }
+
   async getDashboard() {
     const records = await this.listAll();
     const totalRegistrants = records.length;
@@ -908,14 +1064,24 @@ class TableStore {
       if ((record.trackSelected || "Unknown") !== trackName) {
         continue;
       }
-      if (!groups.has(record.agency)) {
-        groups.set(record.agency, []);
+      const normalizedAgency = normalizeAgencyName(record.agency || "");
+      if (!groups.has(normalizedAgency)) {
+        groups.set(normalizedAgency, []);
       }
-      groups.get(record.agency).push(record);
+      groups.get(normalizedAgency).push({
+        ...record,
+        agency: normalizedAgency
+      });
     }
 
     return [...groups.entries()]
-      .sort((a, b) => a[0].localeCompare(b[0]))
+      .sort((a, b) => {
+        const byCount = b[1].length - a[1].length;
+        if (byCount !== 0) {
+          return byCount;
+        }
+        return a[0].localeCompare(b[0]);
+      })
       .map(([agency, attendees]) => ({
         agency,
         attendees: attendees.sort((a, b) => a.lastName.localeCompare(b.lastName))
@@ -939,6 +1105,37 @@ class TableStore {
     return {
       imported,
       total: records.length
+    };
+  }
+
+  async replaceRecords(inputRecords) {
+    const normalized = [];
+
+    for (let i = 0; i < inputRecords.length; i += 1) {
+      const record = normalizeImportRecord(inputRecords[i], i);
+      if (!record) {
+        continue;
+      }
+      normalized.push(record);
+    }
+
+    const keepIds = new Set(normalized.map((item) => item.registrationId));
+    const existing = await this.listAll();
+
+    for (const row of existing) {
+      if (keepIds.has(row.registrationId)) {
+        continue;
+      }
+      await this.client.deleteEntity(config.eventId, row.registrationId);
+    }
+
+    for (const row of normalized) {
+      await this.client.upsertEntity(this.entityFromRecord(row), "Replace");
+    }
+
+    return {
+      imported: normalized.length,
+      total: normalized.length
     };
   }
 
@@ -1106,15 +1303,33 @@ export async function getRegistrationStore() {
   const shouldUseTableStorage = hasTableConfig && (config.useTableStorage || isAzureHosted);
 
   if (shouldUseTableStorage) {
-    try {
-      singletonStore = new TableStore();
-      await singletonStore.initialize();
-      await singletonStore.seedIfEmpty();
-      return singletonStore;
-    } catch (error) {
-      console.warn("Table storage unavailable; falling back to local storage.", error?.message || error);
-      singletonStore = null;
+    const maxAttempts = 3;
+    const retryDelayMs = 2000;
+    let lastError;
+
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        singletonStore = new TableStore();
+        await singletonStore.initialize();
+        await singletonStore.seedIfEmpty();
+        return singletonStore;
+      } catch (error) {
+        lastError = error;
+        singletonStore = null;
+        if (attempt < maxAttempts) {
+          console.warn(`Table storage init attempt ${attempt}/${maxAttempts} failed; retrying in ${retryDelayMs}ms.`, error?.message || error);
+          await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
+        }
+      }
     }
+
+    if (isAzureHosted) {
+      // In production, never silently fall back — surface the error so the
+      // caller receives a clean 500 instead of stale sample data.
+      throw new Error(`Table storage unavailable after ${maxAttempts} attempts: ${lastError?.message || lastError}`);
+    }
+
+    console.warn("Table storage unavailable; falling back to local storage.", lastError?.message || lastError);
   }
 
   singletonStore = new LocalFileStore();

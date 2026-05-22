@@ -612,19 +612,64 @@ function renderAttendeeDetail() {
 
   const attendee = state.selectedAttendee;
   const checked = attendee.status === "Checked-In";
+  const statuses = ["Pending", "Approve", "Checked-In"];
+  const statusOptions = statuses
+    .map((status) => `<option value="${status}" ${attendee.status === status ? "selected" : ""}>${status}</option>`)
+    .join("");
+  const detailTracks = ["No Code", "Low Code", "Pro Code", "Unknown"];
+  const trackOptions = detailTracks
+    .map((track) => `<option value="${track}" ${attendee.trackSelected === track ? "selected" : ""}>${track}</option>`)
+    .join("");
 
   attendeeDetail.innerHTML = `
     <div class="detail-grid">
       <div class="detail-row"><span class="detail-label">Name</span><strong>${attendee.name}</strong></div>
       <div class="detail-row"><span class="detail-label">Title</span>${attendee.title}</div>
       <div class="detail-row"><span class="detail-label">Agency</span>${attendee.agency}</div>
-      <div class="detail-row"><span class="detail-label">Track Selected</span><strong>${attendee.trackSelected}</strong></div>
-      <div class="detail-row"><span class="detail-label">Status</span><span class="status-pill ${checked ? "checked" : ""}">${attendee.status}</span></div>
+      <div class="detail-row">
+        <span class="detail-label">Track Selected</span>
+        <select id="detailTrackSelect" class="detail-select">${trackOptions}</select>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Status</span>
+        <select id="detailStatusSelect" class="detail-select">${statusOptions}</select>
+      </div>
+      <button type="button" id="saveDetailButton" class="secondary-btn">Save Detail Changes</button>
       <button type="button" id="checkInButton" class="primary-btn">
         ${checked ? "Check Out" : "Check-In Attendee"}
       </button>
     </div>
   `;
+
+  const detailTrackSelect = document.getElementById("detailTrackSelect");
+  const detailStatusSelect = document.getElementById("detailStatusSelect");
+  const saveDetailButton = document.getElementById("saveDetailButton");
+  if (saveDetailButton && detailTrackSelect && detailStatusSelect) {
+    saveDetailButton.addEventListener("click", async () => {
+      saveDetailButton.disabled = true;
+      saveDetailButton.textContent = "Saving...";
+
+      try {
+        const payload = await apiPost(`/attendee/update?id=${encodeURIComponent(attendee.registrationId)}`, {
+          status: detailStatusSelect.value,
+          trackSelected: detailTrackSelect.value
+        });
+
+        state.selectedAttendee = payload.attendee;
+        const idx = state.attendees.findIndex((item) => item.registrationId === payload.attendee.registrationId);
+        if (idx >= 0) {
+          state.attendees[idx] = payload.attendee;
+        }
+
+        renderAttendees();
+        renderAttendeeDetail();
+        await loadDashboard();
+      } catch {
+        saveDetailButton.disabled = false;
+        saveDetailButton.textContent = "Retry Save";
+      }
+    });
+  }
 
   const checkInButton = document.getElementById("checkInButton");
   if (!checkInButton) {
@@ -655,7 +700,13 @@ function renderAttendeeDetail() {
 }
 
 function renderTrackButtons(dashboard) {
-  const tracks = ["No Code", "Low Code", "Pro Code"];
+  const tracks = Array.isArray(dashboard.tracks) && dashboard.tracks.length
+    ? dashboard.tracks
+    : ["No Code", "Low Code", "Pro Code", "Unknown"];
+
+  if (!tracks.includes(state.selectedTrack)) {
+    state.selectedTrack = tracks[0];
+  }
 
   trackButtons.innerHTML = tracks
     .map((track) => {
@@ -670,9 +721,9 @@ function renderTrackButtons(dashboard) {
     .join("");
 
   const unknownCount = dashboard.trackCounts?.Unknown || 0;
-  const checkedByTrack = dashboard.checkedInTrackCounts || { "No Code": 0, "Low Code": 0, "Pro Code": 0 };
+  const checkedByTrack = dashboard.checkedInTrackCounts || { "No Code": 0, "Low Code": 0, "Pro Code": 0, Unknown: 0 };
 
-  kpiTotalCheckedIn.innerHTML = `${dashboard.totalCheckedIn || 0}<span class="kpi-sub">(No Code: ${checkedByTrack["No Code"] || 0}, Low Code: ${checkedByTrack["Low Code"] || 0}, Pro Code: ${checkedByTrack["Pro Code"] || 0})</span>`;
+  kpiTotalCheckedIn.innerHTML = `${dashboard.totalCheckedIn || 0}<span class="kpi-sub">(No Code: ${checkedByTrack["No Code"] || 0}, Low Code: ${checkedByTrack["Low Code"] || 0}, Pro Code: ${checkedByTrack["Pro Code"] || 0}, Unknown: ${checkedByTrack.Unknown || 0})</span>`;
 
   unknownTrackInfo.textContent = unknownCount
     ? `${unknownCount} registrants currently have Track Selected set to Unknown (from screenshot seed data).`

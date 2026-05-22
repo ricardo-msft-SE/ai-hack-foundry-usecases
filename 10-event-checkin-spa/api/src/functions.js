@@ -217,6 +217,34 @@ app.http("importRegistrations", {
   }
 });
 
+app.http("replaceRegistrations", {
+  methods: ["POST"],
+  authLevel: "anonymous",
+  route: "replace",
+  handler: async (request) => {
+    let payload;
+
+    try {
+      payload = await request.json();
+    } catch {
+      return badRequest("Invalid JSON body.");
+    }
+
+    const attendees = payload?.attendees;
+    if (!Array.isArray(attendees)) {
+      return badRequest("Body must include an attendees array.");
+    }
+
+    const store = await getRegistrationStore();
+    const result = await store.replaceRecords(attendees);
+
+    return json({
+      message: "Replace completed.",
+      ...result
+    });
+  }
+});
+
 app.http("checkInAttendeeByQuery", {
   methods: ["POST"],
   authLevel: "anonymous",
@@ -249,6 +277,41 @@ app.http("checkOutAttendeeByQuery", {
 
     const store = await getRegistrationStore();
     const attendee = await store.checkOut(id);
+    if (!attendee) {
+      return json({ error: "Attendee not found" }, 404);
+    }
+
+    return json({ attendee });
+  }
+});
+
+app.http("updateAttendeeByQuery", {
+  methods: ["POST"],
+  authLevel: "anonymous",
+  route: "attendee/update",
+  handler: async (request) => {
+    const id = request.query.get("id") || "";
+    if (!id) {
+      return badRequest("Missing required query parameter: id");
+    }
+
+    let payload;
+    try {
+      payload = await request.json();
+    } catch {
+      return badRequest("Invalid JSON body.");
+    }
+
+    if (payload?.status === undefined && payload?.trackSelected === undefined) {
+      return badRequest("Body must include status and/or trackSelected.");
+    }
+
+    const store = await getRegistrationStore();
+    const attendee = await store.updateAttendee(id, {
+      status: payload?.status,
+      trackSelected: payload?.trackSelected
+    });
+
     if (!attendee) {
       return json({ error: "Attendee not found" }, 404);
     }

@@ -265,6 +265,17 @@ input[type="file"] {
   padding-bottom: 0.35rem;
 }
 
+.detail-select {
+  margin-top: 0.2rem;
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--color-text);
+  padding: 0.35rem 0.5rem;
+}
+
 .detail-label {
   font-size: 0.8rem;
   color: var(--color-muted);
