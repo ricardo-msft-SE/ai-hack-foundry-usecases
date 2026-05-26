@@ -1060,9 +1060,10 @@ class TableStore {
   async getTrackAgencies(trackName) {
     const records = await this.listAll();
     const groups = new Map();
+    const includeAllTracks = String(trackName || "").trim().toLowerCase() === "all tracks";
 
     for (const record of records) {
-      if ((record.trackSelected || "Unknown") !== trackName) {
+      if (!includeAllTracks && (record.trackSelected || "Unknown") !== trackName) {
         continue;
       }
       const normalizedAgency = normalizeAgencyName(record.agency || "");
