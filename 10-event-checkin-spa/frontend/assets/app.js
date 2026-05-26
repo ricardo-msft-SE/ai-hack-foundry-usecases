@@ -700,9 +700,10 @@ function renderAttendeeDetail() {
 }
 
 function renderTrackButtons(dashboard) {
-  const tracks = Array.isArray(dashboard.tracks) && dashboard.tracks.length
+  const baseTracks = Array.isArray(dashboard.tracks) && dashboard.tracks.length
     ? dashboard.tracks
     : ["No Code", "Low Code", "Pro Code", "Unknown"];
+  const tracks = ["All Tracks", ...baseTracks];
 
   if (!tracks.includes(state.selectedTrack)) {
     state.selectedTrack = tracks[0];
@@ -710,7 +711,9 @@ function renderTrackButtons(dashboard) {
 
   trackButtons.innerHTML = tracks
     .map((track) => {
-      const count = dashboard.trackCounts?.[track] || 0;
+      const count = track === "All Tracks"
+        ? dashboard.totalRegistrants || 0
+        : dashboard.trackCounts?.[track] || 0;
       return `
       <button type="button" class="track-button ${state.selectedTrack === track ? "active" : ""}" data-track="${track}">
         ${track}

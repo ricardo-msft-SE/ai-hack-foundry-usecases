@@ -1,0 +1,56 @@
+name: Deploy Event Check-In to Azure Production
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "10-event-checkin-spa/**"
+      - ".github/workflows/deploy-event-checkin-prod.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: event-checkin-prod
+  cancel-in-progress: true
+
+jobs:
+  deploy-api:
+    name: Deploy Azure Function App
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install API dependencies
+        working-directory: 10-event-checkin-spa/api
+        run: npm ci
+
+      - name: Deploy Function App
+        uses: Azure/functions-action@v1
+        with:
+          app-name: hackreg-ohio-func-2041
+          package: 10-event-checkin-spa/api
+          publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE_HACKREG_OHIO_FUNC_2041 }}
+
+  deploy-frontend:
+    name: Deploy Azure Static Web App
+    runs-on: ubuntu-latest
+    needs: deploy-api
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy Static Web App
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_HACKREG_OHIO_SWA_2041 }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: upload
+          app_location: 10-event-checkin-spa/frontend
+          output_location: ""
+          skip_api_build: true
