@@ -12,7 +12,7 @@ title: Foundry-First Accelerator Documentation
 
 <section class="metric-grid">
   <div class="metric">
-    <strong>9</strong>
+    <strong>10</strong>
     Accelerator tracks
   </div>
   <div class="metric">
@@ -56,15 +56,32 @@ title: Foundry-First Accelerator Documentation
 
 <section id="bonus-accelerators" class="panel panel-bonus">
   <h2>Bonus Accelerators</h2>
-  <p class="lede-small">These two accelerators extend the portfolio with deep Document Intelligence focus—automated credential verification and claims processing for specialized government workflows.</p>
+  <p class="lede-small">These two accelerators extend the portfolio with deep document processing focus — automated credential verification and claims processing for specialized government workflows.</p>
   <div class="card-grid">
     {% for guide in ordered_guides %}
-    {% if guide.order >= 8 %}
+    {% if guide.order >= 8 and guide.order <= 10 %}
     <article class="card card-bonus">
       <p class="meta">Bonus Accelerator {{ guide.order }}</p>
       <h3>{{ guide.title }}</h3>
       <p>{{ guide.tagline }}</p>
       <a href="{{ guide.url | relative_url }}">Open Guide</a>
+    </article>
+    {% endif %}
+    {% endfor %}
+  </div>
+</section>
+
+<section id="hackathon-labs" class="panel panel-lab">
+  <h2>Hackathon Labs</h2>
+  <p class="lede-small">Hands-on skill-building labs designed for day one of the hackathon. Learn to use GitHub Copilot in VS Code to connect to Azure, explore the repo, deploy infrastructure, and build your Demo Day presentation.</p>
+  <div class="card-grid">
+    {% for guide in ordered_guides %}
+    {% if guide.order >= 11 %}
+    <article class="card card-lab">
+      <p class="meta">Lab</p>
+      <h3>{{ guide.title }}</h3>
+      <p>{{ guide.tagline }}</p>
+      <a href="{{ guide.url | relative_url }}">Open Lab</a>
     </article>
     {% endif %}
     {% endfor %}
