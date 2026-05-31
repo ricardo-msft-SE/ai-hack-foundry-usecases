@@ -1,8 +1,8 @@
 # Document Eligibility Agent — Azure AI Foundry Guide
 
-This guide walks you through building a **Document Eligibility Agent** using Microsoft Azure AI Foundry. The agent accepts document uploads (W-2s, pay stubs, utility bills, government IDs), extracts key fields using Azure Document Intelligence, checks eligibility against program rules, and routes cases to staff.
+This guide walks you through building a **Document Eligibility Agent** using Microsoft Azure AI Foundry. The agent accepts document uploads (W-2s, pay stubs, utility bills, government IDs), extracts key fields using gpt-4o's built-in vision capabilities (or optionally Azure Document Intelligence via a custom Action), checks eligibility against program rules, and routes cases to staff.
 
-**No OCR code, no SDK, no custom pipeline — just Foundry.**
+**No custom OCR pipeline — just Foundry.**
 
 ---
 
@@ -10,11 +10,11 @@ This guide walks you through building a **Document Eligibility Agent** using Mic
 
 | Code-First Component | Foundry-First Replacement |
 |---|---|
-| Azure Document Intelligence SDK (`DocumentAnalysisClient`) | Built-in **Document Intelligence tool** (toggle in agent settings) |
-| Custom OCR field extraction pipeline | Document Intelligence tool extracts fields automatically |
-| PII detection and masking code | Document Intelligence tool handles PII identification |
-| Confidence scoring logic | Built-in confidence scores from Document Intelligence |
-| Flask API for document uploads | Foundry file attachment in conversation |
+| Azure Document Intelligence SDK (`DocumentAnalysisClient`) | **Code Interpreter** tool — gpt-4o vision + Python reads uploaded documents |
+| Custom OCR field extraction pipeline | gpt-4o extracts fields from PDFs/images attached in chat |
+| PII detection and masking code | Instructions in system prompt guide the model to handle PII |
+| Confidence scoring logic | Model expresses confidence in extracted fields in its response |
+| Flask API for document uploads | Foundry file attachment in conversation (Code Interpreter handles it) |
 | Case routing Python plugin | **Action** — upload an OpenAPI spec |
 | Eligibility rules engine | **Knowledge** — upload the program requirements doc |
 
@@ -59,19 +59,22 @@ This guide walks you through building a **Document Eligibility Agent** using Mic
 
 ---
 
-## 📄 Step 3 — Enable the Document Intelligence Tool
+## 📄 Step 3 — Enable Code Interpreter (Document Processing)
 
-This step replaces the entire custom OCR pipeline from the code-first version — Azure Document Intelligence SDK, field extraction code, confidence scoring, PII detection — with a single toggle.
+> ⚠️ **Note (May 2026):** The standalone **Document Intelligence** tool toggle no longer appears in the Foundry portal's "Select a tool" dialog. Document field extraction is now handled by enabling **Code Interpreter**, which allows gpt-4o to process file attachments (PDFs, images, TIFF, JPEG) at runtime using its vision + reasoning capabilities — no separate Azure Document Intelligence resource required for standard field extraction.
+>
+> If you need specialized prebuilt model accuracy (e.g., IRS W-2 form model), see the **Advanced Option** at the end of this step.
 
-1. Inside your agent, find the **Tools** section
-2. Look for **Document Intelligence** (may be listed under "Built-in tools" or "Azure tools")
-3. Click the toggle to **Enable**
-4. If prompted, select or create an **Azure AI Services** resource (Document Intelligence is included)
-5. Click **Save**
+#### Enable Code Interpreter
 
-> 💡 Once enabled, users can attach documents (PDF, JPEG, PNG, TIFF) directly in the chat. The agent will extract fields, detect document type, and assess confidence automatically.
+1. Inside your agent editor, click **+ Add tool** (or the **Tools** section)
+2. In the **Select a tool** dialog, click **Code interpreter**
+3. Click **Add tool**
+4. Click **Save**
 
-**What Document Intelligence extracts automatically:**
+> 💡 With Code Interpreter enabled and gpt-4o selected, users can attach documents directly in the chat window. The agent uses gpt-4o's vision capabilities to read the document and Python code execution to extract and structure the fields — no separate OCR resource needed.
+
+**What gpt-4o + Code Interpreter extracts from uploaded documents:**
 
 | Document Type | Extracted Fields |
 |---|---|
@@ -81,6 +84,21 @@ This step replaces the entire custom OCR pipeline from the code-first version �
 | Government ID | Name, date of birth, expiration date, ID number |
 | Bank Statement | Institution name, account type, balance, statement period |
 | Lease Agreement | Landlord name, tenant name, property address, monthly rent |
+
+**Supported file types:** PDF, PNG, JPEG, TIFF, BMP, GIF (static), WEBP
+
+---
+
+#### Advanced Option — Call Azure Document Intelligence via Custom Action
+
+For production scenarios requiring the highest field-extraction accuracy (IRS prebuilt models, confidence scores per field, layout analysis), you can wire in Azure Document Intelligence as a custom function tool:
+
+1. In **Select a tool**, go to the **Custom** tab
+2. Click **+ New tool** and provide an OpenAPI spec pointing to your Azure Document Intelligence endpoint
+3. Include operations like `POST /documentModels/prebuilt-w2:analyze` with your API key or managed identity auth
+4. The agent will call Document Intelligence when a document is attached, then interpret the structured JSON response
+
+> This requires an Azure Document Intelligence resource (Standard S0 tier) and is recommended when confidence scoring per field or audit-trail extraction accuracy is a compliance requirement.
 
 ---
 
