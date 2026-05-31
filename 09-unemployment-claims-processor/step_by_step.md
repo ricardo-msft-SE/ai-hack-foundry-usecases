@@ -6,9 +6,8 @@ This guide walks you through deploying the Unemployment Claims Processor agent i
 
 ## Prerequisites
 
-- Azure AI Foundry project with **Agent Service**, **Document Intelligence**, and **Code Interpreter** enabled
-- Azure Document Intelligence resource (Standard tier minimum)
-- Azure Compute resource for Code Interpreter (Small VM or container; included in Foundry Standard)
+- Azure AI Foundry project with **Agent Service** enabled
+- A deployed **gpt-4o** model (required for document vision + Code Interpreter)
 - Upload permissions in your Foundry project
 - This accelerator's files:
   - `system_prompt.txt`
@@ -27,30 +26,29 @@ This guide walks you through deploying the Unemployment Claims Processor agent i
 
 ---
 
-## Step 2: Enable Document Intelligence Tool
+## Step 2: Enable Code Interpreter (Document Processing)
 
-1. In your Foundry project, go to **Settings** → **Tools**
-2. Scroll to **Document Intelligence** and verify it shows **Enabled**
-   - If not enabled, click **Enable** and confirm
-   - Ensure your Document Intelligence resource is linked
-3. Return to the project homepage
+> ⚠️ **Note (May 2026):** The standalone **Document Intelligence** tool no longer appears in the Foundry portal's "Select a tool" dialog. Document field extraction is now handled by **Code Interpreter** — gpt-4o uses its vision capabilities plus Python execution to read uploaded wage documents, pay stubs, and PDFs at runtime.
+
+This same Code Interpreter tool also handles benefits calculation (Step 6d), so enabling it once covers both use cases.
+
+1. Inside your agent editor, click **+ Add tool**
+2. In the **Select a tool** dialog, click **Code interpreter**
+3. Click **Add tool**
+4. Click **Save**
+
+> 💡 With Code Interpreter enabled and gpt-4o selected, claimants or staff can attach wage documents directly in the chat. The agent reads the document using gpt-4o's vision capabilities and extracts fields (employer name, wages by week, separation reason) via Python code — no separate OCR resource needed.
+
+**File limits and behavior:**
+- Up to **20 files** per session, **512 MB** per file
+- Files are **ephemeral** — deleted when the session ends
+- Supported formats: PDF, PNG, JPEG, TIFF, BMP, WEBP
+
+> For production scenarios requiring per-field confidence scores or structured extracts (e.g., W-2 prebuilt model), see the Advanced Option in the [02-document-eligibility-agent guide](../02-document-eligibility-agent/step_by_step.md#advanced-option--call-azure-document-intelligence-via-custom-action) for wiring Document Intelligence as a Custom Action.
 
 ---
 
-## Step 3: Enable Code Interpreter
-
-The **Code Interpreter** tool lets agents write and execute Python code to calculate benefits, detect overpayments, and process complex formulas.
-
-1. Go to **Settings** → **Tools**
-2. Scroll to **Code Interpreter** and verify it shows **Enabled**
-   - If not enabled, click **Enable** and select a compute resource
-   - If no compute resource exists, create one (Small VM sufficient for claims processor)
-3. Verify Azure Compute resource status (should show "Running" or "Ready")
-4. Return to the project homepage
-
----
-
-## Step 4: Create a Knowledge Index
+## Step 3: Create a Knowledge Index
 
 1. Go to **+ New** → **Knowledge** or navigate to **Knowledge** tab
 2. Click **+ New knowledge index**
@@ -66,7 +64,7 @@ The **Code Interpreter** tool lets agents write and execute Python code to calcu
 
 ---
 
-## Step 5: Create an Agent
+## Step 4: Create an Agent
 
 1. Go to **+ New** → **Agent** or navigate to **Agents** tab
 2. Click **+ New agent**
@@ -76,9 +74,9 @@ The **Code Interpreter** tool lets agents write and execute Python code to calcu
 
 ---
 
-## Step 6: Configure Agent Instructions and Tools
+## Step 5: Configure Agent Instructions and Tools
 
-### 6a. Set Instructions
+### 5a. Set Instructions
 
 1. In the agent editor, go to **Instructions**
 2. Clear any default text
@@ -86,30 +84,34 @@ The **Code Interpreter** tool lets agents write and execute Python code to calcu
 4. Modify state formulas, benefit rates, or disqualification rules as needed
 5. Click **Save**
 
-### 6b. Add Knowledge Tool
+### 5b. Add Knowledge Tool
 
 1. Click **+ Add tool** → **Knowledge**
-2. Select the knowledge index created in Step 4 (e.g., `Unemployment & Workers Compensation Rules`)
+2. Select the knowledge index created in Step 3 (e.g., `Unemployment & Workers Compensation Rules`)
 3. Click **Add**
 
-### 6c. Add Document Intelligence Tool
+### 5c. Code Interpreter — System Prompt Guidance
 
-1. Click **+ Add tool** → **Document Intelligence**
-2. Configure:
-   - **Auto-extract:** ON (automatically process PDFs/images)
-   - **PII handling:** Choose "Mask PII" (masks SSN and medical info)
-3. Click **Add**
+Code Interpreter is now enabled at the agent level (Step 2). It handles both **document field extraction** (wage amounts, separation reason) and **benefits calculation** (weekly rate formula, max duration). No additional "Add Document Intelligence" step is needed.
 
-### 6d. Add Code Interpreter Tool
+The included `system_prompt.txt` already contains the required directives, but if you customize it, ensure it includes instructions such as:
+- *"When a wage document, pay stub, or separation letter is uploaded, use Code Interpreter to extract key fields: employer name, weekly wages by pay period, separation reason, and effective date."*
+- *"After extracting wages, calculate the claimant's Weekly Benefit Amount (WBA) using the state formula in your instructions."*
+- *"Clearly state your confidence in each extracted field and flag any that appear missing, illegible, or inconsistent."*
+- *"Use Code Interpreter for all numerical calculations — weekly benefit rates, overpayment detection, and max duration."*
 
-1. Click **+ Add tool** → **Code Interpreter**
-2. Configure:
-   - **Auto-execute:** ON (agent can run Python code without approval)
-   - **Timeout:** 30 seconds (sufficient for benefits calculation)
-3. Click **Add**
-   - This enables the agent to calculate weekly benefit rates, identify overpayments, and estimate max duration
+### 5d. Code Interpreter — Additional Configuration
 
-### 6e. Add Unemployment API Action
+| Limit | Value |
+|---|---|
+| Max files per session | 20 files |
+| Max file size | 512 MB each |
+| Session duration | Ephemeral (files deleted at session end) |
+| Pre-installed libraries | pandas, Pillow, PyPDF2, pdfminer, openpyxl, matplotlib |
+
+> ⚠️ Code Interpreter does **not** persist files between sessions. For audit trails, add instructions to output structured JSON or a claims summary that staff can copy before closing the session.
+
+### 5e. Add Unemployment API Action
 
 1. Click **+ Add tool** → **Action**
 2. Click **+ Import from OpenAPI**
@@ -121,9 +123,9 @@ The **Code Interpreter** tool lets agents write and execute Python code to calcu
 
 ---
 
-## Step 7: Test the Agent
+## Step 6: Test the Agent
 
-### 7a. Upload a Sample Wage Record
+### 6a. Upload a Sample Wage Record
 
 1. In the agent chat interface, upload a sample document (e.g., recent pay stubs, wage statement PDF)
 2. Ask the agent:
@@ -131,11 +133,11 @@ The **Code Interpreter** tool lets agents write and execute Python code to calcu
    - "Calculate the weekly benefit amount for a UI claim based on these wages"
    - "Is this claimant eligible for UI benefits?"
 3. Observe the agent's response:
-   - Verify Document Intelligence extracted wage data correctly
+   - Verify gpt-4o + Code Interpreter extracted wage data correctly (employer, weekly wages, pay dates)
    - Confirm agent cited relevant knowledge (UI eligibility rules)
    - Check benefit calculation matches state formula
 
-### 7b. Test Multi-Document Workflow (UI Claim)
+### 6b. Test Multi-Document Workflow (UI Claim)
 
 1. Upload wage records (recent 5+ weeks) AND a separation letter (e.g., RIF notice, termination letter)
 2. Ask: "Process this UI claim. Extract wages, determine separation reason, calculate weekly benefit, and recommend approval or escalation"
@@ -145,7 +147,7 @@ The **Code Interpreter** tool lets agents write and execute Python code to calcu
    - Calculated weekly benefit using state formula
    - Made a decision (Approve/Escalate) with reasoning
 
-### 7c. Test Workers' Compensation Workflow (WC Claim)
+### 6c. Test Workers' Compensation Workflow (WC Claim)
 
 1. Upload medical report (injury description, doctor note, medical bill)
 2. Ask: "Process this WC claim. Determine injury classification, calculate medical benefits, and provide status"
@@ -155,7 +157,7 @@ The **Code Interpreter** tool lets agents write and execute Python code to calcu
    - Provided medical benefit eligibility
    - Made a routing decision (Approve/Escalate/Hearing Officer)
 
-### 7d. Test Overpayment Detection
+### 6d. Test Overpayment Detection
 
 1. Upload wage records showing double income weeks (e.g., claimant worked AND received UI)
 2. Ask: "Check for overpayments in this claim"
@@ -164,7 +166,7 @@ The **Code Interpreter** tool lets agents write and execute Python code to calcu
    - Calculated overpayment amount
    - Flagged for recovery process
 
-### 7e. Test Edge Cases
+### 6e. Test Edge Cases
 
 - **Missing separation letter:** Upload only wage records → agent should flag as "Escalate for missing separation documentation"
 - **Ambiguous separation reason:** Upload termination letter with vague reason → agent should escalate to hearing officer
@@ -173,9 +175,9 @@ The **Code Interpreter** tool lets agents write and execute Python code to calcu
 
 ---
 
-## Step 8: Deploy & Configure Access Control
+## Step 7: Deploy & Configure Access Control
 
-### 8a. Deploy the Agent
+### 7a. Deploy the Agent
 
 1. Click **Deploy** in the agent editor
 2. Choose deployment target:
@@ -183,7 +185,7 @@ The **Code Interpreter** tool lets agents write and execute Python code to calcu
    - **API endpoint:** (Optional) Generate REST API for custom portal integration
 3. Click **Deploy**
 
-### 8b. Set Entra ID RBAC
+### 7b. Set Entra ID RBAC
 
 1. Go to **Settings** → **Access control** → **Role-based access control (RBAC)**
 2. Invite your UI-WC staff:
@@ -192,7 +194,7 @@ The **Code Interpreter** tool lets agents write and execute Python code to calcu
 3. Create a custom role (if needed) for **read-only audit access** to decision logs
 4. Click **Add**
 
-### 8c. Enable Audit Logging
+### 7c. Enable Audit Logging
 
 1. Go to **Settings** → **Monitoring**
 2. Enable **Application Insights** logging
@@ -201,7 +203,7 @@ The **Code Interpreter** tool lets agents write and execute Python code to calcu
 
 ---
 
-## Step 9: Multi-Language Support (Optional)
+## Step 8: Multi-Language Support (Optional)
 
 If your claimant population speaks Spanish, Vietnamese, Hmong, or other languages:
 
@@ -214,7 +216,7 @@ If your claimant population speaks Spanish, Vietnamese, Hmong, or other language
 
 ---
 
-## Step 10 (Optional): Build a Public-Facing Portal
+## Step 9 (Optional): Build a Public-Facing Portal
 
 Once the agent is working in Foundry:
 
@@ -230,8 +232,8 @@ See [Microsoft Foundry documentation](https://learn.microsoft.com/en-us/azure/ai
 
 ## Testing Checklist
 
-- [ ] Agent extracts wage data from sample pay stubs (Document Intelligence working)
-- [ ] Agent extracts separation reason from termination letters (Document Intelligence working)
+- [ ] Agent extracts wage data from sample pay stubs (Code Interpreter + gpt-4o vision working)
+- [ ] Agent extracts separation reason from termination letters (Code Interpreter + gpt-4o vision working)
 - [ ] Agent cites UI eligibility rules from knowledge (RAG working)
 - [ ] Agent calculates weekly benefit using Code Interpreter (matches state formula)
 - [ ] Agent correctly approves a routine UI claim
@@ -245,24 +247,15 @@ See [Microsoft Foundry documentation](https://learn.microsoft.com/en-us/azure/ai
 
 ## Troubleshooting
 
-**Q: Code Interpreter is not executing Python code**
-- Verify Code Interpreter is Enabled in Settings → Tools
-- Check compute resource status (should show "Running")
-- Verify timeout is sufficient (30 seconds minimum for complex calculations)
-
-**Q: Benefits calculation is incorrect**
-- Review system prompt (Step 6a) for state formula errors
-- Check knowledge index contains correct benefit rates and disqualification rules
-- Test Code Interpreter directly: ask agent to "Calculate 50% of $1,000 weekly wages"
-
-**Q: Document Intelligence is not extracting wage data**
-- Verify Document Intelligence is enabled in Settings → Tools
-- Try uploading a higher-quality document (PDF preferred)
-- Check PII masking is not over-redacting critical wage data
+**Q: Code Interpreter is not executing Python code or extracting document fields**
+- Verify Code Interpreter is enabled as a tool on the agent (Step 2)
+- Verify the system prompt includes explicit extraction instructions (Step 5c)
+- Try uploading a higher-quality document (PDF preferred over JPG)
+- Check that gpt-4o is selected as the model — other models may not support vision + Code Interpreter
 
 **Q: Knowledge is not being used**
 - Verify knowledge index status is "Active"
-- Ensure knowledge was added as a tool in Step 6b
+- Ensure knowledge was added as a tool in Step 5b
 - Try rephrasing question to match knowledge content
 
 ---
@@ -270,7 +263,7 @@ See [Microsoft Foundry documentation](https://learn.microsoft.com/en-us/azure/ai
 ## Next Steps
 
 - **Week 2:** Migrate from sample data to real claim documents
-- **Week 3:** Integrate with state UI-WC database (real backend for Step 6e)
+- **Week 3:** Integrate with state UI-WC database (real backend for Step 5e)
 - **Month 2:** Build public-facing claim submission portal
 - **Month 3:** Deploy multi-language support for diverse claimant populations
 

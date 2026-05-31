@@ -1,17 +1,17 @@
 # 02 — Document Eligibility Agent (Foundry Edition)
 
-> Replace a custom Python Document Intelligence SDK + Semantic Kernel workflow with a **zero-code** Azure AI Foundry agent using the built-in Document Intelligence tool.
+> Replace a custom Python Document Intelligence SDK + Semantic Kernel workflow with a **zero-code** Azure AI Foundry agent — using gpt-4o vision + Code Interpreter to process uploaded documents.
 
 ## Purpose
 
-An AI agent that accepts uploaded documents (W-2s, pay stubs, utility bills, IDs), extracts key fields using Azure Document Intelligence, validates eligibility criteria against program rules, and routes completed cases to the right staff member.
+An AI agent that accepts uploaded documents (W-2s, pay stubs, utility bills, IDs), extracts key fields using gpt-4o's vision capabilities via Code Interpreter, validates eligibility criteria against program rules, and routes completed cases to the right staff member.
 
 ## Foundry Features Used
 
 | Feature | Replaces |
 |---|---|
 | **Agent Service** | Flask API + Semantic Kernel conversation loop |
-| **Built-in Document Intelligence tool** | Azure Document Intelligence SDK code + OCR pipeline |
+| **Code Interpreter (gpt-4o vision)** | Azure Document Intelligence SDK code + OCR pipeline |
 | **Knowledge** | Custom eligibility rules engine + policy documents |
 | **Actions (OpenAPI)** | Python case routing plugin + staff assignment logic |
 

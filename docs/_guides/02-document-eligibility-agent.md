@@ -4,7 +4,7 @@ order: 2
 tagline: Document intake, extraction, and program eligibility triage without custom OCR code.
 foundry_features:
   - Agent Service
-  - Document Intelligence Tool
+  - Code Interpreter
   - OpenAPI Actions
   - Knowledge
 ---
@@ -15,7 +15,7 @@ foundry_features:
 An intake assistant for social programs that extracts data from submitted documents, checks eligibility policy, and routes the case.
 
 ## Foundry Build Focus
-- Enable the built-in Document Intelligence tool to replace manual OCR pipelines.
+- Use Code Interpreter (gpt-4o vision) to replace manual OCR pipelines — upload documents and let the agent extract fields via Python.
 - Ground decisions on uploaded policy requirements.
 - Route approved/flagged cases via OpenAPI action calls.
 - Enforce redaction and sensitive data handling via prompt policy.

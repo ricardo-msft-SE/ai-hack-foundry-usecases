@@ -4,7 +4,7 @@ order: 3
 tagline: Multi-agent emergency coordination across weather signals and resource readiness.
 foundry_features:
   - Agent Service
-  - Connected Agents
+  - Foundry Workflow
   - OpenAPI Actions
   - Knowledge
 ---
@@ -15,7 +15,7 @@ foundry_features:
 A coordinator agent delegates to specialists for weather and resource intelligence, then generates a phased response plan.
 
 ## Foundry Build Focus
-- Create specialist agents first, then connect them into a coordinator.
+- Create specialist agents first, then wire them into a coordinator using a **Foundry Workflow** (Build → Workflows → + New workflow).
 - Attach weather and dispatch APIs as separate tools.
 - Keep operating procedures and evacuation policy in Knowledge.
 - Evaluate for actionability, timing, and escalation accuracy.

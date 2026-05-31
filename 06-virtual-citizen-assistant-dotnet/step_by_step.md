@@ -137,4 +137,4 @@ Your .NET citizen assistant is now running as a Foundry agent — no App Service
 - **Add more permits:** Extend `permit-api.json` with additional endpoints (fee calculation, document checklist)
 - **Add more knowledge:** Upload additional `.md` files (zoning rules, fee schedules, contact directories)
 - **Multi-language:** Add `"Always respond in the same language the user writes in"` to the system prompt
-- **Connect to 05 (Inter-Agency Hub):** When this agent can't answer, hand off to the cross-agency knowledge hub agent using Connected Agents
+- **Connect to 05 (Inter-Agency Hub):** When this agent can't answer, hand off to the cross-agency knowledge hub agent — wire them together using a **Foundry Workflow** (see accelerator 03 for the Workflow pattern)

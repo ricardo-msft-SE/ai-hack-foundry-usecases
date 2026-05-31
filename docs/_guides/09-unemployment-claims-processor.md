@@ -1,10 +1,9 @@
 ---
 title: Unemployment Claims Processor
 order: 9
-tagline: Rapid UI and workers' compensation claims processing with Document Intelligence.
+tagline: Rapid UI and workers' compensation claims processing with Code Interpreter and gpt-4o vision.
 foundry_features:
   - Agent Service
-  - Document Intelligence Tool
   - Code Interpreter
   - Knowledge
   - OpenAPI Actions
@@ -16,7 +15,7 @@ foundry_features:
 A state UI-WC agency agent that extracts claim documents, calculates weekly benefits using Code Interpreter, auto-approves 60–70% of claims within 24–48 hours, detects overpayments, and routes complex cases to hearing officers.
 
 ## Foundry Build Focus
-- Enable Document Intelligence to extract wages, separation letters, and medical injury reports.
+- Use Code Interpreter (gpt-4o vision) to extract wages, separation letters, and medical injury reports — no separate Document Intelligence resource needed.
 - Use Code Interpreter to calculate weekly benefit amounts, disability percentages, and overpayment flags using state formulas.
 - Ground eligibility decisions on uploaded UI and WC requirements.
 - Route approved claims, escalations, and overpayment referrals via OpenAPI actions.
@@ -47,7 +46,7 @@ State UI-WC agencies face catastrophic claim volumes during recessions—20,000+
 ## The Solution
 
 Use Azure AI Foundry to build an **Unemployment Claims Processor** agent that:
-- Extracts wage data, separation reasons, and injury details using Document Intelligence
+- Extracts wage data, separation reasons, and injury details using Code Interpreter + gpt-4o vision
 - Calculates benefits in real-time using Code Interpreter (UI formulas, WC disability ratings)
 - Auto-approves routine claims (60–70%)
 - Detects overpayments (30% improvement in detection)
@@ -76,8 +75,7 @@ Use Azure AI Foundry to build an **Unemployment Claims Processor** agent that:
 
 | Component | Purpose |
 | --- | --- |
-| **Document Intelligence** | Extract wages, separation letters, medical reports |
-| **Code Interpreter** | Calculate weekly benefits, detect overpayments, disability ratings |
+| **Code Interpreter (gpt-4o vision)** | Extract wages, separation letters, medical reports; calculate weekly benefits, detect overpayments, disability ratings |
 | **Knowledge (RAG)** | Query UI eligibility rules, WC regulations, state formulas |
 | **Actions (OpenAPI)** | Connect to state UI-WC database, route to hearing officers |
 | **Entra ID RBAC** | Staff access control, audit trails, multi-language support |
@@ -116,7 +114,7 @@ Use Azure AI Foundry to build an **Unemployment Claims Processor** agent that:
 1. Start with [Step-by-Step Guide](../09-unemployment-claims-processor/step_by_step.md)
 2. Copy [System Prompt](../09-unemployment-claims-processor/system_prompt.txt) into Foundry agent **Instructions**
 3. Upload [OpenAPI Spec](../09-unemployment-claims-processor/openapi/unemployment-api.json) as an **Action**
-4. Enable **Code Interpreter** in agent tools (needed for benefit calculations)
+4. Add **Code Interpreter** as an agent tool (Step 2 in the guide — handles both doc extraction AND benefit calculations)
 5. Create knowledge index using [Knowledge Base](../09-unemployment-claims-processor/knowledge/unemployment-requirements.md)
 6. Test with sample claims (wage records, separation letters, medical reports)
 7. Deploy to your UI-WC staff; optionally build public portal

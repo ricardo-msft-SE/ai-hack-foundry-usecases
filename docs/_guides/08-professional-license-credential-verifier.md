@@ -4,7 +4,7 @@ order: 8
 tagline: Automated credential extraction and validation for state licensing boards.
 foundry_features:
   - Agent Service
-  - Document Intelligence Tool
+  - Code Interpreter
   - Knowledge
   - OpenAPI Actions
   - Entra ID RBAC
@@ -16,7 +16,7 @@ foundry_features:
 A state licensing board agent that extracts credentials from submitted transcripts, exam results, and background checks, validates them against licensing rules, and auto-approves 70–80% of applications within 2–4 hours instead of 2–4 weeks.
 
 ## Foundry Build Focus
-- Enable Document Intelligence to replace manual credential scanning across transcripts, exam scores, and background check documents.
+- Use Code Interpreter (gpt-4o vision) to replace manual credential scanning across transcripts, exam scores, and background check documents.
 - Ground eligibility decisions on uploaded licensure requirements for each license type (MD, JD, RN, Contractors).
 - Auto-approve, escalate, or reject via OpenAPI action calls to the state licensing database.
 - Enforce staff access tiers with Entra ID RBAC (reviewers vs. final approvers).

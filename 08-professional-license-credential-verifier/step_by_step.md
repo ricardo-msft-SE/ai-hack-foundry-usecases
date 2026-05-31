@@ -6,8 +6,8 @@ This guide walks you through deploying the Professional License Credential Verif
 
 ## Prerequisites
 
-- Azure AI Foundry project with **Agent Service** and **Document Intelligence** enabled
-- Azure Document Intelligence resource (Standard tier minimum; use the free tier for pilot testing)
+- Azure AI Foundry project with **Agent Service** enabled
+- A deployed **gpt-4o** model (required for document vision + reasoning)
 - Upload permissions in your Foundry project
 - This accelerator's files:
   - `system_prompt.txt`
@@ -26,15 +26,23 @@ This guide walks you through deploying the Professional License Credential Verif
 
 ---
 
-## Step 2: Enable Document Intelligence Tool
+## Step 2: Enable Code Interpreter (Document Processing)
 
-The **Document Intelligence** tool is a built-in Foundry capability that extracts text, tables, and key-value pairs from document images and PDFs.
+> ⚠️ **Note (May 2026):** The standalone **Document Intelligence** tool no longer appears in the Foundry portal's "Select a tool" dialog. Document field extraction is now handled by **Code Interpreter** — gpt-4o uses its vision capabilities plus Python execution to read uploaded PDFs and images at runtime.
 
-1. In your Foundry project, go to **Settings** → **Tools**
-2. Scroll to **Document Intelligence** and verify it shows **Enabled**
-   - If not enabled, click **Enable** and confirm
-   - Ensure your Document Intelligence resource is linked (should auto-populate)
-3. Return to the project homepage
+1. Inside your agent editor, click **+ Add tool**
+2. In the **Select a tool** dialog, click **Code interpreter**
+3. Click **Add tool**
+4. Click **Save**
+
+> 💡 With Code Interpreter enabled and gpt-4o selected, applicants can attach credential documents directly in the chat. The agent reads the document using gpt-4o's vision capabilities and extracts fields (degree type, graduation date, exam scores, license numbers) via Python code — no separate OCR resource needed.
+
+**File limits and behavior:**
+- Up to **20 files** per session, **512 MB** per file
+- Files are **ephemeral** — deleted when the session ends; no persistent storage
+- Supported formats: PDF, PNG, JPEG, TIFF, BMP, WEBP
+
+> For production scenarios requiring per-field confidence scores or audit-trail extraction (e.g., IRS prebuilt W-2 model), see the Advanced Option in the [02-document-eligibility-agent guide](../02-document-eligibility-agent/step_by_step.md#advanced-option--call-azure-document-intelligence-via-custom-action) for wiring Document Intelligence as a Custom Action.
 
 ---
 
@@ -90,13 +98,14 @@ If you need separation by license type (for privacy or organization), create sep
 2. Select the knowledge index created in Step 3 (e.g., `Licensure Requirements`)
 3. Click **Add**
 
-### 5c. Add Document Intelligence Tool
+### 5c. Code Interpreter — System Prompt Guidance
 
-1. Click **+ Add tool** → **Document Intelligence**
-2. Configure:
-   - **Auto-extract:** ON (automatically process uploaded images/PDFs)
-   - **PII handling:** Choose "Mask PII" if your state requires SSN masking
-3. Click **Add**
+Code Interpreter is now enabled at the agent level (Step 2). No additional "Add Document Intelligence" step is needed. However, the system prompt must tell the agent *what to do* when a document is attached.
+
+The included `system_prompt.txt` already contains these directives, but if you customize it, ensure it includes instructions such as:
+- *"When a credential document is uploaded, use Code Interpreter to read it and extract key fields: degree type, institution, graduation date, exam scores, license numbers, and background check results."*
+- *"After extraction, cross-reference the extracted credentials against the licensing rules in your knowledge base."*
+- *"Clearly state your confidence in each extracted field and flag any fields that appear missing, illegible, or inconsistent."*
 
 ### 5d. Add Licensing API Action
 
@@ -126,7 +135,7 @@ If you need separation by license type (for privacy or organization), create sep
    - "Does this applicant meet the education requirement for an MD license in [State]?"
    - "Check if this applicant is eligible under reciprocity agreements"
 3. Observe the agent's response:
-   - Verify Document Intelligence extracted text correctly
+   - Verify gpt-4o + Code Interpreter extracted text correctly (degree type, graduation date, exam scores)
    - Confirm agent cited relevant knowledge (licensing rules)
    - Check decision matches expected outcome
 
@@ -205,7 +214,7 @@ See [Microsoft Foundry documentation](https://learn.microsoft.com/en-us/azure/ai
 
 ## Testing Checklist
 
-- [ ] Agent extracts text from sample transcript (Document Intelligence working)
+- [ ] Agent extracts text and key fields from sample transcript (Code Interpreter + gpt-4o vision working)
 - [ ] Agent cites licensing rules from knowledge (RAG working)
 - [ ] Agent correctly approves a routine credential submission
 - [ ] Agent correctly escalates an incomplete or ambiguous credential
@@ -217,10 +226,11 @@ See [Microsoft Foundry documentation](https://learn.microsoft.com/en-us/azure/ai
 
 ## Troubleshooting
 
-**Q: Document Intelligence is not extracting text correctly**
-- Verify Document Intelligence resource is linked in Settings → Tools
-- Try uploading a higher-quality image (PDF preferred over JPG)
-- Check PII masking is not over-redacting needed text
+**Q: Agent is not extracting credential fields from uploaded documents**
+- Verify Code Interpreter is enabled as a tool on the agent (Step 2)
+- Verify the system prompt includes explicit extraction instructions (Step 5c)
+- Try uploading a higher-quality file (PDF preferred over JPG)
+- Check that gpt-4o is selected as the model — other models may not support vision + Code Interpreter
 
 **Q: Knowledge index is not being used**
 - Verify knowledge index status is "Active" (not "Indexing")

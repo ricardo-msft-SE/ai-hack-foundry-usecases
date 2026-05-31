@@ -1,6 +1,6 @@
 # 03 — Emergency Response Agent (Foundry Edition)
 
-> Replace a custom Python multi-agent orchestration system with **three connected Azure AI Foundry agents** — no orchestration code required.
+> Replace a custom Python multi-agent orchestration system with **three Azure AI Foundry agents wired together via a Foundry Workflow** — no orchestration code required.
 
 ## Purpose
 
@@ -9,11 +9,12 @@ A multi-agent system for emergency response planning and coordination. A **Coord
 ## Architecture
 
 ```
-EmergencyCoordinator (primary agent)
-├── WeatherSpecialist (connected sub-agent)
-│   └── Action: WeatherAPI (real-time weather + forecast data)
-└── ResourcesSpecialist (connected sub-agent)
-    └── Action: ResourcesAPI (agency resources + inventory)
+Foundry Workflow (EmergencyResponseWorkflow)
+└── EmergencyCoordinator (entry point / coordinator node)
+    ├── WeatherSpecialist (workflow node)
+    │   └── Action: WeatherAPI (real-time weather + forecast data)
+    └── ResourcesSpecialist (workflow node)
+        └── Action: ResourcesAPI (agency resources + inventory)
 
 All agents share:
 └── Knowledge: Emergency Procedures & Protocols
@@ -23,8 +24,8 @@ All agents share:
 
 | Feature | Replaces |
 |---|---|
-| **3 Connected Agents** | Custom Python multi-agent orchestrator + Semantic Kernel planner |
-| **Agent-to-Agent delegation** | Manual sub-agent invocation code + result aggregation |
+| **3 Agents + Foundry Workflow** | Custom Python multi-agent orchestrator + Semantic Kernel planner |
+| **Workflow-based delegation** | Manual sub-agent invocation code + result aggregation |
 | **Knowledge (shared)** | Historical incident data + policy document retrieval code |
 | **Actions (OpenAPI)** | Python plugins for weather API + agency resource APIs |
 

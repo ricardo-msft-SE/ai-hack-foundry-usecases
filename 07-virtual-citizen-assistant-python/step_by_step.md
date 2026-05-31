@@ -137,5 +137,5 @@ Your Python + Semantic Kernel citizen assistant is now a Foundry agent — compl
 - **Add reschedule support:** Add a `RescheduleAppointment` endpoint to the OpenAPI spec
 - **Add reminder notifications:** Connect to an email/SMS Action via OpenAPI
 - **Add more schedulable services:** Update `city-services.md` with new services and appointment requirements
-- **Connect with 01 or 06:** Use Connected Agents to route permit questions to a specialized permit agent while keeping scheduling here
+- **Connect with 01 or 06:** Route permit questions to a specialized permit agent while keeping scheduling here — wire them together using a **Foundry Workflow** (see accelerator 03 for the Workflow pattern)
 - **Deploy to Teams or web:** Publish this agent as a Teams app or embed via the Foundry-provided iframe snippet
