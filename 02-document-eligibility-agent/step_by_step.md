@@ -74,6 +74,26 @@ This guide walks you through building a **Document Eligibility Agent** using Mic
 
 > 💡 With Code Interpreter enabled and gpt-4o selected, users can attach documents directly in the chat window. The agent uses gpt-4o's vision capabilities to read the document and Python code execution to extract and structure the fields — no separate OCR resource needed.
 
+#### Code Interpreter — Additional Configuration
+
+After enabling the tool, there are a few important behaviors to be aware of and configure:
+
+**File handling limits:**
+- Maximum **20 files** per conversation session
+- Maximum **512 MB** per file
+- Files are **ephemeral** — they exist only for the duration of the conversation session and are deleted automatically; no persistent storage is created
+
+**Available Python libraries in the sandbox:**
+The Code Interpreter sandbox includes common data/document libraries pre-installed: `pandas`, `Pillow` (PIL), `PyPDF2`/`pdfminer`, `openpyxl`, `matplotlib`, and more. The agent can use these to parse PDFs, read tables, and extract structured data.
+
+**System prompt guidance (important):**
+Code Interpreter is general-purpose — the agent will not automatically know it should extract eligibility fields from documents unless the system prompt tells it to. The included [`system_prompt.txt`](./system_prompt.txt) already contains these instructions, but if you customize it, make sure it includes directives such as:
+- *"When a user uploads a document, use Code Interpreter to read it and extract key fields (e.g., employer name, wages, tax year for a W-2)."*
+- *"After extracting fields, cross-reference them against the eligibility rules in your knowledge base."*
+- *"Express your confidence in each extracted field and flag any fields that appear missing, illegible, or inconsistent."*
+
+Without these instructions, the agent will accept file uploads but may not proactively parse them for eligibility purposes.
+
 **What gpt-4o + Code Interpreter extracts from uploaded documents:**
 
 | Document Type | Extracted Fields |
@@ -182,21 +202,23 @@ Open [`openapi/case-routing-api.json`](./openapi/case-routing-api.json) to see t
 
 Open the **Playground** inside your agent.
 
-### ✅ Test Document Intelligence (OCR + Field Extraction)
+### ✅ Test Code Interpreter (Document Upload + Field Extraction)
 
 Attach a sample W-2 PDF or image to the chat and ask:
 
 **User (with attached W-2):**
 > Please review this document and extract the relevant information.
 
-**Expected:** The agent identifies the document as a W-2, extracts employer name, employee name, wages, and tax year, and reports a confidence score.
+**Expected:** The agent invokes Code Interpreter to read the file, identifies the document as a W-2, and returns a structured list of extracted fields — employer name, employee name, wages, federal tax withheld, and tax year. It should also note any fields that appear missing or unclear.
+
+> 💡 You can watch the agent's reasoning in the **Trace** or **Activity** panel — you'll see it call Code Interpreter, run Python to parse the file, and then interpret the results before responding.
 
 ---
 
 **User:**
 > Is the income on this document within the eligibility limits for food assistance?
 
-**Expected:** The agent compares extracted wages against the income limits from the Knowledge base and returns an eligibility determination with a citation.
+**Expected:** The agent compares the extracted wages against the income limits from the Knowledge base and returns an eligibility determination with a citation to the eligibility rules document.
 
 ---
 
@@ -236,7 +258,7 @@ Attach a sample W-2 PDF or image to the chat and ask:
 
 You now have:
 
-- ✅ An agent that reads and extracts fields from uploaded documents (zero OCR code)
+- ✅ An agent that reads and extracts fields from uploaded documents using gpt-4o vision + Code Interpreter (zero OCR code)
 - ✅ Eligibility checking against program rules (zero rules engine code)
 - ✅ Automated case routing to staff queues (zero plugin code)
 - ✅ No infrastructure to manage, no SDK to maintain
@@ -245,6 +267,6 @@ You now have:
 
 - **Upload real program documents** to Knowledge: income limit tables, document checklists, state regulation PDFs
 - **Connect to your case management system**: replace the mock URL in `case-routing-api.json`
-- **Add more document types**: Document Intelligence supports 40+ prebuilt document types out of the box
+- **Add more document types**: gpt-4o can process any document type — add instructions in the system prompt for new document formats (e.g., Social Security award letters, birth certificates, lease agreements)
 - **Add PII masking**: instruct the agent in the system prompt to redact sensitive fields from responses
 - **Email intake**: connect an email Action (Microsoft Graph API) to let applicants email documents directly
