@@ -86,15 +86,51 @@ This step replaces the entire custom OCR pipeline from the code-first version �
 
 ## 📚 Step 4 — Add Knowledge (Eligibility Rules)
 
-1. Inside your agent, find the **Knowledge** section
+This step replaces the custom RAG pipeline, document retrieval code, and eligibility rules engine from the code-first version.
+
+> 💡 **Understanding the two parts of this step:** Adding Knowledge involves two distinct configurations:
+>
+> - **Upload Files** — the *content source*. You select documents (PDF, DOCX, Markdown, TXT, HTML) from your local machine that contain the information the agent should know about. Foundry reads these files, automatically splits them into searchable passages, and generates vector embeddings. This is *what* you want the agent to know.
+>
+> - **Azure AI Search** — the *backend infrastructure*. This is a separate Azure service that stores and indexes the vector embeddings produced from your uploaded files, so the agent can perform fast semantic lookups at runtime. It is provisioned as an independent Azure resource in your subscription with its own pricing. This is *where* the agent searches. You can reuse an existing Azure AI Search resource across multiple agents and knowledge sets to save cost.
+
+1. Inside your agent, find the **Knowledge** section (right panel or dedicated tab)
 2. Click **+ Add knowledge**
-3. Select **Upload files**
-4. Upload [`knowledge/eligibility-requirements.md`](./knowledge/eligibility-requirements.md)
+3. When prompted for the source type, select **Upload files**
 
-   > For a real deployment, upload all program eligibility guides, income limits tables, and required document checklists here.
+   > This option lets you upload documents directly from your local machine. Other source types (not used here) include **Azure Blob Storage** and **SharePoint** — those connect the agent to documents that already live in cloud storage rather than uploading new files.
 
-5. Select or create an **Azure AI Search** resource
-6. Complete the wizard
+4. Browse and select [`knowledge/eligibility-requirements.md`](./knowledge/eligibility-requirements.md), then click **Upload**
+
+   > For a real deployment, upload all program eligibility guides, income limit tables, and required document checklists. Supported formats: PDF, DOCX, PPTX, TXT, Markdown, HTML. You can upload multiple files in a single step.
+
+5. Click **Next** to proceed to the search resource configuration
+
+6. When prompted to configure the **Azure AI Search** resource:
+   - If you already have an Azure AI Search resource in your subscription, select it from the dropdown — you can reuse a single resource across multiple agents
+   - If not, click **Create new Azure AI Search**:
+     1. Enter a **resource name** (e.g., `eligibility-search`)
+     2. Select your **Subscription** and **Resource Group**
+     3. Choose a **Pricing tier**:
+        - **Free (F)** — sufficient for hackathon/pilot use; limited to 3 indexes and 50 MB storage
+        - **Basic** — recommended for small production deployments
+        - **Standard S1** — recommended for production with multiple document sets
+     4. Select a **Region** (choose the same region as your Foundry project for best latency)
+     5. Click **Create** and wait approximately 2 minutes for provisioning
+
+   > ⚠️ **Azure AI Search is a separate, billable Azure resource.** It is not included in the Foundry/Agent Service pricing. Monitor its usage in the Azure Portal under your resource group.
+
+7. Enter an **index name** (e.g., `eligibility-index`) or accept the auto-generated default
+
+8. Keep the default **vectorization settings** (automatic embedding with your project's embedding model)
+
+9. Click **Next**, review the summary, then click **Create** to complete the wizard. Indexing typically takes 1–3 minutes.
+
+Foundry automatically:
+- Chunks the documents into searchable passages (~512 tokens each)
+- Generates vector embeddings for semantic similarity search
+- Builds and populates the Azure AI Search index
+- Wires citation tracking into every retrieval response — no code needed
 
 The agent will now check extracted document data against the eligibility rules from your Knowledge base.
 

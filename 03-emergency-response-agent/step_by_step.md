@@ -10,10 +10,10 @@ This guide walks you through building a **multi-agent Emergency Response System*
 
 | Code-First Component | Foundry-First Replacement |
 |---|---|
-| Python multi-agent orchestrator class | **Connected Agents** in Foundry (UI wiring) |
-| Semantic Kernel `AgentGroupChat` / planner | Coordinator agent's system prompt + agent delegation |
-| Sub-agent invocation code | Connected Agent tool (automatic) |
-| Result aggregation and formatting logic | Coordinator agent combines sub-agent responses |
+| Python multi-agent orchestrator class | **Foundry Workflow** — visual designer wires agents declaratively |
+| Semantic Kernel `AgentGroupChat` / planner | Workflow orchestration pattern (sequential or group-chat) |
+| Sub-agent invocation code | Workflow nodes call agents automatically |
+| Result aggregation and formatting logic | Coordinator agent node synthesizes sub-agent responses |
 | Weather API Python plugin | **Action** on WeatherSpecialist agent |
 | Resource API Python plugin | **Action** on ResourcesSpecialist agent |
 | Historical incident retrieval pipeline | **Knowledge** on all agents |
@@ -130,24 +130,46 @@ This guide walks you through building a **multi-agent Emergency Response System*
 
 3. Complete the wizard
 
-### 4c. Connect the Specialist Agents (Multi-Agent Wiring)
+### 4c. Wire the Agents Together with a Foundry Workflow
 
-This is where the multi-agent pattern comes to life — without a single line of orchestration code.
+> ⚠️ **Note:** The old "Connected Agents" portal UI is deprecated as of 2026. The current recommended approach for multi-agent orchestration in Microsoft Foundry is **Workflows** — a no-code visual designer that coordinates agents declaratively. See the [official Foundry Workflows documentation](https://learn.microsoft.com/azure/foundry/agents/concepts/workflow).
 
-1. In the Coordinator agent, find the **Tools** tab
-2. Click **+ Add tool**
-3. Select **Agent** (may appear as "Connected agent" or "Agent tool")
-4. From the agent list, select **WeatherSpecialist**
-5. Set a description: `Use this agent to get weather forecasts, current conditions, and weather impact analysis for emergency scenarios`
-6. Click **Add**
+A **Workflow** defines how agents hand off work to each other. For this scenario, the Workflow will route incoming emergency requests to the WeatherSpecialist and ResourcesSpecialist agents, then pass their outputs to the EmergencyCoordinator for synthesis.
 
-Repeat for the second sub-agent:
+#### Create the Workflow
 
-7. Click **+ Add tool** → **Agent** → select **ResourcesSpecialist**
-8. Set a description: `Use this agent to check available emergency resources, agency inventories, personnel availability, and resource deployment recommendations`
-9. Click **Add**
+1. In the left navigation of the Foundry portal, go to **Build** → **Workflows** (or click **+ New** → **Workflow**)
+2. Click **+ New workflow**
+3. Give the workflow a name: `EmergencyResponseWorkflow`
+4. Select **Group chat** or **Sequential** as the orchestration pattern:
+   - **Group chat** — the coordinator agent receives user input, decides which specialist to call, and synthesizes results. Best for this scenario.
+   - **Sequential** — agents run in a fixed order (Weather → Resources → Coordinator)
+5. Click **Create**
 
-> 💡 The Coordinator will now automatically delegate to these agents based on the task. Weather questions go to WeatherSpecialist. Resource questions go to ResourcesSpecialist. The Coordinator synthesizes both into a final plan.
+#### Add the Agents as Nodes
+
+6. In the workflow visual designer, click **+ Add agent**
+7. Select **EmergencyCoordinator** — set it as the **entry point** (receives initial user input)
+8. Click **+ Add agent** again and select **WeatherSpecialist**
+9. Click **+ Add agent** again and select **ResourcesSpecialist**
+
+#### Configure Routing Instructions
+
+10. Select the **EmergencyCoordinator** node and add routing instructions in its agent description or system prompt context:
+    - `Delegate weather impact analysis to WeatherSpecialist`
+    - `Delegate resource availability and deployment to ResourcesSpecialist`
+    - `Synthesize both responses into a final emergency response plan`
+11. Draw connections from **EmergencyCoordinator** → **WeatherSpecialist** and **EmergencyCoordinator** → **ResourcesSpecialist** in the visual canvas
+
+#### Save and Test the Workflow
+
+12. Click **Save**
+13. Click **Run** or **Test in playground** to open a chat interface driven by the workflow
+14. The workflow entry point is **EmergencyCoordinator** — all user messages go to it first
+
+> 💡 The Workflow tracks every agent call, input, and output with built-in tracing. Use the **Trace** tab after a test run to see exactly which agent was invoked, what it received, and what it returned.
+>
+> 📖 For more detail, including YAML-based workflow definitions (for version control and CI/CD), see [Build a workflow in Microsoft Foundry](https://learn.microsoft.com/azure/foundry/agents/concepts/workflow).
 
 ---
 

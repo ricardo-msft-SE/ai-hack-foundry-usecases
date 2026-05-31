@@ -74,14 +74,43 @@ This step replaces the custom Python compliance scoring script.
 
 This step replaces the rule library and severity definition tables.
 
+> 💡 **Understanding the two parts of this step:** Adding Knowledge involves two distinct configurations:
+>
+> - **Upload Files** — the *content source*. You select documents (PDF, DOCX, Markdown, TXT, HTML) from your local machine that contain the compliance rules and standards the agent should enforce. Foundry reads these files, splits them into searchable passages, and generates vector embeddings. This is *what* you want the agent to know.
+>
+> - **Azure AI Search** — the *backend infrastructure*. This is a separate Azure service that stores and indexes the vector embeddings, enabling fast semantic lookups at runtime. It is provisioned as an independent Azure resource in your subscription with its own pricing. This is *where* the agent searches. You can reuse a single Azure AI Search resource across multiple agents and knowledge sets.
+
 1. Inside your agent, find the **Knowledge** section
-2. Click **+ Add knowledge** → **Upload files**
-3. Upload [`knowledge/compliance-standards.md`](./knowledge/compliance-standards.md)
+2. Click **+ Add knowledge**
+3. When prompted for the source type, select **Upload files**
 
-   > For a real deployment, upload your organization's actual compliance frameworks: WCAG 2.1, NIST 800-53, HIPAA safeguards, state agency IT security standards, etc.
+   > This option lets you upload documents directly from your local machine. Other source types (not used here) include **Azure Blob Storage** and **SharePoint** — those connect the agent to documents that already live in cloud storage rather than uploading new files.
 
-4. Select or create an Azure AI Search resource
-5. Complete the wizard
+4. Browse and select [`knowledge/compliance-standards.md`](./knowledge/compliance-standards.md), then click **Upload**
+
+   > For a real deployment, upload your organization's actual compliance frameworks: WCAG 2.1, NIST 800-53, HIPAA safeguards, state agency IT security standards, etc. Supported formats: PDF, DOCX, TXT, Markdown, HTML. You can upload multiple files in a single step.
+
+5. Click **Next** to proceed to the search resource configuration
+
+6. When prompted to configure the **Azure AI Search** resource:
+   - If you already have an Azure AI Search resource in your subscription, select it from the dropdown — it can be shared across agents
+   - If not, click **Create new Azure AI Search**:
+     1. Enter a **resource name** (e.g., `compliance-search`)
+     2. Select your **Subscription** and **Resource Group**
+     3. Choose a **Pricing tier**:
+        - **Free (F)** — sufficient for hackathon/pilot use; limited to 3 indexes and 50 MB storage
+        - **Basic** — recommended for small production deployments
+        - **Standard S1** — recommended for production with multiple compliance frameworks
+     4. Select a **Region** (same region as your Foundry project recommended)
+     5. Click **Create** and wait approximately 2 minutes for provisioning
+
+   > ⚠️ **Azure AI Search is a separate, billable Azure resource.** It is not included in the Foundry/Agent Service pricing. Review its cost tier before creating in a production environment.
+
+7. Enter an **index name** (e.g., `compliance-standards-index`) or accept the auto-generated default
+
+8. Keep the default **vectorization settings** (automatic embedding)
+
+9. Click **Next**, review the summary, then click **Create** to complete the wizard. Indexing typically takes 1–3 minutes.
 
 ---
 

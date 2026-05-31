@@ -264,6 +264,18 @@ Behavior checks:
 - Dashboard totals and checked-in-by-track summary refresh correctly.
 - Current Registration track accordion loads agencies.
 
+Production guardrail checks (run before and after production changes, and any time live data endpoints fail):
+
+```powershell
+powershell -ExecutionPolicy Bypass -File "10-event-checkin-spa/api/scripts/guardrail-prod-storage-access.ps1"
+```
+
+Fast remediation mode for known drift (storage network access/RBAC) and immediate re-validation:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File "10-event-checkin-spa/api/scripts/guardrail-prod-storage-access.ps1" -Fix
+```
+
 ## Safe Data Update Pattern
 
 For bulk attendee edits in production:
