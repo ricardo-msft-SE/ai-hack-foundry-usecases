@@ -182,17 +182,6 @@ main {
   filter: brightness(0.95);
 }
 
-.card-actions {
-  display: flex;
-  gap: 0.55rem;
-  flex-wrap: wrap;
-  align-items: center;
-}
-
-.card-actions a {
-  margin-top: 0.1rem;
-}
-
 .card .meta {
   color: var(--accent-2);
   font-size: 0.8rem;
