@@ -59,14 +59,19 @@ title: Foundry-First Accelerator Documentation
   <p class="lede-small">These two accelerators extend the portfolio with deep document processing focus — automated credential verification and claims processing for specialized government workflows.</p>
   <div class="card-grid">
     {% for guide in ordered_guides %}
-    {% if guide.order >= 8 and guide.order <= 10 %}
     <article class="card card-bonus">
       <p class="meta">Bonus Accelerator {{ guide.order }}</p>
       <h3>{{ guide.title }}</h3>
       <p>{{ guide.tagline }}</p>
+      {% if guide.order <= 9 %}
+      <div class="card-actions">
+        <a href="{{ guide.url | relative_url }}">Open Guide</a>
+        <a href="https://forms.office.com/Pages/ResponsePage.aspx?id=v4j5cvGGr0GRqy180BHbR7105kWO-NdDrl7nzF5FI39UOE4zTDFFVUkzQ0dWM1dXWTcwTDlUQTM5US4u&origin=QRCode">Sign Me Up</a>
+      </div>
+      {% else %}
       <a href="{{ guide.url | relative_url }}">Open Guide</a>
+      {% endif %}
     </article>
-    {% endif %}
     {% endfor %}
   </div>
 </section>
