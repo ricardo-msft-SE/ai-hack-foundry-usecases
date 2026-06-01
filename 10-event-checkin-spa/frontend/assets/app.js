@@ -434,6 +434,7 @@ function renderCredentials() {
 }
 
 async function loadCredentials() {
+  credentialsAccordion.innerHTML = "<p class='loading-msg'>Loading credentials\u2026</p>";
   const payload = await apiGet("/credentials");
   state.credentialsGroups = payload.groups || [];
   state.registrants = (payload.registrants || []).sort((a, b) => {
@@ -771,6 +772,7 @@ function renderTrackAgencies(track, agencies) {
 }
 
 async function loadInitials() {
+  initialButtons.innerHTML = "<p class='loading-msg'>Loading registrants\u2026</p>";
   const payload = await apiGet("/initials");
   const initials = payload.initials || [];
 
@@ -794,6 +796,9 @@ async function loadAttendees(initial) {
 }
 
 async function loadDashboard() {
+  kpiTotalRegistrants.textContent = "\u2026";
+  kpiTotalCheckedIn.textContent = "\u2026";
+  agencyAccordion.innerHTML = "<p class='loading-msg'>Loading dashboard\u2026</p>";
   const payload = await apiGet("/dashboard");
   kpiTotalRegistrants.textContent = String(payload.totalRegistrants || 0);
 
@@ -838,6 +843,7 @@ async function handleManualRegistration() {
 }
 
 async function loadTrackAgencies(track) {
+  agencyAccordion.innerHTML = "<p class='loading-msg'>Loading agencies\u2026</p>";
   const payload = await apiGet(`/track-agencies?track=${encodeURIComponent(track)}`);
   renderTrackAgencies(track, payload.agencies || []);
 }

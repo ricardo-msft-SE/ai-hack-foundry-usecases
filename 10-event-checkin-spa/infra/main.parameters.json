@@ -20,6 +20,21 @@
     "storageAccountName": {
       "value": "hackregohiodata"
     },
+    "storagePublicNetworkAccess": {
+      "value": "Enabled"
+    },
+    "storageDefaultAction": {
+      "value": "Allow"
+    },
+    "functionVnetSubnetResourceId": {
+      "value": ""
+    },
+    "privateEndpointSubnetResourceId": {
+      "value": ""
+    },
+    "privateDnsZoneResourceId": {
+      "value": ""
+    },
     "tableName": {
       "value": "Registrations"
     },

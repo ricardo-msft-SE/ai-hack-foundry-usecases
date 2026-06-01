@@ -270,10 +270,16 @@ Production guardrail checks (run before and after production changes, and any ti
 powershell -ExecutionPolicy Bypass -File "10-event-checkin-spa/api/scripts/guardrail-prod-storage-access.ps1"
 ```
 
+Private-mode posture check (recommended when storage public access is intentionally disabled):
+
+```powershell
+powershell -ExecutionPolicy Bypass -File "10-event-checkin-spa/api/scripts/guardrail-prod-storage-access.ps1" -ExpectedMode Private
+```
+
 Fast remediation mode for known drift (storage network access/RBAC) and immediate re-validation:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File "10-event-checkin-spa/api/scripts/guardrail-prod-storage-access.ps1" -Fix
+powershell -ExecutionPolicy Bypass -File "10-event-checkin-spa/api/scripts/guardrail-prod-storage-access.ps1" -ExpectedMode Private -Fix
 ```
 
 ## Safe Data Update Pattern

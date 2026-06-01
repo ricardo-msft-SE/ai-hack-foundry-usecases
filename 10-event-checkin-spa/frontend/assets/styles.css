@@ -90,6 +90,18 @@ h2 {
   font-size: 0.95rem;
 }
 
+.loading-msg {
+  margin: 0 0 0.8rem;
+  color: var(--color-muted);
+  font-size: 0.95rem;
+  animation: loading-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes loading-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
 .sr-only {
   position: absolute;
   width: 1px;

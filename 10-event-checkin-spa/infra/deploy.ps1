@@ -6,7 +6,24 @@ param(
   [string]$ResourceGroup = "rg-hackreg-ohio",
 
   [Parameter(Mandatory = $false)]
-  [string]$Location = "eastus2"
+  [string]$Location = "eastus2",
+
+  [Parameter(Mandatory = $false)]
+  [ValidateSet("Enabled", "Disabled")]
+  [string]$StoragePublicNetworkAccess = "Enabled",
+
+  [Parameter(Mandatory = $false)]
+  [ValidateSet("Allow", "Deny")]
+  [string]$StorageDefaultAction = "Allow",
+
+  [Parameter(Mandatory = $false)]
+  [string]$FunctionVnetSubnetResourceId = "",
+
+  [Parameter(Mandatory = $false)]
+  [string]$PrivateEndpointSubnetResourceId = "",
+
+  [Parameter(Mandatory = $false)]
+  [string]$PrivateDnsZoneResourceId = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -37,6 +54,8 @@ $deploymentJson = az deployment group create `
   --template-file "./main.bicep" `
   --parameters "./main.parameters.json" `
   --parameters location=$Location staticWebAppLocation=$Location `
+  --parameters storagePublicNetworkAccess=$StoragePublicNetworkAccess storageDefaultAction=$StorageDefaultAction `
+  --parameters functionVnetSubnetResourceId=$FunctionVnetSubnetResourceId privateEndpointSubnetResourceId=$PrivateEndpointSubnetResourceId privateDnsZoneResourceId=$PrivateDnsZoneResourceId `
   --parameters functionAppName=$functionAppName hostingPlanName=$hostingPlanName appInsightsName=$appInsightsName storageAccountName=$storageAccountName staticWebAppName=$staticWebAppName `
   --query properties.outputs -o json
 
@@ -67,3 +86,4 @@ Write-Host "   swa deploy . --env production"
 Write-Host ""
 Write-Host "3) Configure frontend API base to: $functionApiBase"
 Write-Host "4) Static Web App hostname: https://$swaHost"
+Write-Host "5) Function principalId (for RBAC checks): $($deploymentResult.functionAppPrincipalId.value)"

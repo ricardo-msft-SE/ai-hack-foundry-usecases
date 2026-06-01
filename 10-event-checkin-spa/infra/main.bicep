@@ -19,6 +19,29 @@ param storageAccountName string
 @description('Storage table name for registration records')
 param tableName string = 'Registrations'
 
+@description('Storage public network access mode: Enabled for legacy/public path, Disabled for private endpoint path')
+@allowed([
+  'Enabled'
+  'Disabled'
+])
+param storagePublicNetworkAccess string = 'Enabled'
+
+@description('Storage firewall default action')
+@allowed([
+  'Allow'
+  'Deny'
+])
+param storageDefaultAction string = 'Allow'
+
+@description('Existing subnet resource ID for Function App VNet integration (optional)')
+param functionVnetSubnetResourceId string = ''
+
+@description('Existing subnet resource ID for Storage private endpoint (optional)')
+param privateEndpointSubnetResourceId string = ''
+
+@description('Existing private DNS zone resource ID for table.core.windows.net (optional)')
+param privateDnsZoneResourceId string = ''
+
 @description('Static Web App name')
 param staticWebAppName string
 
@@ -36,7 +59,13 @@ resource storage 'Microsoft.Storage/storageAccounts@2023-05-01' = {
     minimumTlsVersion: 'TLS1_2'
     allowBlobPublicAccess: false
     supportsHttpsTrafficOnly: true
-    publicNetworkAccess: 'Enabled'
+    publicNetworkAccess: storagePublicNetworkAccess
+    networkAcls: {
+      bypass: 'AzureServices'
+      defaultAction: storageDefaultAction
+      ipRules: []
+      virtualNetworkRules: []
+    }
   }
 }
 
@@ -73,14 +102,23 @@ resource hostingPlan 'Microsoft.Web/serverfarms@2023-12-01' = {
 }
 
 var storageConnectionString = 'DefaultEndpointsProtocol=https;AccountName=${storage.name};AccountKey=${storage.listKeys().keys[0].value};EndpointSuffix=${environment().suffixes.storage}'
+var hasFunctionSubnet = !empty(functionVnetSubnetResourceId)
+var hasPrivateEndpointSubnet = !empty(privateEndpointSubnetResourceId)
+var hasPrivateDnsZone = !empty(privateDnsZoneResourceId)
 
 resource functionApp 'Microsoft.Web/sites@2023-12-01' = {
   name: functionAppName
   location: location
   kind: 'functionapp,linux'
+  identity: {
+    type: 'SystemAssigned'
+  }
   properties: {
     serverFarmId: hostingPlan.id
     httpsOnly: true
+    ...(hasFunctionSubnet ? {
+      virtualNetworkSubnetId: functionVnetSubnetResourceId
+    } : {})
     siteConfig: {
       linuxFxVersion: 'NODE|24'
       appSettings: [
@@ -113,6 +151,10 @@ resource functionApp 'Microsoft.Web/sites@2023-12-01' = {
           value: storageConnectionString
         }
         {
+          name: 'AZURE_TABLE_ACCOUNT_NAME'
+          value: storage.name
+        }
+        {
           name: 'AZURE_TABLE_NAME'
           value: tableName
         }
@@ -122,6 +164,72 @@ resource functionApp 'Microsoft.Web/sites@2023-12-01' = {
         }
       ]
     }
+  }
+}
+
+resource tablePrivateEndpoint 'Microsoft.Network/privateEndpoints@2023-11-01' = if (hasPrivateEndpointSubnet) {
+  name: '${storage.name}-table-pe'
+  location: location
+  properties: {
+    subnet: {
+      id: privateEndpointSubnetResourceId
+    }
+    privateLinkServiceConnections: [
+      {
+        name: '${storage.name}-table-connection'
+        properties: {
+          privateLinkServiceId: storage.id
+          groupIds: [
+            'table'
+          ]
+        }
+      }
+    ]
+  }
+}
+
+resource tablePrivateDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2023-11-01' = if (hasPrivateEndpointSubnet && hasPrivateDnsZone) {
+  parent: tablePrivateEndpoint
+  name: 'default'
+  properties: {
+    privateDnsZoneConfigs: [
+      {
+        name: 'table-core-windows-net'
+        properties: {
+          privateDnsZoneId: privateDnsZoneResourceId
+        }
+      }
+    ]
+  }
+}
+
+resource tableDataContributorRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  scope: storage
+  name: guid(storage.id, functionApp.id, 'StorageTableDataContributor')
+  properties: {
+    principalId: functionApp.identity.principalId
+    principalType: 'ServicePrincipal'
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '0a9a7e1f-b9d0-4cc4-a60d-0319b160aaa3')
+  }
+}
+
+resource queueDataContributorRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  scope: storage
+  name: guid(storage.id, functionApp.id, 'StorageQueueDataContributor')
+  properties: {
+    principalId: functionApp.identity.principalId
+    principalType: 'ServicePrincipal'
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '974c5e8b-45b9-4653-ba55-5f855dd0fb88')
+  }
+}
+
+resource blobDataOwnerRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  scope: storage
+  name: guid(storage.id, functionApp.id, 'StorageBlobDataOwner')
+  properties: {
+    principalId: functionApp.identity.principalId
+    principalType: 'ServicePrincipal'
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b7e6dc6d-f1e8-4753-8033-0f276bb0955b')
   }
 }
 
@@ -141,3 +249,6 @@ output staticWebAppName string = staticWebApp.name
 output staticWebAppDefaultHostName string = staticWebApp.properties.defaultHostname
 output storageAccountName string = storage.name
 output tableNameOut string = registrationTable.name
+output functionAppPrincipalId string = functionApp.identity.principalId
+output storageAccountId string = storage.id
+output tablePrivateEndpointId string = hasPrivateEndpointSubnet ? tablePrivateEndpoint.id : ''

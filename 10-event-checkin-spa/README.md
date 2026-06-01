@@ -123,6 +123,17 @@ cd 10-event-checkin-spa/infra
 powershell -ExecutionPolicy Bypass -File .\deploy.ps1
 ```
 
+For private data-path mode (recommended for policy-hardened tenants), provide subnet and DNS IDs and disable public storage access:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\deploy.ps1 `
+  -StoragePublicNetworkAccess Disabled `
+  -StorageDefaultAction Deny `
+  -FunctionVnetSubnetResourceId "/subscriptions/<sub>/resourceGroups/<rg>/providers/Microsoft.Network/virtualNetworks/<vnet>/subnets/<func-subnet>" `
+  -PrivateEndpointSubnetResourceId "/subscriptions/<sub>/resourceGroups/<rg>/providers/Microsoft.Network/virtualNetworks/<vnet>/subnets/<pe-subnet>" `
+  -PrivateDnsZoneResourceId "/subscriptions/<sub>/resourceGroups/<rg>/providers/Microsoft.Network/privateDnsZones/table.core.windows.net"
+```
+
 Provisioned resources:
 - Function App (Node.js)
 - Storage Account + Table for registrations
@@ -164,7 +175,7 @@ Write-Host "Restored from: $snapshotPath"
 
 ## Production Guardrail Check
 
-Use this script to detect and optionally remediate the recurring production outage pattern where storage network access drifts and API data routes return 500.
+Use this script to detect and optionally remediate recurring production outage patterns where storage posture drifts and API data routes return 500.
 
 Read-only check:
 
@@ -172,15 +183,21 @@ Read-only check:
 powershell -ExecutionPolicy Bypass -File "10-event-checkin-spa/api/scripts/guardrail-prod-storage-access.ps1"
 ```
 
-Auto-fix mode (enables storage public network access if needed, re-applies missing storage roles, restarts Function App, and re-probes APIs):
+Private-mode check (expects storage public access disabled + default action deny):
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File "10-event-checkin-spa/api/scripts/guardrail-prod-storage-access.ps1" -Fix
+powershell -ExecutionPolicy Bypass -File "10-event-checkin-spa/api/scripts/guardrail-prod-storage-access.ps1" -ExpectedMode Private
+```
+
+Auto-fix mode (applies expected mode settings, re-applies missing storage roles, restarts Function App, and re-probes APIs):
+
+```powershell
+powershell -ExecutionPolicy Bypass -File "10-event-checkin-spa/api/scripts/guardrail-prod-storage-access.ps1" -ExpectedMode Private -Fix
 ```
 
 Notes:
 - Defaults target the current live environment (`rg-hackreg-ohio`, `hackreg-ohio-func-2041`, `hackregohio2041`).
-- Override targets with script parameters when needed (`-SubscriptionId`, `-ResourceGroup`, `-FunctionApp`, `-StorageAccount`).
+- Override targets with script parameters when needed (`-SubscriptionId`, `-ResourceGroup`, `-FunctionApp`, `-StorageAccount`, `-ExpectedMode`).
 
 ## Live Deployment Details
 
