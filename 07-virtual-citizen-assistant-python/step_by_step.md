@@ -108,6 +108,8 @@ Upload the OpenAPI spec to enable appointment availability checks and booking:
 - Booking response includes confirmation number, date/time, location, and what to bring
 - Agent asks for confirmation before canceling an appointment
 
+> **Demo note:** While `scheduling-api.json` still points to `appointments.exampleville.gov`, OpenAPI tool calls can fail with a network/connection error. In that case, use the planning/trace view to confirm the agent chose the correct operation and arguments.
+
 ---
 
 ## 📊 Step 6 — Evaluate Agent Quality

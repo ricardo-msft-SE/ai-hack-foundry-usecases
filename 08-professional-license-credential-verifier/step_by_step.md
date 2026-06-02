@@ -118,6 +118,8 @@ The included `system_prompt.txt` already contains these directives, but if you c
    - Foundry auto-detects endpoints: `QueryLicenseRequirements`, `ValidateCredentials`, `CheckReciprocity`, `SubmitDecision`, `GetApplicationStatus`
 7. Click **Add**
 
+> **Note:** `openapi/licensing-api.json` uses a placeholder endpoint (`licensing.exampleville.gov`). Until you connect a real backend, API calls can fail with a network/connection error.
+
 ### 5e. Add Code Interpreter (Optional)
 
 1. Click **+ Add tool** → **Code Interpreter**
@@ -154,6 +156,8 @@ The included `system_prompt.txt` already contains these directives, but if you c
 - **Incomplete credentials:** Upload only a transcript, no exam results → agent should flag as "Escalate for incomplete file"
 - **Out-of-state education:** Upload transcript from foreign university → agent should calculate equivalency or flag for review
 - **Disciplinary history:** Include mention of prior complaint → agent should auto-escalate
+
+> If API calls fail while using the placeholder endpoint, verify tool-selection behavior in the run trace/planning details. The expected demo outcome is correct operation selection and parameter extraction, even when the backend call fails.
 
 ---
 

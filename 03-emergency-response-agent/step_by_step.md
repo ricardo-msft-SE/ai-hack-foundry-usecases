@@ -77,6 +77,8 @@ This guide walks you through building a **multi-agent Emergency Response System*
    - **Authentication:** None (Anonymous)
 4. Click **Add**
 
+> **Note:** `openapi/weather-api.json` uses a mock endpoint (`weather.exampleville.gov`). In a demo-only setup, weather tool calls can fail with a network/connection error until you replace it with a real API.
+
 ---
 
 ## 🏛️ Step 3 — Create the Resources Specialist Agent
@@ -109,6 +111,8 @@ This guide walks you through building a **multi-agent Emergency Response System*
    - **Definition:** Upload `openapi/resources-api.json`
    - **Authentication:** None (Anonymous)
 4. Click **Add**
+
+> **Note:** `openapi/resources-api.json` uses a mock endpoint (`dispatch.exampleville.gov`). In a demo-only setup, resources tool calls can fail with a network/connection error until you replace it with a real API.
 
 ---
 
@@ -201,6 +205,8 @@ Open the **Playground** in the **EmergencyCoordinator** agent.
 
 **Expected:** Coordinator delegates to WeatherSpecialist, which calls the WeatherAPI OpenAPI tool and returns current conditions and forecast.
 
+> If you are still using the mock endpoint, the call may fail. Use the **Trace** view to confirm the correct tool and parameters were selected.
+
 ---
 
 ### ✅ Test Resources-Only Query
@@ -209,6 +215,8 @@ Open the **Playground** in the **EmergencyCoordinator** agent.
 > How many emergency generators and rescue boats are currently available? Which stations have them?
 
 **Expected:** Coordinator delegates to ResourcesSpecialist, which calls the ResourcesAPI OpenAPI tool and returns inventory and station locations.
+
+> If you are still using the mock endpoint, the call may fail. Use the **Trace** view to confirm the correct tool and parameters were selected.
 
 ---
 

@@ -122,6 +122,8 @@ The included `system_prompt.txt` already contains the required directives, but i
    - Foundry auto-detects endpoints: `CalculateBenefit`, `CheckEligibility`, `SubmitClaim`, `DetectOverpayment`, `RouteToHearing`, `GetClaimStatus`
 7. Click **Add**
 
+> **Note:** `openapi/unemployment-api.json` uses a placeholder endpoint (`unemployment.exampleville.gov`). Until you connect a real backend, API calls can fail with a network/connection error.
+
 ---
 
 ## Step 6: Test the Agent
@@ -173,6 +175,8 @@ The included `system_prompt.txt` already contains the required directives, but i
 - **Ambiguous separation reason:** Upload termination letter with vague reason → agent should escalate to hearing officer
 - **Out-of-state worker:** Upload W-2 from another state → agent should check reciprocal agreements or flag for interstate UI processing
 - **Injured worker still earning:** Upload medical report AND wage records showing continued work → agent should calculate partial WC benefits
+
+> If API calls fail while using the placeholder endpoint, use run trace/planning details to confirm the correct OpenAPI operation and arguments were selected.
 
 ---
 
@@ -258,6 +262,11 @@ See [Microsoft Foundry documentation](https://learn.microsoft.com/en-us/azure/ai
 - Verify knowledge index status is "Active"
 - Ensure knowledge was added as a tool in Step 5b
 - Try rephrasing question to match knowledge content
+
+**Q: API calls are failing**
+- Confirm whether `openapi/unemployment-api.json` still points to the placeholder endpoint (`unemployment.exampleville.gov`)
+- Replace with your real UI-WC backend URL for end-to-end success
+- Use run trace/planning details to verify operation/parameter selection even when backend calls fail
 
 ---
 

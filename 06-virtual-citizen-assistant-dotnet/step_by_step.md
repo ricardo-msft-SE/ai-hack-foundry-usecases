@@ -107,6 +107,8 @@ Test common resident scenarios in the Playground:
 - Permit status responses include the permit number, current status, and estimated completion
 - The agent maintains context across the conversation (remembers "restaurant" from the first message)
 
+> **Demo note:** While `permit-api.json` still points to `permits.exampleville.gov`, OpenAPI tool calls can fail with a network/connection error. In that case, use the Playground planning/trace view to verify the agent selected the correct operation and parameters.
+
 ---
 
 ## 📊 Step 6 — Evaluate Agent Quality
