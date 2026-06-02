@@ -80,19 +80,16 @@ This step replaces the rule library and severity definition tables.
 >
 > - **Azure AI Search** — the *backend infrastructure*. This is a separate Azure service that stores and indexes the vector embeddings, enabling fast semantic lookups at runtime. It is provisioned as an independent Azure resource in your subscription with its own pricing. This is *where* the agent searches. You can reuse a single Azure AI Search resource across multiple agents and knowledge sets.
 
-1. Inside your agent, find the **Knowledge** section
-2. Click **+ Add knowledge**
-3. When prompted for the source type, select **Upload files**
-
-   > This option lets you upload documents directly from your local machine. Other source types (not used here) include **Azure Blob Storage** and **SharePoint** — those connect the agent to documents that already live in cloud storage rather than uploading new files.
-
-4. Browse and select [`knowledge/compliance-standards.md`](./knowledge/compliance-standards.md), then click **Upload**
+1. In the project, open **Build** -> **Knowledge**
+2. Create a new knowledge base (or select an existing one)
+3. Add a knowledge source:
+   - Choose **Upload files** to upload local documents, or
+   - Choose connectors such as **Azure Blob Storage** or **SharePoint** for cloud-hosted documents
+4. Upload [`knowledge/compliance-standards.md`](./knowledge/compliance-standards.md) if you are using file upload
 
    > For a real deployment, upload your organization's actual compliance frameworks: WCAG 2.1, NIST 800-53, HIPAA safeguards, state agency IT security standards, etc. Supported formats: PDF, DOCX, TXT, Markdown, HTML. You can upload multiple files in a single step.
 
-5. Click **Next** to proceed to the search resource configuration
-
-6. When prompted to configure the **Azure AI Search** resource:
+5. Configure or select the **Azure AI Search** resource for this knowledge base:
    - If you already have an Azure AI Search resource in your subscription, select it from the dropdown — it can be shared across agents
    - If not, click **Create new Azure AI Search**:
      1. Enter a **resource name** (e.g., `compliance-search`)
@@ -106,11 +103,14 @@ This step replaces the rule library and severity definition tables.
 
    > ⚠️ **Azure AI Search is a separate, billable Azure resource.** It is not included in the Foundry/Agent Service pricing. Review its cost tier before creating in a production environment.
 
-7. Enter an **index name** (e.g., `compliance-standards-index`) or accept the auto-generated default
+6. Enter an **index name** (e.g., `compliance-standards-index`) or accept the auto-generated default
 
-8. Keep the default **vectorization settings** (automatic embedding)
+7. Keep the default **vectorization settings** (automatic embedding)
 
-9. Click **Next**, review the summary, then click **Create** to complete the wizard. Indexing typically takes 1–3 minutes.
+8. Save the knowledge base and wait for indexing to complete (typically 1–3 minutes)
+9. Open your agent and connect this knowledge base in the agent **Knowledge** area
+
+> **UI note (May 2026):** Some tenants still show direct in-agent flows such as **Knowledge -> Add knowledge -> Upload files** or **Tools -> Add -> Knowledge**. Those options remain valid, but the preferred New Foundry flow is to manage sources in **Build -> Knowledge (Foundry IQ)** and then connect the knowledge base to the agent.
 
 ---
 
