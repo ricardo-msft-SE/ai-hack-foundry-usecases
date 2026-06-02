@@ -30,7 +30,7 @@ This accelerator uses **Azure AI Foundry** with these capabilities:
 | **Document Intelligence Tool** | Extract wage data, separation reason, injury details, medical info from documents |
 | **Knowledge** | Benefit formulas, disqualification rules, federal/state UI-WC regulations |
 | **Code Interpreter** | Calculate weekly benefit rate, identify overpayments, estimate max duration |
-| **Actions (OpenAPI)** | Connect to state UI-WC database for querying rules, storing decisions, routing to hearing officers |
+| **Custom OpenAPI tools** | Connect to state UI-WC database for querying rules, storing decisions, routing to hearing officers |
 | **Entra ID RBAC** | Benefits staff access the agent; applicants see status via public portal only |
 
 ## Setup Checklist
@@ -38,7 +38,7 @@ This accelerator uses **Azure AI Foundry** with these capabilities:
 - [ ] Create or navigate to an Azure AI Foundry project in [ai.azure.com](https://ai.azure.com)
 - [ ] Enable **Document Intelligence** tool in agent settings
 - [ ] Create knowledge indexes using `knowledge/unemployment-requirements.md`
-- [ ] Upload `openapi/unemployment-api.json` as an **Action**
+- [ ] Upload `openapi/unemployment-api.json` as a **custom OpenAPI tool**
 - [ ] Add **Code Interpreter** tool for benefits calculation
 - [ ] Copy `system_prompt.txt` into agent **Instructions**
 - [ ] Test with sample claim documents (wage records, separation letters, medical bills)

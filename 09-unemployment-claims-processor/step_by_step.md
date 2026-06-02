@@ -44,7 +44,7 @@ This same Code Interpreter tool also handles benefits calculation (Step 6d), so 
 - Files are **ephemeral** — deleted when the session ends
 - Supported formats: PDF, PNG, JPEG, TIFF, BMP, WEBP
 
-> For production scenarios requiring per-field confidence scores or structured extracts (e.g., W-2 prebuilt model), see the Advanced Option in the [02-document-eligibility-agent guide](../02-document-eligibility-agent/step_by_step.md#advanced-option--call-azure-document-intelligence-via-custom-action) for wiring Document Intelligence as a Custom Action.
+> For production scenarios requiring per-field confidence scores or structured extracts (e.g., W-2 prebuilt model), see the Advanced Option in the [02-document-eligibility-agent guide](../02-document-eligibility-agent/step_by_step.md#advanced-option--call-azure-document-intelligence-via-custom-openapi-tool) for wiring Document Intelligence as a custom OpenAPI tool.
 
 ---
 
@@ -111,15 +111,16 @@ The included `system_prompt.txt` already contains the required directives, but i
 
 > ⚠️ Code Interpreter does **not** persist files between sessions. For audit trails, add instructions to output structured JSON or a claims summary that staff can copy before closing the session.
 
-### 5e. Add Unemployment API Action
+### 5e. Add Unemployment API OpenAPI Tool
 
-1. Click **+ Add tool** → **Action**
-2. Click **+ Import from OpenAPI**
-3. Choose **Upload file** or **Paste JSON**
-4. Upload or paste contents of `openapi/unemployment-api.json`
-5. Click **Import**
+1. Open **Tools** and click **Add** → **Custom** → **OpenAPI tool**
+2. If your tenant shows the older dialog, use **+ Add tool** → **Action**
+3. Click **+ Import from OpenAPI**
+4. Choose **Upload file** or **Paste JSON**
+5. Upload or paste contents of `openapi/unemployment-api.json`
+6. Click **Import**
    - Foundry auto-detects endpoints: `CalculateBenefit`, `CheckEligibility`, `SubmitClaim`, `DetectOverpayment`, `RouteToHearing`, `GetClaimStatus`
-6. Click **Add**
+7. Click **Add**
 
 ---
 
@@ -241,7 +242,7 @@ See [Microsoft Foundry documentation](https://learn.microsoft.com/en-us/azure/ai
 - [ ] Agent detects overpayments (identifies double-income weeks)
 - [ ] Audit logs show all decisions with timestamps
 - [ ] Entra ID RBAC restricts access to UI-WC staff only
-- [ ] API action calls unemployment database successfully
+- [ ] API tool calls unemployment database successfully
 
 ---
 

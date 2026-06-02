@@ -27,7 +27,7 @@ This accelerator uses **Azure AI Foundry** with these capabilities:
 | **Document Intelligence Tool** | Extract text, tables, and structured data from PDF/image uploads (transcripts, exam results) |
 | **Knowledge** | License requirements database (education, exams, reciprocity, disqualifications) |
 | **Code Interpreter** | Calculate equivalency (out-of-state education vs. state standards) |
-| **Actions (OpenAPI)** | Connect to state licensing database for querying rules and storing decisions |
+| **Custom OpenAPI tools** | Connect to state licensing database for querying rules and storing decisions |
 | **Entra ID RBAC** | Staff with licensing authority access the agent; others see audit trail only |
 
 ## Setup Checklist
@@ -35,7 +35,7 @@ This accelerator uses **Azure AI Foundry** with these capabilities:
 - [ ] Create or navigate to an Azure AI Foundry project in [ai.azure.com](https://ai.azure.com)
 - [ ] Enable **Document Intelligence** tool in agent settings
 - [ ] Create knowledge indexes using `knowledge/licensure-requirements.md` (or split by license type: medical, legal, nursing, contractor)
-- [ ] Upload `openapi/licensing-api.json` as an **Action**
+- [ ] Upload `openapi/licensing-api.json` as a **custom OpenAPI tool**
 - [ ] Copy `system_prompt.txt` into agent **Instructions**
 - [ ] Test with sample credential documents and verify decisions match expected approvals
 - [ ] Assign **Licensure Authority** role via Entra ID for staff; enable audit logging

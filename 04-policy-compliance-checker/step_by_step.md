@@ -194,4 +194,4 @@ You now have:
 - **Add more compliance frameworks** to Knowledge: upload WCAG 2.1 guidelines, ADA standards, state IT security requirements, or your organization's internal policy templates
 - **Automate document ingestion**: add a SharePoint or OneDrive connection to review policy documents automatically when they're updated
 - **Create a compliance dashboard**: use the Azure AI Evaluation tab to track compliance scores over time as policies are revised
-- **Add an approval Action**: add an OpenAPI Action to your document management system to mark documents as "compliance reviewed" after the check
+- **Add an approval OpenAPI tool**: add a custom OpenAPI tool to your document management system to mark documents as "compliance reviewed" after the check

@@ -42,7 +42,7 @@ This guide walks you through deploying the Professional License Credential Verif
 - Files are **ephemeral** — deleted when the session ends; no persistent storage
 - Supported formats: PDF, PNG, JPEG, TIFF, BMP, WEBP
 
-> For production scenarios requiring per-field confidence scores or audit-trail extraction (e.g., IRS prebuilt W-2 model), see the Advanced Option in the [02-document-eligibility-agent guide](../02-document-eligibility-agent/step_by_step.md#advanced-option--call-azure-document-intelligence-via-custom-action) for wiring Document Intelligence as a Custom Action.
+> For production scenarios requiring per-field confidence scores or audit-trail extraction (e.g., IRS prebuilt W-2 model), see the Advanced Option in the [02-document-eligibility-agent guide](../02-document-eligibility-agent/step_by_step.md#advanced-option--call-azure-document-intelligence-via-custom-openapi-tool) for wiring Document Intelligence as a custom OpenAPI tool.
 
 ---
 
@@ -107,15 +107,16 @@ The included `system_prompt.txt` already contains these directives, but if you c
 - *"After extraction, cross-reference the extracted credentials against the licensing rules in your knowledge base."*
 - *"Clearly state your confidence in each extracted field and flag any fields that appear missing, illegible, or inconsistent."*
 
-### 5d. Add Licensing API Action
+### 5d. Add Licensing API OpenAPI Tool
 
-1. Click **+ Add tool** → **Action**
-2. Click **+ Import from OpenAPI**
-3. Choose **Upload file** or **Paste JSON**
-4. Upload or paste contents of `openapi/licensing-api.json`
-5. Click **Import**
+1. Open **Tools** and click **Add** → **Custom** → **OpenAPI tool**
+2. If your tenant shows the older dialog, use **+ Add tool** → **Action**
+3. Click **+ Import from OpenAPI**
+4. Choose **Upload file** or **Paste JSON**
+5. Upload or paste contents of `openapi/licensing-api.json`
+6. Click **Import**
    - Foundry auto-detects endpoints: `QueryLicenseRequirements`, `ValidateCredentials`, `CheckReciprocity`, `SubmitDecision`, `GetApplicationStatus`
-6. Click **Add**
+7. Click **Add**
 
 ### 5e. Add Code Interpreter (Optional)
 
@@ -220,7 +221,7 @@ See [Microsoft Foundry documentation](https://learn.microsoft.com/en-us/azure/ai
 - [ ] Agent correctly escalates an incomplete or ambiguous credential
 - [ ] Audit logs show all decisions with timestamps
 - [ ] Entra ID RBAC restricts access to licensing staff only
-- [ ] API action calls licensing database successfully
+- [ ] API tool calls licensing database successfully
 
 ---
 

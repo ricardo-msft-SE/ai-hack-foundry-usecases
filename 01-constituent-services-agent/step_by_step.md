@@ -14,7 +14,7 @@ This guide walks you through building a **Constituent Services Agent** using Mic
 | Semantic Kernel conversation loop | Agent Service manages conversation state automatically |
 | Custom RAG pipeline code | Native **Knowledge** (auto-chunks, embeds, indexes) |
 | `SearchClient` + Azure AI Search SDK | Azure AI Search created and managed automatically |
-| `@kernel_function` Python plugin classes | **Actions** — upload an OpenAPI spec, no code |
+| `@kernel_function` Python plugin classes | **Custom OpenAPI tools** — upload an OpenAPI spec, no code |
 | Custom citation tracking logic | Built-in citation tracking in every Knowledge response |
 | Multi-language prompt wrapping | System prompt language instruction |
 
@@ -84,7 +84,7 @@ Foundry automatically:
 
 ---
 
-## 🔧 Step 4 — Add an Action (No-Code API Integration)
+## 🔧 Step 4 — Add an OpenAPI Tool (No-Code API Integration)
 
 This step replaces the `@kernel_function` Python plugin classes and any custom API client code.
 
@@ -96,11 +96,11 @@ Open [`openapi/city-services-api.json`](./openapi/city-services-api.json) and no
 
 > To connect to a real city API, replace the `servers.url` value in the JSON with your real API base URL.
 
-### 4b. Upload the Action in Foundry
+### 4b. Add the OpenAPI Tool in Foundry
 
-1. Inside your agent, find the **Tools** tab or **Actions** panel
-2. Click **+ Add tool**
-3. Select **OpenAPI** (may appear as "Custom" or "External API")
+1. Inside your agent, open **Tools**
+2. Click **Add** -> **Custom** -> **OpenAPI tool**
+3. If your tenant shows the older dialog, select **OpenAPI** from **+ Add tool**
 4. Configure:
    - **Tool Name:** `CityServicesAPI`
    - **Definition:** Click **Upload file** → select `openapi/city-services-api.json`
@@ -138,7 +138,7 @@ Click **Try in playground** (or open the **Chat** tab inside your agent).
 
 ---
 
-### ✅ Test Actions (Live API Calls)
+### ✅ Test OpenAPI Tool Calls (Live API Calls)
 
 **User:**
 > Tell me more about the food assistance program.
@@ -191,4 +191,4 @@ You now have:
 - **Connect to a real API**: replace the mock URL in `city-services-api.json` with your real city services endpoint
 - **Add to Teams**: go to the **Channels** tab in your agent and connect to Microsoft Teams for instant deployment
 - **Enable multi-language**: the system prompt already handles this — test it with Spanish, French, or other languages
-- **Escalation routing**: add a second Action pointing to a ticketing system API (e.g., ServiceNow) for cases the agent can't resolve
+- **Escalation routing**: add a second OpenAPI tool pointing to a ticketing system API (e.g., ServiceNow) for cases the agent can't resolve

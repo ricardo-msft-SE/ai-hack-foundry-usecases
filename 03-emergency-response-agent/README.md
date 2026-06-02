@@ -12,9 +12,9 @@ A multi-agent system for emergency response planning and coordination. A **Coord
 Foundry Workflow (EmergencyResponseWorkflow)
 └── EmergencyCoordinator (entry point / coordinator node)
     ├── WeatherSpecialist (workflow node)
-    │   └── Action: WeatherAPI (real-time weather + forecast data)
+    │   └── OpenAPI tool: WeatherAPI (real-time weather + forecast data)
     └── ResourcesSpecialist (workflow node)
-        └── Action: ResourcesAPI (agency resources + inventory)
+        └── OpenAPI tool: ResourcesAPI (agency resources + inventory)
 
 All agents share:
 └── Knowledge: Emergency Procedures & Protocols
@@ -27,7 +27,7 @@ All agents share:
 | **3 Agents + Foundry Workflow** | Custom Python multi-agent orchestrator + Semantic Kernel planner |
 | **Workflow-based delegation** | Manual sub-agent invocation code + result aggregation |
 | **Knowledge (shared)** | Historical incident data + policy document retrieval code |
-| **Actions (OpenAPI)** | Python plugins for weather API + agency resource APIs |
+| **Custom OpenAPI tools** | Python plugins for weather API + agency resource APIs |
 
 ## Files
 
@@ -37,8 +37,8 @@ All agents share:
 | [`system_prompt_coordinator.txt`](./system_prompt_coordinator.txt) | Instructions for the Coordinator agent |
 | [`system_prompt_weather.txt`](./system_prompt_weather.txt) | Instructions for the Weather Specialist agent |
 | [`system_prompt_resources.txt`](./system_prompt_resources.txt) | Instructions for the Resources Specialist agent |
-| [`openapi/weather-api.json`](./openapi/weather-api.json) | OpenAPI spec for weather data Action |
-| [`openapi/resources-api.json`](./openapi/resources-api.json) | OpenAPI spec for agency resources Action |
+| [`openapi/weather-api.json`](./openapi/weather-api.json) | OpenAPI spec for the weather custom OpenAPI tool |
+| [`openapi/resources-api.json`](./openapi/resources-api.json) | OpenAPI spec for the resources custom OpenAPI tool |
 | [`knowledge/emergency-procedures.md`](./knowledge/emergency-procedures.md) | Emergency protocols and response playbooks |
 
 ## Source

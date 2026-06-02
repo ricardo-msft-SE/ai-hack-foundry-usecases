@@ -5,7 +5,7 @@ tagline: Citizen service assistant for benefits, permits, schedules, and civic F
 foundry_features:
   - Agent Service
   - Knowledge
-  - OpenAPI Actions
+  - Custom OpenAPI Tools
   - Evaluation
 ---
 
@@ -17,7 +17,7 @@ A multilingual resident-facing assistant that answers city service questions wit
 ## Foundry Build Focus
 - Configure one assistant agent with role-grounded system instructions.
 - Upload city-service policy and process documents to Knowledge.
-- Attach city services OpenAPI as an Action tool.
+- Attach city services API as a custom OpenAPI tool.
 - Evaluate groundedness and task quality using Foundry evaluations.
 
 ## Repo Artifacts

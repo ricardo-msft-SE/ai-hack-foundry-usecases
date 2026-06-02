@@ -6,7 +6,7 @@ foundry_features:
   - Agent Service
   - Code Interpreter
   - Knowledge
-  - OpenAPI Actions
+  - Custom OpenAPI Tools
 ---
 
 {% assign repo = site.github.repository_url | default: 'https://github.com/ricardo-msft-SE/ai-hack-foundry-usecases' %}
@@ -18,7 +18,7 @@ A state UI-WC agency agent that extracts claim documents, calculates weekly bene
 - Use Code Interpreter (gpt-4o vision) to extract wages, separation letters, and medical injury reports — no separate Document Intelligence resource needed.
 - Use Code Interpreter to calculate weekly benefit amounts, disability percentages, and overpayment flags using state formulas.
 - Ground eligibility decisions on uploaded UI and WC requirements.
-- Route approved claims, escalations, and overpayment referrals via OpenAPI actions.
+- Route approved claims, escalations, and overpayment referrals via custom OpenAPI tool calls.
 
 ## Repo Artifacts
 - [README]({{ repo }}/blob/main/09-unemployment-claims-processor/README.md)
@@ -77,7 +77,7 @@ Use Azure AI Foundry to build an **Unemployment Claims Processor** agent that:
 | --- | --- |
 | **Code Interpreter (gpt-4o vision)** | Extract wages, separation letters, medical reports; calculate weekly benefits, detect overpayments, disability ratings |
 | **Knowledge (RAG)** | Query UI eligibility rules, WC regulations, state formulas |
-| **Actions (OpenAPI)** | Connect to state UI-WC database, route to hearing officers |
+| **Custom OpenAPI tools** | Connect to state UI-WC database, route to hearing officers |
 | **Entra ID RBAC** | Staff access control, audit trails, multi-language support |
 
 ---
@@ -113,7 +113,7 @@ Use Azure AI Foundry to build an **Unemployment Claims Processor** agent that:
 
 1. Start with [Step-by-Step Guide](../09-unemployment-claims-processor/step_by_step.md)
 2. Copy [System Prompt](../09-unemployment-claims-processor/system_prompt.txt) into Foundry agent **Instructions**
-3. Upload [OpenAPI Spec](../09-unemployment-claims-processor/openapi/unemployment-api.json) as an **Action**
+3. Upload [OpenAPI Spec](../09-unemployment-claims-processor/openapi/unemployment-api.json) as a **custom OpenAPI tool**
 4. Add **Code Interpreter** as an agent tool (Step 2 in the guide — handles both doc extraction AND benefit calculations)
 5. Create knowledge index using [Knowledge Base](../09-unemployment-claims-processor/knowledge/unemployment-requirements.md)
 6. Test with sample claims (wage records, separation letters, medical reports)

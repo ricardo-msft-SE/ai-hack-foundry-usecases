@@ -11,9 +11,9 @@ Replace your .NET 9 + ASP.NET Core + Semantic Kernel citizen assistant with a ze
 | `Program.cs` + ASP.NET Core startup | Foundry project + agent | No hosting or config files |
 | `CitizenAssistantController.cs` | Agent conversation endpoint | No controller code |
 | `KernelBuilder` + `AddAzureOpenAIChatCompletion` | Model selection in agent UI | No SDK configuration |
-| `AzureAISearchVectorStore` + `SearchClient` | Knowledge upload | No search index management |
+| `AzureAISearchVectorStore` + `SearchClient` | Foundry IQ knowledge base + agent connection | No search index management |
 | `DocumentRetrievalPlugin.cs` | Knowledge auto-RAG | No plugin code |
-| `PermitStatusPlugin.cs` | OpenAPI Action upload | No function bindings |
+| `PermitStatusPlugin.cs` | Custom OpenAPI tool upload | No function bindings |
 | `appsettings.json` (connection strings, keys) | Foundry managed credentials | No secrets management |
 | Azure App Service | Foundry hosted endpoint | No infrastructure |
 | Application Insights telemetry | Built-in Foundry tracing | No telemetry code |
@@ -49,29 +49,32 @@ Replace your .NET 9 + ASP.NET Core + Semantic Kernel citizen assistant with a ze
 
 ---
 
-## 📚 Step 3 — Add Knowledge
+## 📚 Step 3 — Add Knowledge (New Foundry)
 
-Upload the knowledge file so the agent can answer questions about city services:
+Add the knowledge source in **Build -> Knowledge** (Foundry IQ), then connect it to the agent:
 
-1. In the agent editor, click **+ Add** under the **Knowledge** section
-2. Select **Upload files**
-3. Upload [`knowledge/city-services.md`](./knowledge/city-services.md)
-4. Set the index name: `city-services-dotnet-index`
-5. Click **Create and save**
+1. In the project, open **Build** -> **Knowledge**
+2. Create a new knowledge base (or select an existing one)
+3. Add a file knowledge source and upload [`knowledge/city-services.md`](./knowledge/city-services.md)
+4. Save and wait for indexing to complete
+5. Open your agent and connect this knowledge base in the **Knowledge** area
+
+> **UI note (May 2026):** Depending on tenant/feature flags, you might still see direct **Add knowledge -> Upload files** in the agent. If so, either path is valid; Foundry IQ knowledge-base connection is the preferred New Foundry flow.
 
 > **What this replaces:** The original code used `AzureAISearchVectorStore`, chunked documents manually, and called `SearchClient.SearchAsync()`. Foundry handles all of this — chunking, embedding, indexing, retrieval, and citation injection — with no code.
 
 ---
 
-## 🔧 Step 4 — Add Permit Status Action
+## 🔧 Step 4 — Add Permit Status OpenAPI Tool
 
 Upload the OpenAPI spec to enable live permit lookups:
 
-1. In the agent editor, click **+ Add** under the **Actions** section
-2. Select **Upload OpenAPI file**
-3. Upload [`openapi/permit-api.json`](./openapi/permit-api.json)
-4. Review the imported operations: `GetPermitStatus`, `ListPermitTypes`
-5. Click **Save**
+1. In the agent editor, open **Tools**
+2. Click **Add** -> **Custom** -> **OpenAPI tool**
+3. If your tenant shows the older dialog, select **OpenAPI** from **+ Add tool**
+4. Upload [`openapi/permit-api.json`](./openapi/permit-api.json)
+5. Review the imported operations: `GetPermitStatus`, `ListPermitTypes`
+6. Click **Save**
 
 > **What this replaces:** `PermitStatusPlugin.cs` used `[KernelFunction]` attributes and manual HTTP calls. The OpenAPI spec defines the same contract — Foundry calls the API automatically when the user asks about a permit.
 
@@ -89,7 +92,7 @@ Test common resident scenarios in the Playground:
 - "What are the hours for the DMV office?"
 - "How do I schedule a building inspection?"
 
-**Permit status lookups (tests Action):**
+**Permit status lookups (tests OpenAPI tool):**
 - "What is the status of permit P-2024-001892?"
 - "What types of permits does the city issue?"
 - "My contractor applied for a permit last week — how do I check if it was approved?"

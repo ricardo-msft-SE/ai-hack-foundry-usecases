@@ -8,7 +8,7 @@ permalink: /guides/
 <section class="hero">
   <p class="eyebrow">Guide Catalog</p>
   <h1>All Foundry-First Accelerator Guides</h1>
-  <p class="lede">Choose a domain scenario and jump directly to operational files, including prompts, OpenAPI action specs, and grounding content.</p>
+  <p class="lede">Choose a domain scenario and jump directly to operational files, including prompts, OpenAPI tool specs, and grounding content.</p>
 </section>
 
 <section class="card-grid">

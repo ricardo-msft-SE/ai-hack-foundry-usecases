@@ -9,7 +9,7 @@ Foundry-First recreation of the Python + Semantic Kernel + Flask citizen assista
 | Flask routes and views | Azure AI Foundry Agent Service |
 | Semantic Kernel orchestration | Managed agent conversation engine |
 | `document_retrieval_plugin.py` | Built-in Knowledge (auto-RAG) |
-| `scheduling_plugin.py` | OpenAPI Action (scheduling API) |
+| `scheduling_plugin.py` | Custom OpenAPI tool (scheduling API) |
 | Azure AI Search client | Knowledge indexes (no code) |
 | `app.py` Flask startup | No startup code needed |
 | Gunicorn / Azure App Service | No hosting required |
@@ -25,14 +25,14 @@ A resident uses the city portal to ask questions about services **and to book ap
 |---|---|
 | [step_by_step.md](./step_by_step.md) | Full guide to recreating this agent in Foundry |
 | [system_prompt.txt](./system_prompt.txt) | Paste this into the agent's System Instructions field |
-| [openapi/scheduling-api.json](./openapi/scheduling-api.json) | Upload as an Action to enable appointment booking |
+| [openapi/scheduling-api.json](./openapi/scheduling-api.json) | Upload as a custom OpenAPI tool to enable appointment booking |
 | [knowledge/city-services.md](./knowledge/city-services.md) | Upload as a Knowledge file |
 
 ## Foundry Features Used
 
 - **Agent Service** — replaces Flask app + Semantic Kernel loop
 - **Knowledge** — replaces `document_retrieval_plugin.py`
-- **Actions (OpenAPI)** — replaces `scheduling_plugin.py`
+- **Custom OpenAPI tools** — replaces `scheduling_plugin.py`
 - **Evaluation** — replaces custom logging and assertion scripts
 
 ## Source

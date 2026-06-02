@@ -14,8 +14,8 @@ This guide walks you through building a **multi-agent Emergency Response System*
 | Semantic Kernel `AgentGroupChat` / planner | Workflow orchestration pattern (sequential or group-chat) |
 | Sub-agent invocation code | Workflow nodes call agents automatically |
 | Result aggregation and formatting logic | Coordinator agent node synthesizes sub-agent responses |
-| Weather API Python plugin | **Action** on WeatherSpecialist agent |
-| Resource API Python plugin | **Action** on ResourcesSpecialist agent |
+| Weather API Python plugin | **Custom OpenAPI tool** on WeatherSpecialist agent |
+| Resource API Python plugin | **Custom OpenAPI tool** on ResourcesSpecialist agent |
 | Historical incident retrieval pipeline | **Knowledge** on all agents |
 | Flask API for request handling | Foundry Playground / Channels |
 
@@ -67,14 +67,15 @@ This guide walks you through building a **multi-agent Emergency Response System*
 4. Select or create an Azure AI Search resource
 5. Complete the wizard
 
-### 2c. Add the Weather Action
+### 2c. Add the Weather OpenAPI Tool
 
-1. In the **Tools** tab, click **+ Add tool** → select **OpenAPI**
-2. Configure:
+1. In **Tools**, click **Add** → **Custom** → **OpenAPI tool**
+2. If your tenant shows the older dialog, select **OpenAPI** from **+ Add tool**
+3. Configure:
    - **Tool Name:** `WeatherAPI`
    - **Definition:** Upload `openapi/weather-api.json`
    - **Authentication:** None (Anonymous)
-3. Click **Add**
+4. Click **Add**
 
 ---
 
@@ -99,14 +100,15 @@ This guide walks you through building a **multi-agent Emergency Response System*
 
 4. Complete the wizard
 
-### 3c. Add the Resources Action
+### 3c. Add the Resources OpenAPI Tool
 
-1. In the **Tools** tab, click **+ Add tool** → select **OpenAPI**
-2. Configure:
+1. In **Tools**, click **Add** → **Custom** → **OpenAPI tool**
+2. If your tenant shows the older dialog, select **OpenAPI** from **+ Add tool**
+3. Configure:
    - **Tool Name:** `ResourcesAPI`
    - **Definition:** Upload `openapi/resources-api.json`
    - **Authentication:** None (Anonymous)
-3. Click **Add**
+4. Click **Add**
 
 ---
 
@@ -197,7 +199,7 @@ Open the **Playground** in the **EmergencyCoordinator** agent.
 **User:**
 > What are the current weather conditions and 72-hour forecast for the coastal zones?
 
-**Expected:** Coordinator delegates to WeatherSpecialist, which calls the WeatherAPI Action and returns current conditions and forecast.
+**Expected:** Coordinator delegates to WeatherSpecialist, which calls the WeatherAPI OpenAPI tool and returns current conditions and forecast.
 
 ---
 
@@ -206,7 +208,7 @@ Open the **Playground** in the **EmergencyCoordinator** agent.
 **User:**
 > How many emergency generators and rescue boats are currently available? Which stations have them?
 
-**Expected:** Coordinator delegates to ResourcesSpecialist, which calls the ResourcesAPI Action and returns inventory and station locations.
+**Expected:** Coordinator delegates to ResourcesSpecialist, which calls the ResourcesAPI OpenAPI tool and returns inventory and station locations.
 
 ---
 
@@ -235,8 +237,8 @@ Open the **Playground** in the **EmergencyCoordinator** agent.
 You now have:
 
 - ✅ A three-agent emergency response system with automatic task delegation
-- ✅ Real-time weather integration via the WeatherAPI Action
-- ✅ Live resource inventory checks via the ResourcesAPI Action
+- ✅ Real-time weather integration via the WeatherAPI OpenAPI tool
+- ✅ Live resource inventory checks via the ResourcesAPI OpenAPI tool
 - ✅ Emergency protocols from the Knowledge base informing every plan
 - ✅ Zero orchestration code — all wired in the Foundry portal
 

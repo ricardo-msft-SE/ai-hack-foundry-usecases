@@ -5,7 +5,7 @@ tagline: Multi-agent emergency coordination across weather signals and resource 
 foundry_features:
   - Agent Service
   - Foundry Workflow
-  - OpenAPI Actions
+  - Custom OpenAPI Tools
   - Knowledge
 ---
 

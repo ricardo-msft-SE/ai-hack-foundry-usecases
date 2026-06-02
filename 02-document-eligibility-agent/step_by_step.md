@@ -1,6 +1,6 @@
 # Document Eligibility Agent — Azure AI Foundry Guide
 
-This guide walks you through building a **Document Eligibility Agent** using Microsoft Azure AI Foundry. The agent accepts document uploads (W-2s, pay stubs, utility bills, government IDs), extracts key fields using gpt-4o's built-in vision capabilities (or optionally Azure Document Intelligence via a custom Action), checks eligibility against program rules, and routes cases to staff.
+This guide walks you through building a **Document Eligibility Agent** using Microsoft Azure AI Foundry. The agent accepts document uploads (W-2s, pay stubs, utility bills, government IDs), extracts key fields using gpt-4o's built-in vision capabilities (or optionally Azure Document Intelligence via a custom OpenAPI tool), checks eligibility against program rules, and routes cases to staff.
 
 **No custom OCR pipeline — just Foundry.**
 
@@ -15,7 +15,7 @@ This guide walks you through building a **Document Eligibility Agent** using Mic
 | PII detection and masking code | Instructions in system prompt guide the model to handle PII |
 | Confidence scoring logic | Model expresses confidence in extracted fields in its response |
 | Flask API for document uploads | Foundry file attachment in conversation (Code Interpreter handles it) |
-| Case routing Python plugin | **Action** — upload an OpenAPI spec |
+| Case routing Python plugin | **Custom OpenAPI tool** — upload an OpenAPI spec |
 | Eligibility rules engine | **Knowledge** — upload the program requirements doc |
 
 ---
@@ -109,9 +109,9 @@ Without these instructions, the agent will accept file uploads but may not proac
 
 ---
 
-#### Advanced Option — Call Azure Document Intelligence via Custom Action
+#### Advanced Option — Call Azure Document Intelligence via Custom OpenAPI Tool
 
-For production scenarios requiring the highest field-extraction accuracy (IRS prebuilt models, confidence scores per field, layout analysis), you can wire in Azure Document Intelligence as a custom function tool:
+For production scenarios requiring the highest field-extraction accuracy (IRS prebuilt models, confidence scores per field, layout analysis), you can wire in Azure Document Intelligence as a custom OpenAPI tool:
 
 1. In **Select a tool**, go to the **Custom** tab
 2. Click **+ New tool** and provide an OpenAPI spec pointing to your Azure Document Intelligence endpoint
@@ -174,7 +174,7 @@ The agent will now check extracted document data against the eligibility rules f
 
 ---
 
-## 🔧 Step 5 — Add Case Routing Action
+## 🔧 Step 5 — Add Case Routing OpenAPI Tool
 
 This step replaces the Python case routing plugin that assigned processed cases to staff queues.
 
@@ -186,15 +186,16 @@ Open [`openapi/case-routing-api.json`](./openapi/case-routing-api.json) to see t
 
 > Replace `api.exampleville.gov` in the `servers.url` field with your real case management system URL.
 
-### 5b. Upload the Action in Foundry
+### 5b. Add the OpenAPI Tool in Foundry
 
 1. Inside your agent, find the **Tools** tab
-2. Click **+ Add tool** → select **OpenAPI**
-3. Configure:
+2. Click **Add** → **Custom** → **OpenAPI tool**
+3. If your tenant shows the older dialog, select **OpenAPI** from **+ Add tool**
+4. Configure:
    - **Tool Name:** `CaseRoutingAPI`
    - **Definition:** Click **Upload file** → select `openapi/case-routing-api.json`
    - **Authentication:** Select **None (Anonymous)** for testing; use API Key or OAuth for production
-4. Click **Add**
+5. Click **Add**
 
 ---
 
@@ -231,7 +232,7 @@ Attach a sample W-2 PDF or image to the chat and ask:
 
 ---
 
-### ✅ Test Case Routing (Action)
+### ✅ Test Case Routing (OpenAPI Tool)
 
 **User:**
 > Route this case to the food assistance queue. Applicant is Maria Garcia, case ID CA-2024-001.
@@ -269,4 +270,4 @@ You now have:
 - **Connect to your case management system**: replace the mock URL in `case-routing-api.json`
 - **Add more document types**: gpt-4o can process any document type — add instructions in the system prompt for new document formats (e.g., Social Security award letters, birth certificates, lease agreements)
 - **Add PII masking**: instruct the agent in the system prompt to redact sensitive fields from responses
-- **Email intake**: connect an email Action (Microsoft Graph API) to let applicants email documents directly
+- **Email intake**: connect an email OpenAPI tool (Microsoft Graph API) to let applicants email documents directly

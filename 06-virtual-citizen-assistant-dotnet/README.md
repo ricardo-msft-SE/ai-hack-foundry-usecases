@@ -25,14 +25,14 @@ A resident visits the city portal and asks questions about permits, services, an
 |---|---|
 | [step_by_step.md](./step_by_step.md) | Full guide to recreating this agent in Foundry |
 | [system_prompt.txt](./system_prompt.txt) | Paste this into the agent's System Instructions field |
-| [openapi/permit-api.json](./openapi/permit-api.json) | Upload as an Action to enable permit status lookups |
+| [openapi/permit-api.json](./openapi/permit-api.json) | Upload as a custom OpenAPI tool to enable permit status lookups |
 | [knowledge/city-services.md](./knowledge/city-services.md) | Upload as a Knowledge file |
 
 ## Foundry Features Used
 
 - **Agent Service** — replaces the MVC controller + Semantic Kernel loop
 - **Knowledge** — replaces SearchClient + RAG pipeline
-- **Actions (OpenAPI)** — replaces .NET plugin methods
+- **Custom OpenAPI tools** — replaces .NET plugin methods
 - **Evaluation** — replaces custom logging/telemetry scripts
 
 ## Source

@@ -5,7 +5,7 @@ tagline: Replace ASP.NET Core and Semantic Kernel orchestration with direct Foun
 foundry_features:
   - Agent Service
   - Knowledge
-  - OpenAPI Actions
+  - Custom OpenAPI Tools
   - Evaluation
 ---
 
@@ -17,7 +17,7 @@ A migration playbook showing how a .NET web + plugin architecture can be deliver
 ## Foundry Build Focus
 - Translate controller and plugin responsibilities into agent instructions and tools.
 - Replace custom retrieval code with Knowledge uploads.
-- Attach permit operations through OpenAPI actions.
+- Attach permit operations through a custom OpenAPI tool.
 - Compare quality with the original behavior using evaluation sets.
 
 ## Repo Artifacts

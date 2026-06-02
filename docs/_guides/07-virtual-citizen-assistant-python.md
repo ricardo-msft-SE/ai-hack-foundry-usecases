@@ -5,7 +5,7 @@ tagline: Replace Flask and Semantic Kernel plugins with a Foundry-native appoint
 foundry_features:
   - Agent Service
   - Knowledge
-  - OpenAPI Actions
+  - Custom OpenAPI Tools
   - Evaluation
 ---
 

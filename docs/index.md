@@ -7,7 +7,7 @@ title: Foundry-First Accelerator Documentation
 <section class="hero">
   <p class="eyebrow">AI Hack Foundry Use Cases</p>
   <h1>Foundry-First Accelerators for Government</h1>
-  <p class="lede">This site turns the repository into a guided experience: each accelerator has a quick path from concept to execution, with direct links to prompts, OpenAPI action specs, and knowledge packs.</p>
+  <p class="lede">This site turns the repository into a guided experience: each accelerator has a quick path from concept to execution, with direct links to prompts, OpenAPI tool specs, and knowledge packs.</p>
 </section>
 
 <section class="metric-grid">

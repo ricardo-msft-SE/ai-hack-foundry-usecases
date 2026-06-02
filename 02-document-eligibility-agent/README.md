@@ -13,7 +13,7 @@ An AI agent that accepts uploaded documents (W-2s, pay stubs, utility bills, IDs
 | **Agent Service** | Flask API + Semantic Kernel conversation loop |
 | **Code Interpreter (gpt-4o vision)** | Azure Document Intelligence SDK code + OCR pipeline |
 | **Knowledge** | Custom eligibility rules engine + policy documents |
-| **Actions (OpenAPI)** | Python case routing plugin + staff assignment logic |
+| **Custom OpenAPI tools** | Python case routing plugin + staff assignment logic |
 
 ## Files
 
@@ -21,7 +21,7 @@ An AI agent that accepts uploaded documents (W-2s, pay stubs, utility bills, IDs
 |---|---|
 | [`step_by_step.md`](./step_by_step.md) | Complete click-by-click Foundry portal guide |
 | [`system_prompt.txt`](./system_prompt.txt) | System instructions for the document eligibility agent |
-| [`openapi/case-routing-api.json`](./openapi/case-routing-api.json) | OpenAPI spec to upload as an Action for case routing |
+| [`openapi/case-routing-api.json`](./openapi/case-routing-api.json) | OpenAPI spec to upload as a custom OpenAPI tool for case routing |
 | [`knowledge/eligibility-requirements.md`](./knowledge/eligibility-requirements.md) | Eligibility rules and program requirements document |
 
 ## Source

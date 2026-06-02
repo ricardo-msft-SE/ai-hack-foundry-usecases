@@ -10,8 +10,8 @@ Replace your Python + Semantic Kernel + Flask citizen assistant — including th
 |---|---|---|
 | `app.py` + Flask routes | Foundry agent endpoint | No web framework |
 | `kernel = Kernel()` setup | Built-in agent engine | No SDK install |
-| `kernel.add_plugin(DocumentRetrievalPlugin)` | Knowledge upload | No plugin code |
-| `kernel.add_plugin(SchedulingPlugin)` | OpenAPI Action upload | No function code |
+| `kernel.add_plugin(DocumentRetrievalPlugin)` | Foundry IQ knowledge base + agent connection | No plugin code |
+| `kernel.add_plugin(SchedulingPlugin)` | Custom OpenAPI tool upload | No function code |
 | `AzureAISearchVectorStore` configuration | Knowledge auto-RAG | No vector store setup |
 | `@kernel_function` decorators | OpenAPI `operationId` | No Python code |
 | `requirements.txt` + `pip install` | Nothing | No dependencies |
@@ -49,30 +49,33 @@ Replace your Python + Semantic Kernel + Flask citizen assistant — including th
 
 ---
 
-## 📚 Step 3 — Add Knowledge
+## 📚 Step 3 — Add Knowledge (New Foundry)
 
-1. In the agent editor, click **+ Add** under the **Knowledge** section
-2. Select **Upload files**
-3. Upload [`knowledge/city-services.md`](./knowledge/city-services.md)
-4. Set the index name: `city-services-python-index`
-5. Click **Create and save**
+1. In the project, open **Build** -> **Knowledge**
+2. Create a new knowledge base (or select an existing one)
+3. Add a file knowledge source and upload [`knowledge/city-services.md`](./knowledge/city-services.md)
+4. Save and wait for indexing to complete
+5. Open your agent and connect this knowledge base in the **Knowledge** area
+
+> **UI note (May 2026):** In some tenants, the agent still shows direct **Add knowledge -> Upload files**. That path still works, but connecting a Foundry IQ knowledge base is the preferred New Foundry flow.
 
 > **What this replaces:** `document_retrieval_plugin.py` used `@kernel_function` to query Azure AI Search with `SearchClient.search()`. Foundry handles chunking, embedding, indexing, and retrieval — no code needed.
 
 ---
 
-## 🔧 Step 4 — Add Scheduling Action
+## 🔧 Step 4 — Add Scheduling OpenAPI Tool
 
 Upload the OpenAPI spec to enable appointment availability checks and booking:
 
-1. In the agent editor, click **+ Add** under the **Actions** section
-2. Select **Upload OpenAPI file**
-3. Upload [`openapi/scheduling-api.json`](./openapi/scheduling-api.json)
-4. Review the imported operations:
+1. In the agent editor, open **Tools**
+2. Click **Add** -> **Custom** -> **OpenAPI tool**
+3. If your tenant shows the older dialog, select **OpenAPI** from **+ Add tool**
+4. Upload [`openapi/scheduling-api.json`](./openapi/scheduling-api.json)
+5. Review the imported operations:
    - `CheckAvailability` — check open appointment slots by service and date
    - `BookAppointment` — book a specific appointment slot
    - `CancelAppointment` — cancel an existing appointment
-5. Click **Save**
+6. Click **Save**
 
 > **What this replaces:** `scheduling_plugin.py` contained three `@kernel_function`-decorated methods for availability, booking, and cancellation. Each was a separate HTTP call wrapped in Python. The OpenAPI spec defines the same interface — Foundry calls the API automatically.
 
@@ -87,7 +90,7 @@ Upload the OpenAPI spec to enable appointment availability checks and booking:
 - "What do I need to bring to a benefits counseling appointment?"
 - "Can I walk in for a building inspection, or do I need to schedule?"
 
-**Scheduling flow (tests Action — multi-turn):**
+**Scheduling flow (tests OpenAPI tool — multi-turn):**
 - "I need to schedule a building inspection"
 - "Next Thursday works for me"
 - "Book the 10 AM slot" ← agent calls `BookAppointment`, returns confirmation number
@@ -135,7 +138,7 @@ Your Python + Semantic Kernel citizen assistant is now a Foundry agent — compl
 
 **Extend this agent:**
 - **Add reschedule support:** Add a `RescheduleAppointment` endpoint to the OpenAPI spec
-- **Add reminder notifications:** Connect to an email/SMS Action via OpenAPI
+- **Add reminder notifications:** Connect to an email/SMS OpenAPI tool
 - **Add more schedulable services:** Update `city-services.md` with new services and appointment requirements
 - **Connect with 01 or 06:** Route permit questions to a specialized permit agent while keeping scheduling here — wire them together using a **Foundry Workflow** (see accelerator 03 for the Workflow pattern)
 - **Deploy to Teams or web:** Publish this agent as a Teams app or embed via the Foundry-provided iframe snippet

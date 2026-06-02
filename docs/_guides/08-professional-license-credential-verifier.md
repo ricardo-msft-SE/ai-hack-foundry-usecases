@@ -6,7 +6,7 @@ foundry_features:
   - Agent Service
   - Code Interpreter
   - Knowledge
-  - OpenAPI Actions
+  - Custom OpenAPI Tools
   - Entra ID RBAC
 ---
 
@@ -18,7 +18,7 @@ A state licensing board agent that extracts credentials from submitted transcrip
 ## Foundry Build Focus
 - Use Code Interpreter (gpt-4o vision) to replace manual credential scanning across transcripts, exam scores, and background check documents.
 - Ground eligibility decisions on uploaded licensure requirements for each license type (MD, JD, RN, Contractors).
-- Auto-approve, escalate, or reject via OpenAPI action calls to the state licensing database.
+- Auto-approve, escalate, or reject via custom OpenAPI tool calls to the state licensing database.
 - Enforce staff access tiers with Entra ID RBAC (reviewers vs. final approvers).
 
 ## Repo Artifacts
