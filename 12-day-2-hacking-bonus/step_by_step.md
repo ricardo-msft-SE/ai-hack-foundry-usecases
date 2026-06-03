@@ -18,7 +18,7 @@ Keep the scope narrow enough to deliver a working demo in one day.
 ## Step 2 - Run strategic-priority research
 
 Use Microsoft Researcher and/or GHCP with:
-- prompts/agency-strategic-priorities-research.prompt.md
+- [prompts/agency-strategic-priorities-research.prompt.md](./prompts/agency-strategic-priorities-research.prompt.md)
 
 Collect public artifacts such as:
 - Strategic plans
@@ -35,7 +35,7 @@ Output:
 ## Step 3 - Generate accelerator use cases
 
 Use:
-- prompts/use-case-accelerator-ideation.prompt.md
+- [prompts/use-case-accelerator-ideation.prompt.md](./prompts/use-case-accelerator-ideation.prompt.md)
 
 Ask for:
 - 10 to 15 candidate use cases
@@ -62,7 +62,7 @@ Output:
 ## Step 5 - Create the Foundry agent with GHCP
 
 Use:
-- prompts/ghcp-create-foundry-agent.prompt.md
+- [prompts/ghcp-create-foundry-agent.prompt.md](./prompts/ghcp-create-foundry-agent.prompt.md)
 
 Output:
 - Agent definition and instruction set
@@ -72,7 +72,7 @@ Output:
 ## Step 6 - Provision Azure resources with GHCP
 
 Use:
-- prompts/ghcp-provision-azure-resources.prompt.md
+- [prompts/ghcp-provision-azure-resources.prompt.md](./prompts/ghcp-provision-azure-resources.prompt.md)
 
 Output:
 - Resource group and required services
@@ -82,7 +82,7 @@ Output:
 ## Step 7 - Deploy web experience
 
 Use:
-- prompts/ghcp-deploy-webapp.prompt.md
+- [prompts/ghcp-deploy-webapp.prompt.md](./prompts/ghcp-deploy-webapp.prompt.md)
 
 Output:
 - Working web app endpoint
@@ -92,7 +92,7 @@ Output:
 ## Step 8 - Evaluate and improve
 
 Use:
-- prompts/ghcp-test-and-evaluate.prompt.md
+- [prompts/ghcp-test-and-evaluate.prompt.md](./prompts/ghcp-test-and-evaluate.prompt.md)
 
 Output:
 - Test matrix and pass/fail summary
@@ -101,7 +101,7 @@ Output:
 ## Step 9 - Add guardrails and security checks
 
 Use:
-- prompts/ghcp-security-and-guardrails.prompt.md
+- [prompts/ghcp-security-and-guardrails.prompt.md](./prompts/ghcp-security-and-guardrails.prompt.md)
 
 Output:
 - Guardrail checklist
@@ -111,7 +111,7 @@ Output:
 ## Step 10 - Package docs and demo assets
 
 Use:
-- prompts/ghcp-docs-and-demo-assets.prompt.md
+- [prompts/ghcp-docs-and-demo-assets.prompt.md](./prompts/ghcp-docs-and-demo-assets.prompt.md)
 
 Output:
 - Architecture summary
