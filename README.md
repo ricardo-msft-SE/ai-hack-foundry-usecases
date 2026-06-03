@@ -43,12 +43,13 @@ The **Foundry-first approach** replaces all of that with native portal features:
 
 ---
 
-## Bonus Accelerators (Document Processing Focused)
+## Bonus Accelerators
 
 | # | Accelerator | Purpose | Key Foundry Features |
 |---|---|---|---|
 | 8 | [Professional License Credential Verifier](./08-professional-license-credential-verifier/) | Extract and auto-approve professional credentials for licensing boards | Agent + Code Interpreter + Knowledge + Action |
 | 9 | [Unemployment Claims Processor](./09-unemployment-claims-processor/) | Rapid UI and WC claims processing with automated benefit calculation | Agent + Code Interpreter + Knowledge + Action |
+| 12 | [Day 2 Hacking Bonus](./12-day-2-hacking-bonus/) | Use Microsoft Researcher and/or GitHub Copilot to identify agency priorities, generate high-impact accelerator use cases, and ship solutions during the hackathon | Microsoft Researcher + GitHub Copilot + Azure AI Foundry |
 
 ### Bonus Accelerators — Why These?
 
@@ -58,6 +59,8 @@ The Bonus Accelerators focus on **high-impact document processing** with **autom
 - **UI/WC agencies** face catastrophic claim volumes during recessions; manual processing takes 3–6 weeks per claim
 
 Both accelerators leverage **Code Interpreter + gpt-4o vision** (extract credentials, wages, medical data) + **Code Interpreter** Python execution (verify eligibility, calculate benefits) for **rapid auto-approval** (70–80% of cases within 24–48 hours).
+
+The Day 2 Hacking Bonus extends this into a build sprint workflow: participants research agency priorities using public information, translate those priorities into accelerator-grade use cases, then use GitHub Copilot in VS Code to create, provision, test, and deploy agentic solutions.
 
 ---
 

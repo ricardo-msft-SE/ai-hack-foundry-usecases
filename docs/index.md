@@ -12,11 +12,11 @@ title: Foundry-First Accelerator Documentation
 
 <section class="metric-grid">
   <div class="metric">
-    <strong>10</strong>
+    <strong>11</strong>
     Accelerator tracks
   </div>
   <div class="metric">
-    <strong>55+</strong>
+    <strong>65+</strong>
     Files mapped into docs
   </div>
   <div class="metric">
@@ -77,12 +77,32 @@ title: Foundry-First Accelerator Documentation
   </div>
 </section>
 
+<section id="day2-hacking-bonus" class="panel panel-bonus">
+  <h2>Day 2 Hacking Bonus</h2>
+  <p class="lede-small">A rapid day-two hackathon track focused on turning real agency strategy into build-ready agent solutions. Teams use Microsoft Researcher and/or GitHub Copilot to research strategic priorities, generate accelerator use cases, and ship with Azure AI Foundry.</p>
+  <div class="card-grid">
+    {% for guide in ordered_guides %}
+    {% if guide.order == 12 %}
+    <article class="card card-bonus">
+      <p class="meta">Day 2 Bonus</p>
+      <h3>{{ guide.title }}</h3>
+      <p>{{ guide.tagline }}</p>
+      <div class="card-actions">
+        <a href="{{ guide.url | relative_url }}">Open Guide</a>
+        <a href="https://forms.office.com/Pages/ResponsePage.aspx?id=v4j5cvGGr0GRqy180BHbR7105kWO-NdDrl7nzF5FI39UOE4zTDFFVUkzQ0dWM1dXWTcwTDlUQTM5US4u&origin=QRCode">Sign Me Up</a>
+      </div>
+    </article>
+    {% endif %}
+    {% endfor %}
+  </div>
+</section>
+
 <section id="hackathon-labs" class="panel panel-lab">
   <h2>Hackathon Labs</h2>
   <p class="lede-small">Hands-on skill-building labs designed for day one of the hackathon. Learn to use GitHub Copilot in VS Code to connect to Azure, explore the repo, deploy infrastructure, and build your Demo Day presentation.</p>
   <div class="card-grid">
     {% for guide in ordered_guides %}
-    {% if guide.order >= 11 %}
+    {% if guide.order >= 11 and guide.order != 12 %}
     <article class="card card-lab">
       <p class="meta">Lab</p>
       <h3>{{ guide.title }}</h3>
