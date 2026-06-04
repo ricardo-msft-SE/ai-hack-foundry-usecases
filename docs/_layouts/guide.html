@@ -3,6 +3,7 @@ layout: default
 ---
 <article class="guide-page">
   <header class="guide-hero">
+    {% if page.icon_file %}<img class="guide-icon" src="{{ page.icon_file | relative_url }}" alt="{{ page.icon_label }}" width="52" height="52" />{% endif %}
     <p class="eyebrow">Accelerator {{ page.order }}</p>
     <h1>{{ page.title }}</h1>
     <p class="lede">{{ page.tagline }}</p>

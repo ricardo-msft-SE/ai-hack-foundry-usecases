@@ -1,3 +1,5 @@
+<img src="../docs/assets/icons/11-github-copilot-lab.svg" width="52" height="52" alt="GitHub Copilot Hackathon Lab" />
+
 # GitHub Copilot Hackathon Lab
 
 > Turn VS Code + GitHub Copilot into your Azure CLI expert, repo navigator, infrastructure deployer, and slide deck generator — four self-contained labs for hackathon day one.

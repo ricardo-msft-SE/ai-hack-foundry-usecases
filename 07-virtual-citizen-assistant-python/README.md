@@ -1,3 +1,5 @@
+<img src="../docs/assets/icons/07-virtual-assistant-python.svg" width="52" height="52" alt="Virtual Citizen Assistant (Python)" />
+
 # 07 — Virtual Citizen Assistant (Python)
 
 Foundry-First recreation of the Python + Semantic Kernel + Flask citizen assistant — with scheduling.

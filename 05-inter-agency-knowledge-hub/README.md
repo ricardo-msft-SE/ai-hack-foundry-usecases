@@ -1,3 +1,5 @@
+<img src="../docs/assets/icons/05-inter-agency-knowledge.svg" width="52" height="52" alt="Inter-Agency Knowledge Hub" />
+
 # 05 — Inter-Agency Knowledge Hub (Foundry Edition)
 
 > Replace a custom Python cross-agency search system with a **zero-code** Azure AI Foundry agent using multiple Knowledge indexes and Entra ID role-based access control.

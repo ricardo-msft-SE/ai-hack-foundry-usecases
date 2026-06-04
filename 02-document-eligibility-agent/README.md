@@ -1,3 +1,5 @@
+<img src="../docs/assets/icons/02-document-eligibility.svg" width="52" height="52" alt="Document Eligibility Agent" />
+
 # 02 — Document Eligibility Agent (Foundry Edition)
 
 > Replace a custom Python Document Intelligence SDK + Semantic Kernel workflow with a **zero-code** Azure AI Foundry agent — using gpt-4o vision + Code Interpreter to process uploaded documents.

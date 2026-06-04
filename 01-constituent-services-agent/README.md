@@ -1,3 +1,5 @@
+<img src="../docs/assets/icons/01-constituent-services.svg" width="52" height="52" alt="Constituent Services Agent" />
+
 # 01 — Constituent Services Agent (Foundry Edition)
 
 > Replace a custom Python Flask + Semantic Kernel chatbot with a **zero-code** Azure AI Foundry agent.

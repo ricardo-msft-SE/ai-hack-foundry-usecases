@@ -1,3 +1,5 @@
+<img src="../docs/assets/icons/03-emergency-response.svg" width="52" height="52" alt="Emergency Response Agent" />
+
 # 03 — Emergency Response Agent (Foundry Edition)
 
 > Replace a custom Python multi-agent orchestration system with **three Azure AI Foundry agents wired together via a Foundry Workflow** — no orchestration code required.

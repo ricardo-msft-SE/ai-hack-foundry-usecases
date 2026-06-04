@@ -1,3 +1,5 @@
+<img src="../docs/assets/icons/06-virtual-assistant-dotnet.svg" width="52" height="52" alt="Virtual Citizen Assistant (.NET)" />
+
 # 06 — Virtual Citizen Assistant (.NET)
 
 Foundry-First recreation of the .NET 9 + ASP.NET Core MVC + Semantic Kernel citizen assistant.

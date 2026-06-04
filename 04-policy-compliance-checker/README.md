@@ -1,3 +1,5 @@
+<img src="../docs/assets/icons/04-policy-compliance.svg" width="52" height="52" alt="Policy Compliance Checker" />
+
 # 04 — Policy Compliance Checker (Foundry Edition)
 
 > Replace a custom Python rule engine + document parser with a **zero-code** Azure AI Foundry agent using the built-in Code Interpreter tool.

@@ -1,3 +1,5 @@
+<img src="../docs/assets/icons/12-day2-hacking-bonus.svg" width="52" height="52" alt="Day 2 Hacking Bonus" />
+
 # 12 - Day 2 Hacking Bonus (Foundry Edition)
 
 Turn agency strategy into build-ready accelerator labs in a single hackathon day.

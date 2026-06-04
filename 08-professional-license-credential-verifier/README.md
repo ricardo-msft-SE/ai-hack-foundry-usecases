@@ -1,3 +1,5 @@
+<img src="../docs/assets/icons/08-credential-verifier.svg" width="52" height="52" alt="Professional License Credential Verifier" />
+
 # Professional License Credential Verifier
 
 ## Scenario

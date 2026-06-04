@@ -164,6 +164,15 @@ main {
   margin-bottom: 0.55rem;
 }
 
+.guide-icon {
+  display: block;
+  width: 3.2rem;
+  height: 3.2rem;
+  border-radius: 50%;
+  margin-bottom: 0.9rem;
+  box-shadow: 0 4px 14px rgba(45, 90, 150, 0.18);
+}
+
 .card-bonus .card-icon {
   background: rgba(255, 243, 220, 0.95);
   border-color: rgba(217, 123, 0, 0.3);

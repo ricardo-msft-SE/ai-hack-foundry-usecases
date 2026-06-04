@@ -1,3 +1,5 @@
+<img src="../docs/assets/icons/09-claims-processor.svg" width="52" height="52" alt="Unemployment Claims Processor" />
+
 # Unemployment Claims Processor
 
 ## Scenario
