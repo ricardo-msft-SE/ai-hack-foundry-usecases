@@ -1,6 +1,8 @@
 ---
 title: Emergency Response Agent
 order: 3
+icon_file: /assets/icons/03-emergency-response.svg
+icon_label: Emergency response
 tagline: Multi-agent emergency coordination across weather signals and resource readiness.
 foundry_features:
   - Agent Service

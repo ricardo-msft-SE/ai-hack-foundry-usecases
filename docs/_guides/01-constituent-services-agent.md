@@ -1,6 +1,8 @@
 ---
 title: Constituent Services Agent
 order: 1
+icon_file: /assets/icons/01-constituent-services.svg
+icon_label: Government services
 tagline: Citizen service assistant for benefits, permits, schedules, and civic FAQs.
 foundry_features:
   - Agent Service

@@ -1,6 +1,8 @@
 ---
 title: Professional License Credential Verifier
 order: 8
+icon_file: /assets/icons/08-credential-verifier.svg
+icon_label: Credential verification
 tagline: Automated credential extraction and validation for state licensing boards.
 foundry_features:
   - Agent Service

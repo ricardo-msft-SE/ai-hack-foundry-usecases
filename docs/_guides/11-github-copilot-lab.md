@@ -1,6 +1,8 @@
 ---
 title: GitHub Copilot Hackathon Lab
 order: 11
+icon_file: /assets/icons/11-github-copilot-lab.svg
+icon_label: GitHub Copilot lab
 tagline: Four hands-on labs that teach VS Code + GitHub Copilot as your Azure expert, repo navigator, and demo day presenter.
 foundry_features:
   - GitHub Copilot

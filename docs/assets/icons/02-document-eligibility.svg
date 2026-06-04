@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40">
+  <circle cx="20" cy="20" r="20" fill="#1565c0"/>
+  <!-- document with folded corner -->
+  <path d="M12,8 L26,8 L30,13 L30,32 L12,32 Z" fill="none" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+  <polyline points="26,8 26,13 30,13" fill="none" stroke="white" stroke-width="2"/>
+  <!-- checkmark -->
+  <polyline points="16,21 19,25 26,16" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

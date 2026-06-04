@@ -156,6 +156,24 @@ main {
   color: var(--accent);
 }
 
+.card-icon {
+  display: block;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 50%;
+  margin-bottom: 0.55rem;
+}
+
+.card-bonus .card-icon {
+  background: rgba(255, 243, 220, 0.95);
+  border-color: rgba(217, 123, 0, 0.3);
+}
+
+.card-lab .card-icon {
+  background: rgba(230, 250, 245, 0.95);
+  border-color: rgba(14, 159, 144, 0.3);
+}
+
 .card h3 {
   margin-top: 0;
   margin-bottom: 0.45rem;

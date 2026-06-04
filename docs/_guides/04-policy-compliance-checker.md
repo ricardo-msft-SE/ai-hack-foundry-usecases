@@ -1,6 +1,8 @@
 ---
 title: Policy Compliance Checker
 order: 4
+icon_file: /assets/icons/04-policy-compliance.svg
+icon_label: Policy compliance
 tagline: Structured compliance scoring and remediation planning for public-sector AI solutions.
 foundry_features:
   - Agent Service

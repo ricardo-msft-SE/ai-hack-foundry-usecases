@@ -44,6 +44,7 @@ title: Foundry-First Accelerator Documentation
     {% for guide in ordered_guides %}
     {% if guide.order <= 7 %}
     <article class="card">
+      {% if guide.icon_file %}<img class="card-icon" src="{{ guide.icon_file | relative_url }}" alt="{{ guide.icon_label }}" width="40" height="40" />{% endif %}
       <p class="meta">Accelerator {{ guide.order }}</p>
       <h3>{{ guide.title }}</h3>
       <p>{{ guide.tagline }}</p>
@@ -64,6 +65,7 @@ title: Foundry-First Accelerator Documentation
     {% for guide in ordered_guides %}
     {% if guide.order >= 8 and guide.order <= 9 %}
     <article class="card card-bonus">
+      {% if guide.icon_file %}<img class="card-icon" src="{{ guide.icon_file | relative_url }}" alt="{{ guide.icon_label }}" width="40" height="40" />{% endif %}
       <p class="meta">Bonus Accelerator {{ guide.order }}</p>
       <h3>{{ guide.title }}</h3>
       <p>{{ guide.tagline }}</p>
@@ -84,6 +86,7 @@ title: Foundry-First Accelerator Documentation
     {% for guide in ordered_guides %}
     {% if guide.order == 12 %}
     <article class="card card-bonus">
+      {% if guide.icon_file %}<img class="card-icon" src="{{ guide.icon_file | relative_url }}" alt="{{ guide.icon_label }}" width="40" height="40" />{% endif %}
       <p class="meta">Day 2 Bonus</p>
       <h3>{{ guide.title }}</h3>
       <p>{{ guide.tagline }}</p>
@@ -104,6 +107,7 @@ title: Foundry-First Accelerator Documentation
     {% for guide in ordered_guides %}
     {% if guide.order >= 11 and guide.order != 12 %}
     <article class="card card-lab">
+      {% if guide.icon_file %}<img class="card-icon" src="{{ guide.icon_file | relative_url }}" alt="{{ guide.icon_label }}" width="40" height="40" />{% endif %}
       <p class="meta">Lab</p>
       <h3>{{ guide.title }}</h3>
       <p>{{ guide.tagline }}</p>

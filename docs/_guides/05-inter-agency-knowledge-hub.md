@@ -1,6 +1,8 @@
 ---
 title: Inter-Agency Knowledge Hub
 order: 5
+icon_file: /assets/icons/05-inter-agency-knowledge.svg
+icon_label: Inter-agency knowledge
 tagline: Federated cross-department retrieval with RBAC-aware information boundaries.
 foundry_features:
   - Agent Service

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40">
+  <circle cx="20" cy="20" r="20" fill="#6a1b9a"/>
+  <!-- connecting lines (draw before nodes so nodes appear on top) -->
+  <line x1="20" y1="14" x2="13" y2="26" stroke="white" stroke-width="1.8"/>
+  <line x1="20" y1="14" x2="27" y2="26" stroke="white" stroke-width="1.8"/>
+  <line x1="13" y1="26" x2="27" y2="26" stroke="white" stroke-width="1.8"/>
+  <!-- three nodes -->
+  <circle cx="20" cy="13" r="3.5" fill="white"/>
+  <circle cx="12" cy="27" r="3.5" fill="white"/>
+  <circle cx="28" cy="27" r="3.5" fill="white"/>
+</svg>

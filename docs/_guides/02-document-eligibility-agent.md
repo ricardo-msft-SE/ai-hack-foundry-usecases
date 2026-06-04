@@ -1,6 +1,8 @@
 ---
 title: Document Eligibility Agent
 order: 2
+icon_file: /assets/icons/02-document-eligibility.svg
+icon_label: Document processing
 tagline: Document intake, extraction, and program eligibility triage without custom OCR code.
 foundry_features:
   - Agent Service

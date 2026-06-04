@@ -1,6 +1,8 @@
 ---
 title: Unemployment Claims Processor
 order: 9
+icon_file: /assets/icons/09-claims-processor.svg
+icon_label: Claims processing
 tagline: Rapid UI and workers' compensation claims processing with Code Interpreter and gpt-4o vision.
 foundry_features:
   - Agent Service

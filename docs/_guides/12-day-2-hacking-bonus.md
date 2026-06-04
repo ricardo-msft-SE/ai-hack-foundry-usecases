@@ -1,6 +1,8 @@
 ---
 title: Day 2 Hacking Bonus
 order: 12
+icon_file: /assets/icons/12-day2-hacking-bonus.svg
+icon_label: Day 2 hacking bonus
 tagline: Research agency priorities with Microsoft Researcher and/or GitHub Copilot, then convert them into build-ready Foundry accelerator solutions.
 foundry_features:
   - Microsoft Researcher
