@@ -50,7 +50,6 @@ title: Foundry-First Accelerator Documentation
       <p>{{ guide.tagline }}</p>
       <div class="card-actions">
         <a href="{{ guide.url | relative_url }}">Open Guide</a>
-        <a href="https://forms.office.com/Pages/ResponsePage.aspx?id=v4j5cvGGr0GRqy180BHbR7105kWO-NdDrl7nzF5FI39UOE4zTDFFVUkzQ0dWM1dXWTcwTDlUQTM5US4u&origin=QRCode">Sign Me Up</a>
       </div>
     </article>
     {% endif %}
@@ -71,7 +70,6 @@ title: Foundry-First Accelerator Documentation
       <p>{{ guide.tagline }}</p>
       <div class="card-actions">
         <a href="{{ guide.url | relative_url }}">Open Guide</a>
-        <a href="https://forms.office.com/Pages/ResponsePage.aspx?id=v4j5cvGGr0GRqy180BHbR7105kWO-NdDrl7nzF5FI39UOE4zTDFFVUkzQ0dWM1dXWTcwTDlUQTM5US4u&origin=QRCode">Sign Me Up</a>
       </div>
     </article>
     {% endif %}
@@ -92,7 +90,6 @@ title: Foundry-First Accelerator Documentation
       <p>{{ guide.tagline }}</p>
       <div class="card-actions">
         <a href="{{ guide.url | relative_url }}">Open Guide</a>
-        <a href="https://forms.office.com/Pages/ResponsePage.aspx?id=v4j5cvGGr0GRqy180BHbR7105kWO-NdDrl7nzF5FI39UOE4zTDFFVUkzQ0dWM1dXWTcwTDlUQTM5US4u&origin=QRCode">Sign Me Up</a>
       </div>
     </article>
     {% endif %}
